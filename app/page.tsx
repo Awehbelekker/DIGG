@@ -4,7 +4,7 @@ import Link from 'next/link'
 
 export default function HomePage() {
   return (
-    <div>
+    <div className="min-h-screen">
       <Hero />
       
       {/* Problem/Solution Strip */}
