@@ -6,9 +6,22 @@ export async function middleware(request: NextRequest) {
     request,
   })
 
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
+  const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+
+  // If environment variables are missing, skip Supabase auth check
+  // This allows the site to work even if env vars aren't set (though admin won't work)
+  if (!supabaseUrl || !supabaseAnonKey) {
+    // Only protect admin routes if we have Supabase configured
+    if (request.nextUrl.pathname.startsWith('/admin') && request.nextUrl.pathname !== '/admin/login') {
+      return NextResponse.redirect(new URL('/admin/login', request.url))
+    }
+    return supabaseResponse
+  }
+
   const supabase = createServerClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    supabaseUrl,
+    supabaseAnonKey,
     {
       cookies: {
         getAll() {
