@@ -1,0 +1,14 @@
+// Backup of original page.tsx - minimal version for testing
+export default function HomePage() {
+  return (
+    <div className="min-h-screen flex items-center justify-center bg-gray-50">
+      <div className="text-center">
+        <h1 className="text-4xl font-bold text-[#1B2A6B] mb-4">DIGG Architecture</h1>
+        <p className="text-gray-600">Cape Town Architecture Practice</p>
+        <p className="text-sm text-gray-500 mt-4">
+          If you see this, the site is working!
+        </p>
+      </div>
+    </div>
+  )
+}
