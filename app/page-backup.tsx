@@ -1,10 +1,11 @@
+// Backup of original page.tsx
 import Hero from '@/components/public/Hero'
 import StatsBar from '@/components/public/StatsBar'
 import Link from 'next/link'
 
 export default function HomePage() {
   return (
-    <div>
+    <>
       <Hero />
       
       {/* Problem/Solution Strip */}
@@ -90,6 +91,6 @@ export default function HomePage() {
           </Link>
         </div>
       </section>
-    </div>
+    </>
   )
 }
