@@ -42,15 +42,17 @@ export default function ContactForm() {
 
   if (submitted) {
     return (
-      <div className="bg-green-50 border border-green-200 rounded-lg p-6 text-center">
-        <p className="text-green-800 font-semibold">Thank you for your message! We'll get back to you soon.</p>
+      <div className="max-w-2xl mx-auto bg-green-50 border border-green-200 rounded-2xl p-8 text-center">
+        <p className="text-green-800 font-semibold text-lg">Thank you for your message! We'll get back to you soon.</p>
       </div>
     )
   }
 
+  const inputClass = "w-full px-4 py-2.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#F7941D] focus:border-transparent focus:outline-none transition-shadow"
+
   return (
-    <form onSubmit={handleSubmit} className="max-w-2xl mx-auto bg-white p-8 rounded-lg shadow-md">
-      <h2 className="text-2xl font-bold text-[#1B2A6B] text-center mb-8">Get in Touch</h2>
+    <form onSubmit={handleSubmit} className="max-w-2xl mx-auto bg-white p-8 lg:p-10 rounded-2xl shadow-sm border border-gray-100">
+      <h2 className="text-2xl font-bold text-[#1B2A6B] text-center mb-8 tracking-tight">Get in Touch</h2>
       
       <div className="mb-6">
         <label htmlFor="name" className="block text-sm font-medium text-[#1B2A6B] mb-2">
@@ -62,7 +64,7 @@ export default function ContactForm() {
           required
           value={formData.name}
           onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-          className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-[#F7941D] focus:border-transparent"
+          className={inputClass}
         />
       </div>
 
@@ -76,7 +78,7 @@ export default function ContactForm() {
           required
           value={formData.phone}
           onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-          className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-[#F7941D] focus:border-transparent"
+          className={inputClass}
         />
       </div>
 
@@ -90,7 +92,7 @@ export default function ContactForm() {
           required
           value={formData.email}
           onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-          className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-[#F7941D] focus:border-transparent"
+          className={inputClass}
         />
       </div>
 
@@ -103,7 +105,7 @@ export default function ContactForm() {
           required
           value={formData.type}
           onChange={(e) => setFormData({ ...formData, type: e.target.value })}
-          className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-[#F7941D] focus:border-transparent"
+          className={inputClass}
         >
           <option value="">Please select</option>
           <option value="property-owner">Property owner</option>
@@ -113,7 +115,7 @@ export default function ContactForm() {
         </select>
       </div>
 
-      <div className="mb-6">
+      <div className="mb-8">
         <label htmlFor="message" className="block text-sm font-medium text-[#1B2A6B] mb-2">
           Tell us about your property or project
         </label>
@@ -122,14 +124,14 @@ export default function ContactForm() {
           rows={5}
           value={formData.message}
           onChange={(e) => setFormData({ ...formData, message: e.target.value })}
-          className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-[#F7941D] focus:border-transparent"
+          className={inputClass}
         />
       </div>
 
       <button
         type="submit"
         disabled={loading}
-        className="w-full bg-[#F7941D] text-white px-8 py-3 rounded font-semibold hover:bg-[#e6850a] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+        className="w-full bg-[#F7941D] text-white px-8 py-3.5 rounded-xl font-semibold hover:bg-[#e6850a] hover:shadow-md transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed focus:outline-none focus-visible:ring-2 focus-visible:ring-[#F7941D] focus-visible:ring-offset-2"
       >
         {loading ? 'Sending...' : 'Start the Conversation'}
       </button>

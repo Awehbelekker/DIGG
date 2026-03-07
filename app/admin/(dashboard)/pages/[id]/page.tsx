@@ -1,6 +1,7 @@
 import { createClient } from '@/lib/supabase/server'
 import { notFound } from 'next/navigation'
 import PageEditor from '@/components/admin/PageEditor'
+import AdminPageHeading from '@/components/admin/AdminPageHeading'
 
 export default async function EditPagePage({ params }: { params: { id: string } }) {
   const supabase = await createClient()
@@ -16,7 +17,7 @@ export default async function EditPagePage({ params }: { params: { id: string } 
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-      <h1 className="text-3xl font-bold text-[#1B2A6B] mb-8">Edit Page</h1>
+      <AdminPageHeading className="mb-8">Edit Page</AdminPageHeading>
       <PageEditor page={page as any} />
     </div>
   )

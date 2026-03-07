@@ -1,4 +1,7 @@
+import Link from 'next/link'
 import { createClient } from '@/lib/supabase/server'
+import AdminPageHeading from '@/components/admin/AdminPageHeading'
+import FormExportButton from '@/components/admin/FormExportButton'
 
 export default async function AdminFormsPage() {
   const supabase = await createClient()
@@ -9,7 +12,10 @@ export default async function AdminFormsPage() {
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-      <h1 className="text-3xl font-bold text-[#1B2A6B] mb-8">Form Submissions</h1>
+      <div className="flex flex-wrap items-center justify-between gap-4 mb-8">
+        <AdminPageHeading subtitle="Contact and agent registration submissions.">Form Submissions</AdminPageHeading>
+        <FormExportButton />
+      </div>
 
       {submissions && submissions.length > 0 ? (
         <div className="bg-white rounded-lg shadow-md overflow-hidden">
@@ -19,9 +25,12 @@ export default async function AdminFormsPage() {
                 <div className="flex justify-between items-start mb-4">
                   <div>
                     <div className="flex items-center space-x-3">
-                      <h3 className="text-lg font-semibold text-[#1B2A6B]">
+                      <Link
+                        href={`/admin/forms/${submission.id}`}
+                        className="text-lg font-semibold text-[#1B2A6B] hover:text-[#F7941D] transition-colors"
+                      >
                         {submission.data.name || 'Unknown'}
-                      </h3>
+                      </Link>
                       <span className={`px-3 py-1 rounded-full text-xs font-semibold ${
                         submission.form_type === 'contact'
                           ? 'bg-[#5BC8E8] text-[#1B2A6B]'
@@ -34,6 +43,12 @@ export default async function AdminFormsPage() {
                       {new Date(submission.created_at).toLocaleString()}
                     </p>
                   </div>
+                  <Link
+                    href={`/admin/forms/${submission.id}`}
+                    className="px-3 py-1.5 text-sm font-medium text-[#F7941D] hover:bg-[#F7941D]/10 rounded-lg transition-colors"
+                  >
+                    View
+                  </Link>
                 </div>
                 <div className="mt-4 space-y-2">
                   {Object.entries(submission.data).map(([key, value]: [string, any]) => (

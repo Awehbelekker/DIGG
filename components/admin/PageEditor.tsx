@@ -1,9 +1,10 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import { Page } from '@/lib/types/database'
+import PageBuilder from '@/components/admin/PageBuilder'
 
 interface PageEditorProps {
   page?: Page
@@ -129,26 +130,28 @@ export default function PageEditor({ page }: PageEditorProps) {
 
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-2">
-            Content (JSON)
+            Page content
           </label>
-          <textarea
-            value={JSON.stringify(formData.content, null, 2)}
-            onChange={(e) => {
-              try {
-                setFormData({ ...formData, content: JSON.parse(e.target.value) })
-              } catch (err) {
-                // Invalid JSON, don't update
-              }
-            }}
-            rows={20}
-            className="w-full px-4 py-2 border border-gray-300 rounded-md font-mono text-sm focus:ring-2 focus:ring-[#F7941D] focus:border-transparent"
-          />
-          <p className="mt-1 text-sm text-gray-500">
-            Page content as JSON. Structure: {"{"} "sections": [] {"}"}
+          <p className="mb-3 text-sm text-gray-500">
+            Add sections and edit them below. Reorder with the arrows; use Edit to change content.
           </p>
+          <PageBuilder
+            sections={formData.content.sections}
+            onChange={(sections) => setFormData({ ...formData, content: { sections } })}
+          />
         </div>
 
-        <div className="flex justify-end space-x-4">
+        <div className="flex justify-end gap-3 flex-wrap">
+          {formData.slug && (
+            <a
+              href={`/${formData.slug}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="px-6 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50"
+            >
+              Preview
+            </a>
+          )}
           <button
             type="button"
             onClick={() => router.back()}

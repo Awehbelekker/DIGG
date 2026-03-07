@@ -1,5 +1,6 @@
 import { createClient } from '@/lib/supabase/server'
 import Link from 'next/link'
+import AdminPageHeading from '@/components/admin/AdminPageHeading'
 
 export default async function AdminDashboard() {
   const supabase = await createClient()
@@ -26,7 +27,25 @@ export default async function AdminDashboard() {
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-      <h1 className="text-3xl font-bold text-[#1B2A6B] mb-8">Dashboard</h1>
+      <AdminPageHeading className="mb-8">Dashboard</AdminPageHeading>
+
+      {/* Quick links */}
+      <div className="mb-8 flex flex-wrap gap-3">
+        <Link
+          href="/admin/settings"
+          className="inline-flex items-center px-4 py-2 rounded-xl bg-[#1B2A6B] text-white text-sm font-medium hover:bg-[#2a3d8a] transition-colors"
+        >
+          Hero & Selected Work
+        </Link>
+        <a
+          href="/"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="inline-flex items-center px-4 py-2 rounded-xl border border-gray-300 bg-white text-gray-700 text-sm font-medium hover:bg-gray-50 transition-colors"
+        >
+          View site →
+        </a>
+      </div>
 
       {/* Stats Grid */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
@@ -34,17 +53,17 @@ export default async function AdminDashboard() {
           <Link
             key={stat.label}
             href={stat.href}
-            className="bg-white p-6 rounded-lg shadow-md hover:shadow-lg transition-shadow"
+            className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 hover:shadow-md hover:border-gray-200 transition-all"
           >
-            <h3 className="text-lg font-semibold text-gray-600 mb-2">{stat.label}</h3>
+            <h3 className="text-lg font-semibold text-gray-600 mb-2" style={{ fontFamily: 'var(--font-heading)' }}>{stat.label}</h3>
             <p className="text-4xl font-bold text-[#F7941D]">{stat.count}</p>
           </Link>
         ))}
       </div>
 
       {/* Recent Form Submissions */}
-      <div className="bg-white rounded-lg shadow-md p-6">
-        <h2 className="text-2xl font-bold text-[#1B2A6B] mb-4">Recent Form Submissions</h2>
+      <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
+        <AdminPageHeading as="h2" className="mb-4">Recent Form Submissions</AdminPageHeading>
         {recentSubmissions && recentSubmissions.length > 0 ? (
           <div className="space-y-4">
             {recentSubmissions.map((submission: any) => (

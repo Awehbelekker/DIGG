@@ -1,5 +1,15 @@
 @import "tailwindcss";
 
+/* Lazy Fox – add your font files to public/fonts/ (see public/fonts/README.txt) */
+@font-face {
+  font-family: 'Lazy Fox';
+  src: url('/fonts/LazyFox.woff2') format('woff2'),
+       url('/fonts/LazyFox.woff') format('woff');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
 :root {
   --color-orange: #F7941D;
   --color-navy: #1B2A6B;
@@ -8,6 +18,8 @@
   --color-off-white: #FAFAFA;
   --color-text: #333333;
   --color-text-light: #666666;
+  /* --font-heading and --font-body are set by layout (Playfair Display, DM Sans) */
+  --font-sans: var(--font-body);
 }
 
 @theme inline {
@@ -18,6 +30,7 @@
   --color-off-white: #FAFAFA;
   --color-text: #333333;
   --color-text-light: #666666;
+  --font-sans: var(--font-body);
 }
 
 * {
@@ -28,8 +41,14 @@ html {
   scroll-behavior: smooth;
 }
 
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+}
+
 body {
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  font-family: var(--font-body);
   line-height: 1.6;
   color: var(--color-text);
   background-color: var(--color-off-white);
@@ -37,4 +56,25 @@ body {
   -moz-osx-font-smoothing: grayscale;
   margin: 0;
   padding: 0;
+}
+
+/* Headings: serif for authority and elegance (architecture-industry standard) */
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-heading);
+  font-weight: 600;
+  letter-spacing: -0.02em;
+}
+
+/* Focus ring for accessibility (keyboard/screen readers) */
+:focus-visible {
+  outline: 2px solid var(--color-orange);
+  outline-offset: 2px;
+}
+
+/* Scroll-reveal: respect reduced motion (no fade/slide for these users) */
+@media (prefers-reduced-motion: reduce) {
+  .reveal-section {
+    opacity: 1;
+    transform: none;
+  }
 }

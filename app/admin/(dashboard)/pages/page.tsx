@@ -1,5 +1,7 @@
 import { createClient } from '@/lib/supabase/server'
 import Link from 'next/link'
+import AdminPageHeading from '@/components/admin/AdminPageHeading'
+import PageRowActions from '@/components/admin/PageRowActions'
 
 export default async function AdminPagesPage() {
   const supabase = await createClient()
@@ -11,7 +13,7 @@ export default async function AdminPagesPage() {
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
       <div className="flex justify-between items-center mb-8">
-        <h1 className="text-3xl font-bold text-[#1B2A6B]">Pages</h1>
+        <AdminPageHeading>Pages</AdminPageHeading>
         <Link
           href="/admin/pages/new"
           className="bg-[#F7941D] text-white px-6 py-2 rounded font-semibold hover:bg-[#e6850a] transition-colors"
@@ -63,14 +65,7 @@ export default async function AdminPagesPage() {
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                     {new Date(page.updated_at).toLocaleDateString()}
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                    <Link
-                      href={`/admin/pages/${page.id}`}
-                      className="text-[#F7941D] hover:text-[#e6850a] mr-4"
-                    >
-                      Edit
-                    </Link>
-                  </td>
+                  <PageRowActions page={{ id: page.id, title: page.title, slug: page.slug }} />
                 </tr>
               ))}
             </tbody>

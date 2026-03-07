@@ -27,18 +27,18 @@ export default function AdminNav() {
   ]
 
   return (
-    <nav className="bg-[#1B2A6B] text-white">
+    <nav className="bg-[#1B2A6B] text-white border-b border-white/10">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between items-center h-16">
-          <div className="flex space-x-8">
+        <div className="flex justify-between items-center h-14">
+          <div className="flex flex-wrap items-center gap-1">
             {navItems.map((item) => (
               <Link
                 key={item.href}
                 href={item.href}
-                className={`px-3 py-2 rounded-md text-sm font-medium transition-colors ${
+                className={`px-4 py-2 rounded-xl text-sm font-medium transition-colors ${
                   pathname === item.href
                     ? 'bg-[#F7941D] text-white'
-                    : 'text-gray-300 hover:bg-[#2a3d8a] hover:text-white'
+                    : 'text-gray-300 hover:bg-white/10 hover:text-white'
                 }`}
               >
                 {item.label}
@@ -48,9 +48,9 @@ export default function AdminNav() {
           <button
             onClick={handleLogout}
             disabled={loading}
-            className="px-4 py-2 bg-red-600 hover:bg-red-700 rounded-md text-sm font-medium transition-colors disabled:opacity-50"
+            className="px-4 py-2 bg-white/10 hover:bg-red-600 rounded-xl text-sm font-medium transition-colors disabled:opacity-50"
           >
-            {loading ? 'Logging out...' : 'Logout'}
+            {loading ? 'Logging out…' : 'Logout'}
           </button>
         </div>
       </div>

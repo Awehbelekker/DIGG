@@ -39,21 +39,21 @@ export default function GivePage() {
       <Hero title="Because Architecture Should Serve More Than One Client." />
 
       {/* Opening Section */}
-      <section className="py-12">
+      <section className="py-16 lg:py-20">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-          <p className="text-xl mb-8">The 'G' in DIGG is the one we're most proud of.</p>
-          <p>
+          <p className="text-xl mb-8 leading-relaxed">The 'G' in DIGG is the one we're most proud of.</p>
+          <p className="leading-relaxed">
             Building a successful practice is not enough on its own. From the beginning, DIGG has been committed to giving back — to the profession, to the community, and to the city we call home. These are not marketing initiatives. They are part of who we are as a team.
           </p>
         </div>
       </section>
 
       {/* Initiatives */}
-      {initiatives.map((initiative, index) => (
-        <section key={index} className={`${initiative.bgColor} py-12`}>
+      {initiatives.map((initiative) => (
+        <section key={initiative.title} className={`${initiative.bgColor} py-16 lg:py-20`}>
           <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="bg-white p-8 rounded-lg shadow-md">
-              <h2 className="text-3xl font-bold text-[#1B2A6B] mb-4">{initiative.title}</h2>
+            <div className="bg-white p-8 lg:p-10 rounded-2xl shadow-sm border border-gray-100">
+              <h2 className="text-3xl font-bold text-[#1B2A6B] mb-4 tracking-tight">{initiative.title}</h2>
               <h3 className="text-2xl font-semibold mb-6 text-[#F7941D]">{initiative.subtitle}</h3>
               <p className="mb-4 leading-relaxed">{initiative.description}</p>
               {initiative.note && (

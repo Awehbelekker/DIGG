@@ -15,11 +15,11 @@ export default function AboutPage() {
       />
 
       {/* Opening Section */}
-      <section className="py-12">
+      <section className="py-16 lg:py-20">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-          <p className="text-xl font-medium mb-8">Most architects will tell you how to make your property look better.</p>
-          <p className="text-xl font-medium mb-8 text-[#F7941D]">The DIGG team will show you how to make it pay.</p>
-          <p className="mb-4">
+          <p className="text-xl font-medium mb-8 leading-relaxed">Most architects will tell you how to make your property look better.</p>
+          <p className="text-xl font-medium mb-8 text-[#F7941D] leading-relaxed">The DIGG team will show you how to make it pay.</p>
+          <p className="mb-4 leading-relaxed">
             We built DIGG around a frustration we kept seeing in the Cape Town property market: owners sitting on untapped potential with no trusted, practical guide to unlock it. Too many architects design for design's sake. Too many developers overpromise. Too many homeowners leave value on the table.
           </p>
           <p className="font-semibold">We built DIGG to be different.</p>
@@ -27,9 +27,9 @@ export default function AboutPage() {
       </section>
 
       {/* Judy's Story */}
-      <section className="bg-white py-12">
+      <section className="bg-white py-16 lg:py-20">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-          <h2 className="text-3xl font-bold text-[#1B2A6B] mb-4">Judy's Story — The Principal</h2>
+          <h2 className="text-3xl font-bold text-[#1B2A6B] mb-4 tracking-tight">Judy's Story — The Principal</h2>
           <h3 className="text-2xl font-semibold mb-8 text-[#F7941D]">Twelve years. Every scale. Every sector.</h3>
           <p className="mb-4">
             DIGG is led by Judy Downing — a SACAP-registered architect (PAT44740093) who holds a BSc Architecture (Hons) from the University of Pretoria and has spent over a decade working at the highest levels of the profession.
@@ -44,9 +44,9 @@ export default function AboutPage() {
       </section>
 
       {/* Investor Angle */}
-      <section className="py-12">
+      <section className="py-16 lg:py-20">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-          <h2 className="text-3xl font-bold text-[#1B2A6B] mb-4">The Investor Angle</h2>
+          <h2 className="text-3xl font-bold text-[#1B2A6B] mb-4 tracking-tight">The Investor Angle</h2>
           <h3 className="text-2xl font-semibold mb-8 text-[#F7941D]">We don't just design properties. We own them.</h3>
           <p className="mb-4">
             Since 2016, Judy has been an active short-term rental investor in the Cape Town market. Our team understands the Airbnb platform not from a textbook but from a real P&L. We know what guests respond to, what design decisions drive occupancy, and what property investors actually need from an architect — because we are investors too.
@@ -58,9 +58,9 @@ export default function AboutPage() {
       </section>
 
       {/* DIGG Philosophy */}
-      <section className="bg-white py-12">
+      <section className="bg-white py-16 lg:py-20">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-          <h2 className="text-3xl font-bold text-[#1B2A6B] mb-4">The DIGG Philosophy</h2>
+          <h2 className="text-3xl font-bold text-[#1B2A6B] mb-4 tracking-tight">The DIGG Philosophy</h2>
           <h3 className="text-2xl font-semibold mb-8 text-[#F7941D]">Develop simply. Design with purpose. Deliver value.</h3>
           <p className="mb-4">
             DIGG is not here to win awards for complexity. We believe the best architectural solutions are the ones that work — financially, practically, and for the people who live and work in them. Creative thinking should produce simple, viable answers. Not overcomplicated, expensive ones.
@@ -72,9 +72,9 @@ export default function AboutPage() {
       </section>
 
       {/* Credentials */}
-      <section className="py-12">
+      <section className="py-16 lg:py-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <h2 className="text-3xl font-bold text-[#1B2A6B] text-center mb-12">DIGG Credentials at a Glance</h2>
+          <h2 className="text-3xl font-bold text-[#1B2A6B] text-center mb-12 tracking-tight">DIGG Credentials at a Glance</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {[
               { title: 'SACAP Registered Architect', desc: 'PAT44740093' },
@@ -83,9 +83,9 @@ export default function AboutPage() {
               { title: 'International Projects', desc: 'South Africa, Saudi Arabia, Ghana' },
               { title: 'SAPOA Award Winner', desc: '66 Grayston Office Refurbishment' },
               { title: 'Active Investors', desc: 'Cape Town property since 2016' },
-              { title: 'Specialist Software', desc: 'Revit, BIM 360, Navisworks, Enscape, Twin Motion' }
-            ].map((cred, index) => (
-              <div key={index} className="bg-white p-6 rounded-lg border-l-4 border-[#F7941D] shadow-md">
+              { title: 'Specialist Software', desc: 'Revit, BIM 360, Navisworks, Enscape, Twin Motion' },
+            ].map((cred) => (
+              <div key={cred.title} className="bg-white p-6 rounded-2xl border-l-4 border-[#F7941D] shadow-sm hover:shadow-md transition-shadow">
                 <strong className="text-[#1B2A6B]">{cred.title}</strong>
                 <br />
                 <span className="text-gray-600">{cred.desc}</span>
@@ -96,15 +96,15 @@ export default function AboutPage() {
       </section>
 
       {/* CTA Section */}
-      <section className="bg-[#1B2A6B] text-white py-16 my-16">
+      <section className="bg-[#1B2A6B] text-white py-20 lg:py-24 my-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <h2 className="text-3xl md:text-4xl font-bold mb-6">Ready to see what your property could be?</h2>
-          <p className="max-w-3xl mx-auto mb-8 text-lg opacity-90">
+          <h2 className="text-3xl md:text-4xl font-bold mb-6 tracking-tight">Ready to see what your property could be?</h2>
+          <p className="max-w-3xl mx-auto mb-10 text-lg opacity-90 leading-relaxed">
             Let's start with a conversation. No jargon, no pressure — just an honest look at what's possible for your property.
           </p>
           <Link
             href="/contact"
-            className="inline-block bg-[#F7941D] text-white px-8 py-3 rounded font-semibold hover:bg-[#e6850a] transition-colors"
+            className="inline-block bg-[#F7941D] text-white px-8 py-3.5 rounded-xl font-semibold hover:bg-[#e6850a] hover:shadow-lg hover:-translate-y-0.5 transition-all duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-[#1B2A6B]"
           >
             Book a Free Discovery Call
           </Link>
