@@ -72,7 +72,7 @@ export default async function AdminDashboard() {
                   <div>
                     <p className="font-semibold text-[#1B2A6B]">
                       {typeof (submission.data as Record<string, unknown>)?.name === 'string'
-                        ? (submission.data as Record<string, unknown>).name
+                        ? (submission.data as Record<string, unknown>).name as string
                         : 'Unknown'}
                     </p>
                     <p className="text-sm text-gray-600">
