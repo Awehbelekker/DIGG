@@ -201,7 +201,7 @@ export default function PageEditor({ page }: PageEditorProps) {
       </div>
     </form>
 
-      {/* Live preview pane — renders sections client-side in real time */}
+      {/* Live preview pane — click on text or images to edit inline */}
       <div className="bg-white rounded-lg shadow-md overflow-hidden sticky top-4">
         <div className="px-4 py-2 border-b border-gray-200 bg-gray-50 flex items-center justify-between">
           <span className="text-sm font-medium text-gray-700">Live preview</span>
@@ -210,7 +210,15 @@ export default function PageEditor({ page }: PageEditorProps) {
           )}
         </div>
         <div className="max-h-[80vh] overflow-y-auto overflow-x-hidden">
-          <LivePreview sections={formData.content.sections} slug={previewSlug} />
+          <LivePreview
+            sections={formData.content.sections}
+            slug={previewSlug}
+            onUpdateSection={(index, data) => {
+              const next = [...formData.content.sections]
+              next[index] = { ...next[index], data }
+              setFormData({ ...formData, content: { sections: next } })
+            }}
+          />
         </div>
       </div>
     </div>

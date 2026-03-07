@@ -100,3 +100,26 @@ h2, h3, h4, h5, h6 {
 .animate-slide-in {
   animation: slide-in 0.25s ease-out;
 }
+
+/* Inline editing indicators */
+.inline-editable {
+  cursor: text;
+  border-radius: 4px;
+  transition: box-shadow 0.15s ease, background-color 0.15s ease;
+}
+.inline-editable:hover {
+  box-shadow: 0 0 0 2px rgba(91, 200, 232, 0.5);
+}
+.inline-editable--active {
+  box-shadow: 0 0 0 2px #F7941D !important;
+  background-color: rgba(255,255,255,0.08);
+}
+.inline-editable--empty::after {
+  content: attr(data-placeholder);
+  opacity: 0.35;
+  font-style: italic;
+}
+.inline-image-edit {
+  border-radius: inherit;
+  overflow: hidden;
+}
