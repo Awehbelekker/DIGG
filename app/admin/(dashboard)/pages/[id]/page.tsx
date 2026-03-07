@@ -3,12 +3,13 @@ import { notFound } from 'next/navigation'
 import PageEditor from '@/components/admin/PageEditor'
 import AdminPageHeading from '@/components/admin/AdminPageHeading'
 
-export default async function EditPagePage({ params }: { params: { id: string } }) {
+export default async function EditPagePage({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params
   const supabase = await createClient()
   const { data: page, error } = await supabase
     .from('pages')
     .select('*')
-    .eq('id', params.id)
+    .eq('id', id)
     .single()
 
   if (error || !page) {
