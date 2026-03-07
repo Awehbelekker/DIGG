@@ -9,6 +9,7 @@ import Analytics from "@/components/Analytics";
 import SuppressPlayAbortError from "@/components/SuppressPlayAbortError";
 import { getSiteSettings } from "@/lib/site-settings";
 import { googleFontsUrl, DEFAULT_HEADING_FONT, DEFAULT_BODY_FONT } from "@/lib/google-fonts";
+import { getNavLinks } from "@/lib/get-nav-links";
 
 const montserrat = Montserrat({
   subsets: ["latin"],
@@ -54,7 +55,7 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const settings = await getSiteSettings();
+  const [settings, navLinks] = await Promise.all([getSiteSettings(), getNavLinks()]);
   const headingFont = (settings.heading_font && String(settings.heading_font).trim()) || DEFAULT_HEADING_FONT;
   const bodyFont = (settings.body_font && String(settings.body_font).trim()) || DEFAULT_BODY_FONT;
   const useCustomFonts = headingFont !== DEFAULT_HEADING_FONT || bodyFont !== DEFAULT_BODY_FONT;
@@ -84,12 +85,14 @@ export default async function RootLayout({
           logoSize={logoSize}
           logoPosition={navbarLogoPosition}
           phoneNumber={phone}
+          links={navLinks}
         />
         <main id="main-content" tabIndex={-1}>{children}</main>
         <Footer
           logoUrl={logoUrl}
           logoSize={logoSize}
           logoPosition={footerLogoPosition}
+          links={navLinks}
         />
         <WhatsAppButton />
         <Analytics />

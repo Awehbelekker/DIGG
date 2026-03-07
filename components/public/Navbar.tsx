@@ -15,11 +15,14 @@ function telHref(phone: string): string {
   return digits ? `tel:${digits}` : '#'
 }
 
+type NavLink = { href: string; label: string }
+
 type NavbarProps = {
   logoUrl?: string
   logoSize?: 'small' | 'medium' | 'large'
   logoPosition?: 'left' | 'center'
   phoneNumber?: string
+  links?: NavLink[]
 }
 
 function MenuIcon({ open }: { open: boolean }) {
@@ -44,7 +47,13 @@ function MenuIcon({ open }: { open: boolean }) {
   )
 }
 
-export default function Navbar({ logoUrl = '', logoSize = 'medium', logoPosition = 'left', phoneNumber = '' }: NavbarProps) {
+const DEFAULT_LINKS: NavLink[] = [
+  { href: '/', label: 'Home' },
+  { href: '/about', label: 'About' },
+  { href: '/contact', label: 'Contact' },
+]
+
+export default function Navbar({ logoUrl = '', logoSize = 'medium', logoPosition = 'left', phoneNumber = '', links }: NavbarProps) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const logoSrc = logoUrl && logoUrl.trim() ? logoUrl.trim() : '/logo/digg-logo.png'
   const sizeClass = LOGO_SIZE_CLASS[logoSize]
@@ -52,15 +61,7 @@ export default function Navbar({ logoUrl = '', logoSize = 'medium', logoPosition
   const showPhone = phoneNumber.trim().length > 0
   const phoneLink = showPhone ? telHref(phoneNumber) : null
 
-  const navLinks = [
-    { href: '/', label: 'Home' },
-    { href: '/about', label: 'About' },
-    { href: '/#products', label: 'Products' },
-    { href: '/insights', label: 'Insights' },
-    { href: '/for-agents', label: 'For Agents' },
-    { href: '/give', label: 'Give' },
-    { href: '/contact', label: 'Contact' },
-  ]
+  const navLinks = links && links.length > 0 ? links : DEFAULT_LINKS
 
   const logoEl = (
     <Link

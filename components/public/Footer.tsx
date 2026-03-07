@@ -8,13 +8,16 @@ const FOOTER_LOGO_SIZE_CLASS = {
   large: 'h-16 w-auto',
 } as const
 
+type NavLink = { href: string; label: string }
+
 type FooterProps = {
   logoUrl?: string
   logoSize?: 'small' | 'medium' | 'large'
   logoPosition?: 'left' | 'center'
+  links?: NavLink[]
 }
 
-export default function Footer({ logoUrl = '', logoSize = 'medium', logoPosition = 'left' }: FooterProps) {
+export default function Footer({ logoUrl = '', logoSize = 'medium', logoPosition = 'left', links = [] }: FooterProps) {
   const logoSrc = logoUrl && logoUrl.trim() ? logoUrl.trim() : '/logo/digg-logo.png'
   const sizeClass = FOOTER_LOGO_SIZE_CLASS[logoSize]
   const isExternalLogo = logoSrc.startsWith('http')
@@ -49,15 +52,18 @@ export default function Footer({ logoUrl = '', logoSize = 'medium', logoPosition
             <p className="text-white/80 text-sm">Cape Town, South Africa</p>
           </div>
           <nav className={`flex flex-wrap gap-4 sm:gap-6 text-sm ${logoPosition === 'center' ? 'justify-center' : ''}`} aria-label="Footer">
-            <Link href="/about" className="min-h-[44px] flex items-center py-2 text-white/80 hover:text-white transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-[#1B2A6B] rounded">
-              About
-            </Link>
-            <Link href="/contact" className="min-h-[44px] flex items-center py-2 text-white/80 hover:text-white transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-[#1B2A6B] rounded">
-              Contact
-            </Link>
-            <Link href="/for-agents" className="min-h-[44px] flex items-center py-2 text-white/80 hover:text-white transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-[#1B2A6B] rounded">
-              For Agents
-            </Link>
+            {(links.length > 0 ? links.filter(l => l.href !== '/') : [
+              { href: '/about', label: 'About' },
+              { href: '/contact', label: 'Contact' },
+            ]).map((link) => (
+              <Link
+                key={link.href}
+                href={link.href}
+                className="min-h-[44px] flex items-center py-2 text-white/80 hover:text-white transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-[#1B2A6B] rounded"
+              >
+                {link.label}
+              </Link>
+            ))}
           </nav>
         </div>
         <div className="mt-8 pt-8 border-t border-white/10">
