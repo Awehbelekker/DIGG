@@ -3,6 +3,7 @@
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { useState } from 'react'
+import { showToast } from '@/components/admin/Toast'
 import { deleteInsight } from '@/app/admin/(dashboard)/insights/actions'
 import type { Insight } from '@/lib/types/database'
 
@@ -17,7 +18,7 @@ export default function InsightRowActions({ insight }: { insight: Insight }) {
       await deleteInsight(insight.id)
       router.refresh()
     } catch (e) {
-      alert('Error: ' + (e instanceof Error ? e.message : 'Failed to delete'))
+      showToast('Error: ' + (e instanceof Error ? e.message : 'Failed to delete'), 'error')
     } finally {
       setLoading(false)
     }

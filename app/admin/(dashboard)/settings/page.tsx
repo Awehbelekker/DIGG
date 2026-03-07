@@ -5,6 +5,7 @@ import { createClient } from '@/lib/supabase/client'
 import AdminPageHeading from '@/components/admin/AdminPageHeading'
 import SettingsUrlValidation from '@/components/admin/SettingsUrlValidation'
 import { GOOGLE_FONT_OPTIONS, DEFAULT_HEADING_FONT, DEFAULT_BODY_FONT } from '@/lib/google-fonts'
+import { showToast } from '@/components/admin/Toast'
 
 type SelectedWorkItem = { title: string; place: string; imageUrl?: string; link?: string }
 
@@ -90,9 +91,9 @@ export default function AdminSettingsPage() {
       if (error) throw error
 
       setSettings({ ...settings, [key]: value })
-      alert('Settings saved!')
+      showToast('Settings saved!')
     } catch (err) {
-      alert('Error saving settings: ' + (err instanceof Error ? err.message : String(err)))
+      showToast('Error saving settings: ' + (err instanceof Error ? err.message : String(err)), 'error')
     } finally {
       setSaving(false)
     }

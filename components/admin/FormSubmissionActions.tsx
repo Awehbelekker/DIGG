@@ -3,6 +3,7 @@
 import { useRouter } from 'next/navigation'
 import { useState, useEffect } from 'react'
 import { markSubmissionRead, markSubmissionArchived } from '@/app/admin/(dashboard)/forms/actions'
+import { showToast } from '@/components/admin/Toast'
 import type { FormSubmission } from '@/lib/types/database'
 
 export default function FormSubmissionActions({ submission }: { submission: FormSubmission }) {
@@ -23,7 +24,7 @@ export default function FormSubmissionActions({ submission }: { submission: Form
       await markSubmissionRead(submission.id, !read)
       router.refresh()
     } catch (e) {
-      alert('Error: ' + (e instanceof Error ? e.message : 'Failed'))
+      showToast('Error: ' + (e instanceof Error ? e.message : 'Failed'), 'error')
     } finally {
       setLoading(null)
     }
@@ -35,7 +36,7 @@ export default function FormSubmissionActions({ submission }: { submission: Form
       await markSubmissionArchived(submission.id, !archived)
       router.refresh()
     } catch (e) {
-      alert('Error: ' + (e instanceof Error ? e.message : 'Failed'))
+      showToast('Error: ' + (e instanceof Error ? e.message : 'Failed'), 'error')
     } finally {
       setLoading(null)
     }

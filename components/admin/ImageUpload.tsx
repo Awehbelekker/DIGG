@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import { createClient } from '@/lib/supabase/client'
+import { showToast } from '@/components/admin/Toast'
 
 interface ImageUploadProps {
   onUpload: () => void
@@ -19,13 +20,13 @@ export default function ImageUpload({ onUpload }: ImageUploadProps) {
 
     // Validate file type
     if (!file.type.startsWith('image/')) {
-      alert('Please select an image file')
+      showToast('Please select an image file', 'error')
       return
     }
 
     // Validate file size (max 10MB)
     if (file.size > 10 * 1024 * 1024) {
-      alert('File size must be less than 10MB')
+      showToast('File size must be less than 10MB', 'error')
       return
     }
 
@@ -64,10 +65,10 @@ export default function ImageUpload({ onUpload }: ImageUploadProps) {
       setAltText('')
       e.target.value = ''
       onUpload()
-      alert('Image uploaded successfully!')
+      showToast('Image uploaded successfully!')
     } catch (err) {
       console.error('Error uploading image:', err)
-      alert('Error uploading image: ' + (err instanceof Error ? err.message : String(err)))
+      showToast('Error uploading image: ' + (err instanceof Error ? err.message : String(err)), 'error')
     } finally {
       setUploading(false)
     }

@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
+import { showToast } from '@/components/admin/Toast'
 import type { Insight } from '@/lib/types/database'
 import Link from 'next/link'
 
@@ -31,11 +32,12 @@ export default function InsightEditor({ insight }: { insight?: Insight | null })
         const { error } = await supabase.from('insights').insert([formData])
         if (error) throw error
       }
+      showToast('Insight saved!')
       router.push('/admin/insights')
       router.refresh()
     } catch (err) {
       console.error(err)
-      alert('Error saving: ' + (err instanceof Error ? err.message : String(err)))
+      showToast('Error saving: ' + (err instanceof Error ? err.message : String(err)), 'error')
     } finally {
       setLoading(false)
     }

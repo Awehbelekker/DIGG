@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import { createClient } from '@/lib/supabase/client'
+import { showToast } from '@/components/admin/Toast'
 
 function buildCSV(submissions: import('@/lib/types/database').FormSubmission[]): string {
   if (submissions.length === 0) return ''
@@ -44,7 +45,7 @@ export default function FormExportButton() {
       URL.revokeObjectURL(url)
     } catch (e) {
       console.error(e)
-      alert('Export failed. Try again.')
+      showToast('Export failed. Try again.', 'error')
     } finally {
       setLoading(false)
     }

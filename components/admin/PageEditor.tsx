@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
+import { showToast } from '@/components/admin/Toast'
 import { Page } from '@/lib/types/database'
 import { getRecommendedStartingSections } from '@/lib/section-config'
 import PageBuilder from '@/components/admin/PageBuilder'
@@ -53,11 +54,12 @@ export default function PageEditor({ page }: PageEditorProps) {
         if (error) throw error
       }
 
+      showToast('Page saved!')
       router.push('/admin/pages')
       router.refresh()
     } catch (err) {
       console.error('Error saving page:', err)
-      alert('Error saving page: ' + (err instanceof Error ? err.message : String(err)))
+      showToast('Error saving page: ' + (err instanceof Error ? err.message : String(err)), 'error')
     } finally {
       setLoading(false)
     }

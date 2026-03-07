@@ -1,6 +1,7 @@
 import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
 import AdminNav from '@/components/admin/AdminNav'
+import { ToastProvider } from '@/components/admin/Toast'
 
 export default async function AdminDashboardLayout({
   children,
@@ -17,9 +18,11 @@ export default async function AdminDashboardLayout({
   }
 
   return (
-    <div className="min-h-screen bg-[#FAFAFA]">
-      <AdminNav />
-      <main className="py-8">{children}</main>
-    </div>
+    <ToastProvider>
+      <div className="min-h-screen bg-[#FAFAFA]">
+        <AdminNav />
+        <main className="py-8">{children}</main>
+      </div>
+    </ToastProvider>
   )
 }

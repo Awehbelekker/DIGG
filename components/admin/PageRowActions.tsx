@@ -3,6 +3,7 @@
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { useState } from 'react'
+import { showToast } from '@/components/admin/Toast'
 import { deletePage, duplicatePage } from '@/app/admin/(dashboard)/pages/actions'
 
 type PageRowActionsProps = {
@@ -20,7 +21,7 @@ export default function PageRowActions({ page }: PageRowActionsProps) {
       await deletePage(page.id)
       router.refresh()
     } catch (e) {
-      alert('Error: ' + (e instanceof Error ? e.message : 'Failed to delete'))
+      showToast('Error: ' + (e instanceof Error ? e.message : 'Failed to delete'), 'error')
     } finally {
       setLoading(null)
     }
@@ -32,7 +33,7 @@ export default function PageRowActions({ page }: PageRowActionsProps) {
       await duplicatePage(page.id)
       router.refresh()
     } catch (e) {
-      alert('Error: ' + (e instanceof Error ? e.message : 'Failed to duplicate'))
+      showToast('Error: ' + (e instanceof Error ? e.message : 'Failed to duplicate'), 'error')
     } finally {
       setLoading(null)
     }

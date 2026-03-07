@@ -14,6 +14,7 @@ export default function AgentForm() {
   const [loading, setLoading] = useState(false)
   const [submitted, setSubmitted] = useState(false)
   const [emailError, setEmailError] = useState('')
+  const [submitError, setSubmitError] = useState('')
 
   const validateEmail = (email: string) => {
     if (!email.trim()) return ''
@@ -27,6 +28,7 @@ export default function AgentForm() {
     setEmailError(err)
     if (err) return
     setLoading(true)
+    setSubmitError('')
 
     try {
       const supabase = createClient()
@@ -44,7 +46,7 @@ export default function AgentForm() {
       setFormData({ name: '', agency: '', phone: '', email: '', referral: '' })
     } catch (error) {
       console.error('Error submitting form:', error)
-      alert('There was an error submitting your registration. Please try again or contact us directly.')
+      setSubmitError('There was an error submitting your registration. Please try again or contact us directly.')
     } finally {
       setLoading(false)
     }
@@ -141,6 +143,12 @@ export default function AgentForm() {
           className={inputClass}
         />
       </div>
+
+      {submitError && (
+        <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-xl text-red-700 text-sm" role="alert">
+          {submitError}
+        </div>
+      )}
 
       <button
         type="submit"

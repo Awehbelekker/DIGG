@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import { createClient } from '@/lib/supabase/client'
+import { showToast } from '@/components/admin/Toast'
 
 export default function NewsletterExportButton() {
   const [loading, setLoading] = useState(false)
@@ -28,7 +29,7 @@ export default function NewsletterExportButton() {
       a.click()
       URL.revokeObjectURL(url)
     } catch (e) {
-      alert('Export failed: ' + (e instanceof Error ? e.message : String(e)))
+      showToast('Export failed: ' + (e instanceof Error ? e.message : String(e)), 'error')
     } finally {
       setLoading(false)
     }
