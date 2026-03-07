@@ -361,6 +361,90 @@ export default function AdminSettingsPage() {
         </div>
 
         <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 space-y-6">
+          <h2 className="text-lg font-semibold text-[#1B2A6B]">Homepage content (headlines & copy)</h2>
+          <p className="text-sm text-gray-500">Edit the main text on the homepage. Leave blank to use the default copy.</p>
+          {[
+            { key: 'hero_title', label: 'Hero headline', value: settings.hero_title ?? '', placeholder: 'Your Property Should Be Working Harder.' },
+            { key: 'hero_subtitle', label: 'Hero subtitle', value: settings.hero_subtitle ?? '', placeholder: 'DIGG is a Cape Town architecture practice...' },
+            { key: 'hero_primary_cta_text', label: 'Hero primary button text', value: settings.hero_primary_cta_text ?? '', placeholder: 'See What We Do' },
+            { key: 'hero_primary_cta_href', label: 'Hero primary button link', value: settings.hero_primary_cta_href ?? '', placeholder: '#products' },
+            { key: 'hero_secondary_cta_text', label: 'Hero secondary button text', value: settings.hero_secondary_cta_text ?? '', placeholder: 'Talk to Our Team' },
+            { key: 'hero_secondary_cta_href', label: 'Hero secondary button link', value: settings.hero_secondary_cta_href ?? '', placeholder: '/contact' },
+            { key: 'selected_work_heading', label: 'Selected Work section heading', value: settings.selected_work_heading ?? '', placeholder: 'Selected Work' },
+            { key: 'selected_work_intro', label: 'Selected Work intro paragraph', value: settings.selected_work_intro ?? '', placeholder: 'A selection of projects...' },
+            { key: 'selected_work_cta_text', label: 'Selected Work link text', value: settings.selected_work_cta_text ?? '', placeholder: 'Discuss your project →' },
+            { key: 'products_heading', label: 'Products section heading', value: settings.products_heading ?? '', placeholder: 'Built Products. Proven Solutions.' },
+            { key: 'products_intro', label: 'Products section intro', value: settings.products_intro ?? '', placeholder: "We've turned decades of..." },
+            { key: 'agents_heading', label: 'Estate agents strip heading', value: settings.agents_heading ?? '', placeholder: 'Are You an Estate Agent?' },
+            { key: 'agents_intro', label: 'Estate agents strip paragraph', value: settings.agents_intro ?? '', placeholder: 'Give your sellers something...' },
+            { key: 'agents_cta_text', label: 'Estate agents button text', value: settings.agents_cta_text ?? '', placeholder: 'Partner With DIGG' },
+          ].map(({ key, label, value, placeholder }) => (
+            <div key={key}>
+              <label className="block text-sm font-medium text-gray-700 mb-2">{label}</label>
+              <div className="flex space-x-2">
+                <input
+                  type="text"
+                  value={value}
+                  onChange={(e) => setSettings({ ...settings, [key]: e.target.value })}
+                  className="flex-1 px-4 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#F7941D] focus:border-transparent"
+                  placeholder={placeholder}
+                />
+                <button
+                  onClick={() => handleSave(key, settings[key] ?? '')}
+                  disabled={saving}
+                  className="px-6 py-2 bg-[#F7941D] text-white rounded-xl font-semibold hover:bg-[#e6850a] transition-colors disabled:opacity-50"
+                >
+                  Save
+                </button>
+              </div>
+            </div>
+          ))}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">Middle strip (3 boxes)</label>
+            <p className="text-xs text-gray-500 mb-2">Title and body for each of the three value boxes (e.g. Untapped Value, Intelligent Design, Full-Service Partnership).</p>
+            {[0, 1, 2].map((i) => {
+              const strip = Array.isArray(settings.homepage_strip) && settings.homepage_strip[i] ? settings.homepage_strip[i] : { title: '', body: '' }
+              return (
+                <div key={i} className="mb-4 p-4 rounded-xl bg-gray-50 border border-gray-100">
+                  <p className="text-xs font-medium text-gray-500 mb-2">Box {i + 1}</p>
+                  <input
+                    type="text"
+                    value={strip.title}
+                    onChange={(e) => {
+                      const next = [...(Array.isArray(settings.homepage_strip) ? settings.homepage_strip : [{ title: '', body: '' }, { title: '', body: '' }, { title: '', body: '' }])]
+                      while (next.length <= i) next.push({ title: '', body: '' })
+                      next[i] = { ...next[i], title: e.target.value }
+                      setSettings({ ...settings, homepage_strip: next })
+                    }}
+                    placeholder="Title"
+                    className="w-full mb-2 px-4 py-2 border border-gray-300 rounded-lg text-sm"
+                  />
+                  <textarea
+                    value={strip.body}
+                    onChange={(e) => {
+                      const next = [...(Array.isArray(settings.homepage_strip) ? settings.homepage_strip : [{ title: '', body: '' }, { title: '', body: '' }, { title: '', body: '' }])]
+                      while (next.length <= i) next.push({ title: '', body: '' })
+                      next[i] = { ...next[i], body: e.target.value }
+                      setSettings({ ...settings, homepage_strip: next })
+                    }}
+                    placeholder="Body text"
+                    rows={2}
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg text-sm"
+                  />
+                </div>
+              )
+            })}
+            <button
+              onClick={() => handleSave('homepage_strip', settings.homepage_strip ?? [])}
+              disabled={saving}
+              className="mt-2 px-6 py-2 bg-[#F7941D] text-white rounded-xl font-semibold hover:bg-[#e6850a] transition-colors disabled:opacity-50"
+            >
+              Save strip
+            </button>
+          </div>
+        </div>
+
+        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 space-y-6">
           <h2 className="text-lg font-semibold text-[#1B2A6B]">Homepage hero & sharing</h2>
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">Hero image URL (homepage)</label>

@@ -15,6 +15,22 @@ export type SiteSettings = {
   logo_size?: 'small' | 'medium' | 'large'
   selected_work?: Array<{ title: string; place: string; imageUrl?: string; link?: string }>
   homepage_products?: Array<{ title: string; description: string; imageUrl?: string; link?: string; comingSoon?: boolean }>
+  // Homepage editable copy (Admin → Settings → Homepage content)
+  hero_title?: string
+  hero_subtitle?: string
+  hero_primary_cta_text?: string
+  hero_primary_cta_href?: string
+  hero_secondary_cta_text?: string
+  hero_secondary_cta_href?: string
+  selected_work_heading?: string
+  selected_work_intro?: string
+  selected_work_cta_text?: string
+  products_heading?: string
+  products_intro?: string
+  homepage_strip?: Array<{ title: string; body: string }>
+  agents_heading?: string
+  agents_intro?: string
+  agents_cta_text?: string
 }
 
 export async function getSiteSettings(): Promise<SiteSettings> {

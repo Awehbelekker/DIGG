@@ -34,19 +34,47 @@ export default async function HomePage() {
         { title: 'Rezoning & Densification', description: 'Unlock the value your zoning is hiding.', comingSoon: false, imageUrl: 'https://images.unsplash.com/photo-1600573472592-401b489a3cdc?w=600&q=80', link: '' },
       ]
 
+  const heroTitle = (settings.hero_title && String(settings.hero_title).trim()) || 'Your Property Should Be Working Harder.'
+  const heroSubtitle = (settings.hero_subtitle && String(settings.hero_subtitle).trim()) || "DIGG is a Cape Town architecture practice built on one idea: great design should generate real returns. We help property owners, investors and developers unlock the financial potential sitting inside their buildings and land."
+  const heroPrimaryCtaText = (settings.hero_primary_cta_text && String(settings.hero_primary_cta_text).trim()) || 'See What We Do'
+  const heroPrimaryCtaHref = (settings.hero_primary_cta_href && String(settings.hero_primary_cta_href).trim()) || '#products'
+  const heroSecondaryCtaText = (settings.hero_secondary_cta_text && String(settings.hero_secondary_cta_text).trim()) || 'Talk to Our Team'
+  const heroSecondaryCtaHref = (settings.hero_secondary_cta_href && String(settings.hero_secondary_cta_href).trim()) || '/contact'
+  const selectedWorkHeading = (settings.selected_work_heading && String(settings.selected_work_heading).trim()) || 'Selected Work'
+  const selectedWorkIntro = (settings.selected_work_intro && String(settings.selected_work_intro).trim()) || 'A selection of projects where design and return on investment go hand in hand.'
+  const selectedWorkCtaText = (settings.selected_work_cta_text && String(settings.selected_work_cta_text).trim()) || 'Discuss your project →'
+  const productsHeading = (settings.products_heading && String(settings.products_heading).trim()) || 'Built Products. Proven Solutions.'
+  const productsIntro = (settings.products_intro && String(settings.products_intro).trim()) || "We've turned decades of large-scale architectural experience into a suite of accessible, income-generating property products. Choose your starting point."
+  const stripItems = Array.isArray(settings.homepage_strip) && settings.homepage_strip.length >= 3
+    ? settings.homepage_strip
+    : [
+        { title: 'Untapped Value', body: "Most Cape Town properties have income potential that hasn't been activated yet." },
+        { title: 'Intelligent Design', body: 'We design for outcomes, not just aesthetics. Every decision is weighed against your financial return.' },
+        { title: 'Full-Service Partnership', body: 'From first sketch to council approval — our team walks the whole journey with you.' },
+      ]
+  const agentsHeading = (settings.agents_heading && String(settings.agents_heading).trim()) || 'Are You an Estate Agent?'
+  const agentsIntro = (settings.agents_intro && String(settings.agents_intro).trim()) || "Give your sellers something no other agent offers — professional plans and a 3D model as part of every listing. Let's build a referral partnership that works for both of us."
+  const agentsCtaText = (settings.agents_cta_text && String(settings.agents_cta_text).trim()) || 'Partner With DIGG'
+
   return (
     <div className="min-h-screen">
-      <Hero backgroundImage={heroImageUrl} />
+      <Hero
+        title={heroTitle}
+        subtitle={heroSubtitle}
+        primaryCTA={{ text: heroPrimaryCtaText, href: heroPrimaryCtaHref }}
+        secondaryCTA={{ text: heroSecondaryCtaText, href: heroSecondaryCtaHref }}
+        backgroundImage={heroImageUrl}
+      />
 
       {/* Selected Work — project-led, from CMS */}
       <RevealSection className="bg-white py-14 sm:py-20 lg:py-28">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="max-w-3xl mb-10 sm:mb-14">
             <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-[#1B2A6B] mb-3 sm:mb-4 tracking-tight">
-              Selected Work
+              {selectedWorkHeading}
             </h2>
             <p className="text-lg text-gray-600 leading-relaxed">
-              A selection of projects where design and return on investment go hand in hand.
+              {selectedWorkIntro}
             </p>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">
@@ -79,7 +107,7 @@ export default async function HomePage() {
               href="/contact"
               className="text-[#1B2A6B] font-medium hover:text-[#F7941D] transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-[#F7941D] focus-visible:ring-offset-2 rounded"
             >
-              Discuss your project →
+              {selectedWorkCtaText}
             </Link>
           </p>
         </div>
@@ -90,11 +118,11 @@ export default async function HomePage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-10 lg:gap-12">
             {[
-              { title: 'Untapped Value', body: "Most Cape Town properties have income potential that hasn't been activated yet.", accent: 'bg-[#1B2A6B]' },
-              { title: 'Intelligent Design', body: 'We design for outcomes, not just aesthetics. Every decision is weighed against your financial return.', accent: 'bg-[#F7941D]' },
-              { title: 'Full-Service Partnership', body: 'From first sketch to council approval — our team walks the whole journey with you.', accent: 'bg-[#5BC8E8]' },
-            ].map((item) => (
-              <div key={item.title} className="text-center p-8 rounded-2xl bg-[#FAFAFA] hover:bg-white hover:shadow-lg border border-transparent hover:border-gray-100 transition-all duration-300">
+              { ...stripItems[0], accent: 'bg-[#1B2A6B]' as const },
+              { ...stripItems[1], accent: 'bg-[#F7941D]' as const },
+              { ...stripItems[2], accent: 'bg-[#5BC8E8]' as const },
+            ].map((item, i) => (
+              <div key={i} className="text-center p-8 rounded-2xl bg-[#FAFAFA] hover:bg-white hover:shadow-lg border border-transparent hover:border-gray-100 transition-all duration-300">
                 <div className={`w-12 h-1 ${item.accent} rounded-full mx-auto mb-6`} aria-hidden />
                 <h3 className="text-xl font-bold text-[#1B2A6B] mb-4">{item.title}</h3>
                 <p className="text-gray-600 leading-relaxed">{item.body}</p>
@@ -110,10 +138,10 @@ export default async function HomePage() {
       <RevealSection id="products" className="bg-[#FAFAFA] py-20 lg:py-24">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <h2 className="text-3xl md:text-4xl font-bold text-[#1B2A6B] text-center mb-4 tracking-tight">
-            Built Products. Proven Solutions.
+            {productsHeading}
           </h2>
           <p className="text-center max-w-3xl mx-auto mb-14 text-lg text-gray-600">
-            We've turned decades of large-scale architectural experience into a suite of accessible, income-generating property products. Choose your starting point.
+            {productsIntro}
           </p>
           
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 lg:gap-8">
@@ -153,15 +181,15 @@ export default async function HomePage() {
       {/* Estate Agent Strip */}
       <section className="bg-[#1B2A6B] text-white py-20 lg:py-24 my-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <h2 className="text-3xl md:text-4xl font-bold mb-6 tracking-tight">Are You an Estate Agent?</h2>
+          <h2 className="text-3xl md:text-4xl font-bold mb-6 tracking-tight">{agentsHeading}</h2>
           <p className="max-w-3xl mx-auto mb-10 text-lg opacity-90 leading-relaxed">
-            Give your sellers something no other agent offers — professional plans and a 3D model as part of every listing. Let's build a referral partnership that works for both of us.
+            {agentsIntro}
           </p>
           <Link
             href="/for-agents"
             className="inline-block bg-[#F7941D] text-white px-8 py-3.5 rounded-xl font-semibold hover:bg-[#e6850a] hover:shadow-lg hover:-translate-y-0.5 transition-all duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-[#1B2A6B]"
           >
-            Partner With DIGG
+            {agentsCtaText}
           </Link>
         </div>
       </section>

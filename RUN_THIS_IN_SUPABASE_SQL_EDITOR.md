@@ -13,3 +13,5 @@ Steps:
 3. Open Supabase Dashboard, go to SQL Editor, paste, click Run
 
 That file contains only SQL and nothing else.
+
+After running it: About, Contact, For Agents, and Give become editable in Admin → Pages (block 5 seeds them). Homepage headlines and copy are editable in Admin → Settings → Homepage content.
