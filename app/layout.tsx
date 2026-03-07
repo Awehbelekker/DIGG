@@ -6,6 +6,7 @@ import Footer from "@/components/public/Footer";
 import WhatsAppButton from "@/components/public/WhatsAppButton";
 import FontLoader from "@/components/FontLoader";
 import Analytics from "@/components/Analytics";
+import SuppressPlayAbortError from "@/components/SuppressPlayAbortError";
 import { getSiteSettings } from "@/lib/site-settings";
 import { googleFontsUrl, DEFAULT_HEADING_FONT, DEFAULT_BODY_FONT } from "@/lib/google-fonts";
 
@@ -37,7 +38,7 @@ export async function generateMetadata(): Promise<Metadata> {
   return {
     title: "DIGG Architecture Cape Town | Property That Pays",
     description: "Cape Town architecture team specialising in income-generating design — Airbnb units, secondary dwellings, rezoning and property investment.",
-    ...(favicon && { icons: { icon: favicon } }),
+    icons: { icon: favicon || '/favicon.ico' },
     ...(ogImage && {
       openGraph: { images: [ogImage] },
       twitter: { card: "summary_large_image", images: [ogImage] },
@@ -89,6 +90,7 @@ export default async function RootLayout({
         />
         <WhatsAppButton />
         <Analytics />
+        <SuppressPlayAbortError />
       </body>
     </html>
   );
