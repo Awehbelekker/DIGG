@@ -70,6 +70,13 @@ export default function Footer({ logoUrl = '', logoSize = 'medium', logoPosition
         <p className="text-xs text-white/50 mt-2" aria-hidden>
           Cape Town architecture &amp; property design — income-generating solutions.
         </p>
+        <Link
+          href="/admin/login"
+          className="inline-block mt-3 text-[10px] text-white/20 hover:text-white/50 transition-colors"
+          aria-label="Admin"
+        >
+          Admin
+        </Link>
       </div>
     </footer>
   )
