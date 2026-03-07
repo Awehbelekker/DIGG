@@ -38,7 +38,10 @@ export async function generateMetadata(): Promise<Metadata> {
   return {
     title: "DIGG Architecture Cape Town | Property That Pays",
     description: "Cape Town architecture team specialising in income-generating design — Airbnb units, secondary dwellings, rezoning and property investment.",
-    icons: { icon: favicon || '/favicon.ico' },
+    icons: {
+      icon: favicon || '/favicon.ico',
+      apple: '/favicon.ico',
+    },
     ...(ogImage && {
       openGraph: { images: [ogImage] },
       twitter: { card: "summary_large_image", images: [ogImage] },
