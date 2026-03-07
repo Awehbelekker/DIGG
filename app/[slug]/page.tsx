@@ -10,15 +10,20 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const supabase = await createClient()
   const { data: page } = await supabase
     .from('pages')
-    .select('title, meta_title, meta_description')
+    .select('title, meta_title, meta_description, meta_og_image')
     .eq('slug', slug)
     .eq('published', true)
     .single()
 
   if (!page) return { title: 'Not found' }
+  const ogImage = (page.meta_og_image as string)?.trim()
   return {
     title: (page.meta_title as string) || (page.title as string) || 'Page',
     description: (page.meta_description as string) || undefined,
+    ...(ogImage && {
+      openGraph: { images: [ogImage] },
+      twitter: { card: 'summary_large_image' as const, images: [ogImage] },
+    }),
   }
 }
 
@@ -40,7 +45,7 @@ export default async function DynamicPage({ params }: Props) {
   return (
     <div className="min-h-screen">
       {sections.map((section, index) => (
-        <SectionRenderer key={`${section.type}-${index}`} section={section as any} />
+        <SectionRenderer key={`${section.type}-${index}`} section={section as import('@/lib/types/database').PageSection} />
       ))}
       {sections.length === 0 && (
         <section className="py-20 text-center text-gray-500">

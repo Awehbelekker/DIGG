@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import AdminPageHeading from '@/components/admin/AdminPageHeading'
+import SettingsUrlValidation from '@/components/admin/SettingsUrlValidation'
 import { GOOGLE_FONT_OPTIONS, DEFAULT_HEADING_FONT, DEFAULT_BODY_FONT } from '@/lib/google-fonts'
 
 type SelectedWorkItem = { title: string; place: string; imageUrl?: string; link?: string }
@@ -20,14 +21,30 @@ function parseSelectedWork(v: unknown): SelectedWorkItem[] {
   return []
 }
 
+type HomepageProductItem = { title: string; description: string; imageUrl?: string; link?: string; comingSoon?: boolean }
+
+function parseHomepageProducts(v: unknown): HomepageProductItem[] {
+  if (Array.isArray(v)) return v
+  if (typeof v === 'string') {
+    try {
+      const parsed = JSON.parse(v)
+      return Array.isArray(parsed) ? parsed : []
+    } catch {
+      return []
+    }
+  }
+  return []
+}
+
 export default function AdminSettingsPage() {
-  const [settings, setSettings] = useState<Record<string, any>>({})
+  const [settings, setSettings] = useState<Record<string, unknown>>({})
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
   const supabase = createClient()
 
   useEffect(() => {
     loadSettings()
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- load once on mount
   }, [])
 
   const loadSettings = async () => {
@@ -38,8 +55,8 @@ export default function AdminSettingsPage() {
     if (error) {
       console.error('Error loading settings:', error)
     } else {
-      const settingsMap: Record<string, any> = {}
-      data?.forEach((setting: any) => {
+      const settingsMap: Record<string, unknown> = {}
+      data?.forEach((setting: { key: string; value: unknown }) => {
         let val = setting.value
         if (typeof val === 'string' && (val.startsWith('[') || val.startsWith('{'))) {
           try {
@@ -55,7 +72,7 @@ export default function AdminSettingsPage() {
     setLoading(false)
   }
 
-  const handleSave = async (key: string, value: any) => {
+  const handleSave = async (key: string, value: unknown) => {
     setSaving(true)
     try {
       const { error } = await supabase
@@ -70,8 +87,8 @@ export default function AdminSettingsPage() {
 
       setSettings({ ...settings, [key]: value })
       alert('Settings saved!')
-    } catch (error: any) {
-      alert('Error saving settings: ' + error.message)
+    } catch (err) {
+      alert('Error saving settings: ' + (err instanceof Error ? err.message : String(err)))
     } finally {
       setSaving(false)
     }
@@ -103,6 +120,32 @@ export default function AdminSettingsPage() {
     handleSave('selected_work', selectedWork)
   }
 
+  const homepageProducts = parseHomepageProducts(settings.homepage_products)
+  const setHomepageProducts = (next: HomepageProductItem[]) => {
+    setSettings({ ...settings, homepage_products: next })
+  }
+  const addHomepageProduct = () => {
+    setHomepageProducts([...homepageProducts, { title: '', description: '', link: '', comingSoon: false }])
+  }
+  const updateHomepageProduct = (index: number, updates: Partial<HomepageProductItem>) => {
+    const next = [...homepageProducts]
+    next[index] = { ...next[index], ...updates }
+    setHomepageProducts(next)
+  }
+  const removeHomepageProduct = (index: number) => {
+    setHomepageProducts(homepageProducts.filter((_, i) => i !== index))
+  }
+  const moveHomepageProduct = (index: number, dir: 'up' | 'down') => {
+    const j = dir === 'up' ? index - 1 : index + 1
+    if (j < 0 || j >= homepageProducts.length) return
+    const next = [...homepageProducts]
+    ;[next[index], next[j]] = [next[j], next[index]]
+    setHomepageProducts(next)
+  }
+  const saveHomepageProducts = () => {
+    handleSave('homepage_products', homepageProducts)
+  }
+
   if (loading) {
     return (
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -113,9 +156,10 @@ export default function AdminSettingsPage() {
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-      <AdminPageHeading className="mb-8" subtitle="Contact details, hero image, sharing, and Selected Work.">Site Settings</AdminPageHeading>
+      <AdminPageHeading className="mb-8" subtitle="Contact details, hero image, sharing, Selected Work, and Homepage Products.">Site Settings</AdminPageHeading>
 
       <div className="space-y-8">
+        <SettingsUrlValidation settings={settings} />
         <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 space-y-6">
           <h2 className="text-lg font-semibold text-[#1B2A6B]">Contact & identity</h2>
           <div>
@@ -441,6 +485,74 @@ export default function AdminSettingsPage() {
               className="px-6 py-2 bg-[#F7941D] text-white rounded-xl font-semibold hover:bg-[#e6850a] disabled:opacity-50"
             >
               Save Selected Work
+            </button>
+          )}
+        </div>
+
+        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 space-y-4">
+          <h2 className="text-lg font-semibold text-[#1B2A6B]">Homepage Products (Built Products)</h2>
+          <p className="text-sm text-gray-500">Products shown in the &quot;Built Products. Proven Solutions.&quot; section on the homepage. Add, edit, reorder; set link or leave blank to go to Contact.</p>
+          {homepageProducts.map((item, index) => (
+            <div key={index} className="p-4 rounded-xl bg-[#FAFAFA] border border-gray-100 space-y-3">
+              <div className="flex flex-wrap gap-2 items-center">
+                <button type="button" onClick={() => moveHomepageProduct(index, 'up')} disabled={index === 0} className="p-1.5 rounded border border-gray-200 text-gray-600 hover:bg-gray-100 disabled:opacity-40" aria-label="Move up">↑</button>
+                <button type="button" onClick={() => moveHomepageProduct(index, 'down')} disabled={index === homepageProducts.length - 1} className="p-1.5 rounded border border-gray-200 text-gray-600 hover:bg-gray-100 disabled:opacity-40" aria-label="Move down">↓</button>
+                <input
+                  type="text"
+                  placeholder="Product title"
+                  value={item.title}
+                  onChange={(e) => updateHomepageProduct(index, { title: e.target.value })}
+                  className="flex-1 min-w-[160px] px-3 py-2 border border-gray-300 rounded-lg text-sm"
+                />
+                <label className="flex items-center gap-2 shrink-0">
+                  <input
+                    type="checkbox"
+                    checked={!!item.comingSoon}
+                    onChange={(e) => updateHomepageProduct(index, { comingSoon: e.target.checked })}
+                    className="rounded text-[#F7941D]"
+                  />
+                  <span className="text-sm text-gray-700">Coming soon</span>
+                </label>
+                <button type="button" onClick={() => removeHomepageProduct(index)} className="px-3 py-2 text-red-600 hover:bg-red-50 rounded-lg text-sm">Remove</button>
+              </div>
+              <input
+                type="url"
+                placeholder="Image URL"
+                value={item.imageUrl || ''}
+                onChange={(e) => updateHomepageProduct(index, { imageUrl: e.target.value })}
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm"
+              />
+              <textarea
+                placeholder="Description"
+                value={item.description}
+                onChange={(e) => updateHomepageProduct(index, { description: e.target.value })}
+                rows={2}
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm"
+              />
+              <input
+                type="text"
+                placeholder="Link (optional, e.g. /contact or full URL)"
+                value={item.link || ''}
+                onChange={(e) => updateHomepageProduct(index, { link: e.target.value })}
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm"
+              />
+            </div>
+          ))}
+          <button
+            type="button"
+            onClick={addHomepageProduct}
+            className="px-4 py-2 border-2 border-dashed border-gray-300 rounded-xl text-gray-600 hover:border-[#F7941D] hover:text-[#F7941D] text-sm font-medium"
+          >
+            + Add product
+          </button>
+          {homepageProducts.length > 0 && (
+            <button
+              type="button"
+              onClick={saveHomepageProducts}
+              disabled={saving}
+              className="px-6 py-2 bg-[#F7941D] text-white rounded-xl font-semibold hover:bg-[#e6850a] disabled:opacity-50"
+            >
+              Save Homepage Products
             </button>
           )}
         </div>

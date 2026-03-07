@@ -14,6 +14,7 @@ export type SiteSettings = {
   footer_logo_position?: 'left' | 'center'
   logo_size?: 'small' | 'medium' | 'large'
   selected_work?: Array<{ title: string; place: string; imageUrl?: string; link?: string }>
+  homepage_products?: Array<{ title: string; description: string; imageUrl?: string; link?: string; comingSoon?: boolean }>
 }
 
 export async function getSiteSettings(): Promise<SiteSettings> {

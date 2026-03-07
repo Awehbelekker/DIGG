@@ -66,7 +66,7 @@ export default async function AdminDashboard() {
         <AdminPageHeading as="h2" className="mb-4">Recent Form Submissions</AdminPageHeading>
         {recentSubmissions && recentSubmissions.length > 0 ? (
           <div className="space-y-4">
-            {recentSubmissions.map((submission: any) => (
+            {recentSubmissions.map((submission: import('@/lib/types/database').FormSubmission) => (
               <div key={submission.id} className="border-b border-gray-200 pb-4 last:border-0">
                 <div className="flex justify-between items-start">
                   <div>

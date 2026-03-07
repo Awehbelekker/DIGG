@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import type { PageSection } from '@/lib/types/database'
 
 type SectionBlockEditorProps = {
@@ -13,11 +13,7 @@ const inputClass = 'w-full px-3 py-2 border border-gray-300 rounded-lg focus:rin
 const labelClass = 'block text-sm font-medium text-gray-700 mb-1'
 
 export default function SectionBlockEditor({ section, onSave, onCancel }: SectionBlockEditorProps) {
-  const [data, setData] = useState<Record<string, unknown>>({ ...section.data })
-
-  useEffect(() => {
-    setData({ ...section.data })
-  }, [section])
+  const [data, setData] = useState<Record<string, unknown>>(() => ({ ...section.data }))
 
   const update = (key: string, value: unknown) => setData((prev) => ({ ...prev, [key]: value }))
 
@@ -83,6 +79,55 @@ export default function SectionBlockEditor({ section, onSave, onCancel }: Sectio
             <option value="left">Left</option>
             <option value="center">Center</option>
             <option value="right">Right</option>
+          </select>
+        </div>
+        <EditorFooter onCancel={onCancel} />
+      </form>
+    )
+  }
+
+  if (section.type === 'image') {
+    return (
+      <form onSubmit={handleSubmit} className="space-y-4">
+        <div>
+          <label className={labelClass}>Image URL</label>
+          <input
+            type="url"
+            value={(data.imageUrl as string) ?? ''}
+            onChange={(e) => update('imageUrl', e.target.value)}
+            className={inputClass}
+            placeholder="https://..."
+          />
+        </div>
+        <div>
+          <label className={labelClass}>Alt text (for accessibility)</label>
+          <input
+            type="text"
+            value={(data.alt as string) ?? ''}
+            onChange={(e) => update('alt', e.target.value)}
+            className={inputClass}
+            placeholder="Describe the image"
+          />
+        </div>
+        <div>
+          <label className={labelClass}>Caption (optional)</label>
+          <input
+            type="text"
+            value={(data.caption as string) ?? ''}
+            onChange={(e) => update('caption', e.target.value)}
+            className={inputClass}
+            placeholder="Shown below the image"
+          />
+        </div>
+        <div>
+          <label className={labelClass}>Layout</label>
+          <select
+            value={(data.layout as string) ?? 'contained'}
+            onChange={(e) => update('layout', e.target.value)}
+            className={inputClass}
+          >
+            <option value="contained">Contained (max width, rounded)</option>
+            <option value="full">Full width (edge to edge)</option>
           </select>
         </div>
         <EditorFooter onCancel={onCancel} />
@@ -196,7 +241,7 @@ export default function SectionBlockEditor({ section, onSave, onCancel }: Sectio
   }
 
   if (section.type === 'products') {
-    const items = (data.items as { title: string; description: string; link: string; comingSoon: boolean }[]) ?? []
+    const items = (data.items as { title: string; description: string; link: string; comingSoon: boolean; imageUrl?: string }[]) ?? []
     return (
       <form onSubmit={handleSubmit} className="space-y-4">
         <div>
@@ -216,6 +261,17 @@ export default function SectionBlockEditor({ section, onSave, onCancel }: Sectio
               onChange={(e) => {
                 const next = [...items]
                 next[i] = { ...next[i], title: e.target.value }
+                update('items', next)
+              }}
+              className={inputClass}
+            />
+            <input
+              type="url"
+              placeholder="Image URL"
+              value={item.imageUrl ?? ''}
+              onChange={(e) => {
+                const next = [...items]
+                next[i] = { ...next[i], imageUrl: e.target.value }
                 update('items', next)
               }}
               className={inputClass}
@@ -253,7 +309,7 @@ export default function SectionBlockEditor({ section, onSave, onCancel }: Sectio
           </div>
         ))}
         <div className="flex gap-2">
-          <button type="button" onClick={() => update('items', [...items, { title: '', description: '', link: '', comingSoon: false }])} className="px-3 py-1.5 border border-gray-300 rounded-lg text-sm hover:bg-gray-50">
+          <button type="button" onClick={() => update('items', [...items, { title: '', description: '', link: '', comingSoon: false, imageUrl: '' }])} className="px-3 py-1.5 border border-gray-300 rounded-lg text-sm hover:bg-gray-50">
             + Add product
           </button>
           {items.length > 0 && (

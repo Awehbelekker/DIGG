@@ -25,6 +25,7 @@ export async function duplicatePage(id: string) {
       content: page.content,
       meta_title: page.meta_title,
       meta_description: page.meta_description,
+      meta_og_image: page.meta_og_image ?? null,
       published: false,
     },
   ])

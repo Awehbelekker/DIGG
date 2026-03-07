@@ -5,6 +5,7 @@ export interface Page {
   content: PageContent
   meta_title: string | null
   meta_description: string | null
+  meta_og_image: string | null
   published: boolean
   created_at: string
   updated_at: string
@@ -15,8 +16,8 @@ export interface PageContent {
 }
 
 export interface PageSection {
-  type: 'hero' | 'text' | 'grid' | 'stats' | 'products' | 'cta' | 'form'
-  data: Record<string, any>
+  type: 'hero' | 'text' | 'image' | 'grid' | 'stats' | 'products' | 'cta' | 'form'
+  data: Record<string, unknown>
 }
 
 export interface Image {
@@ -31,13 +32,32 @@ export interface Image {
 export interface SiteSetting {
   id: string
   key: string
-  value: string | Record<string, any>
+  value: string | Record<string, unknown>
   updated_at: string
 }
 
 export interface FormSubmission {
   id: string
   form_type: 'contact' | 'agent'
-  data: Record<string, any>
+  data: Record<string, unknown>
+  created_at: string
+  read?: boolean
+  archived?: boolean
+}
+
+export interface Insight {
+  id: string
+  slug: string
+  title: string
+  body: string
+  published: boolean
+  created_at: string
+  updated_at: string
+}
+
+export interface NewsletterSignup {
+  id: string
+  email: string
+  source: string | null
   created_at: string
 }

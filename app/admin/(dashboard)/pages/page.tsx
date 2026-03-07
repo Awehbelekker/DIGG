@@ -5,15 +5,23 @@ import PageRowActions from '@/components/admin/PageRowActions'
 
 export default async function AdminPagesPage() {
   const supabase = await createClient()
-  const { data: pages, error } = await supabase
+  const { data: pages } = await supabase
     .from('pages')
     .select('*')
     .order('updated_at', { ascending: false })
 
+  const builtInPages = [
+    { name: 'Home', path: '/', slug: 'home', configureHref: '/admin/settings', configureLabel: 'Hero & Selected Work' },
+    { name: 'About', path: '/about', slug: 'about', configureHref: null, configureLabel: null },
+    { name: 'Contact', path: '/contact', slug: 'contact', configureHref: null, configureLabel: null },
+    { name: 'For Agents', path: '/for-agents', slug: 'for-agents', configureHref: null, configureLabel: null },
+    { name: 'Give', path: '/give', slug: 'give', configureHref: null, configureLabel: null },
+  ]
+
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
       <div className="flex justify-between items-center mb-8">
-        <AdminPageHeading>Pages</AdminPageHeading>
+        <AdminPageHeading subtitle="Built-in site pages and CMS pages you create.">Pages</AdminPageHeading>
         <Link
           href="/admin/pages/new"
           className="bg-[#F7941D] text-white px-6 py-2 rounded font-semibold hover:bg-[#e6850a] transition-colors"
@@ -22,6 +30,44 @@ export default async function AdminPagesPage() {
         </Link>
       </div>
 
+      {/* Built-in site pages */}
+      <div className="bg-white rounded-lg shadow-md overflow-hidden mb-8">
+        <div className="px-6 py-3 border-b border-gray-200 bg-gray-50">
+          <h2 className="text-sm font-semibold text-gray-700">Built-in pages</h2>
+          <p className="text-xs text-gray-500 mt-0.5">Main site pages. Configure content in Settings where available.</p>
+        </div>
+        <ul className="divide-y divide-gray-200">
+          {builtInPages.map((p) => (
+            <li key={p.slug} className="flex items-center justify-between px-6 py-4 hover:bg-gray-50">
+              <div>
+                <span className="font-medium text-gray-900">{p.name}</span>
+                <span className="text-gray-500 ml-2 text-sm">/{p.path === '/' ? '' : p.path.slice(1)}</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <a
+                  href={p.path}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="px-3 py-1.5 text-sm font-medium text-[#1B2A6B] hover:text-[#F7941D] border border-gray-200 rounded-lg hover:bg-gray-50"
+                >
+                  View
+                </a>
+                {p.configureHref && (
+                  <Link
+                    href={p.configureHref}
+                    className="px-3 py-1.5 text-sm font-medium bg-[#F7941D] text-white rounded-lg hover:bg-[#e6850a]"
+                  >
+                    {p.configureLabel}
+                  </Link>
+                )}
+              </div>
+            </li>
+          ))}
+        </ul>
+      </div>
+
+      {/* CMS pages (dynamic routes) */}
+      <h2 className="text-sm font-semibold text-gray-700 mb-3">CMS pages (custom slugs)</h2>
       {pages && pages.length > 0 ? (
         <div className="bg-white rounded-lg shadow-md overflow-hidden">
           <table className="min-w-full divide-y divide-gray-200">
@@ -45,7 +91,7 @@ export default async function AdminPagesPage() {
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
-              {pages.map((page: any) => (
+              {pages.map((page: import('@/lib/types/database').Page) => (
                 <tr key={page.id}>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div className="text-sm font-medium text-gray-900">{page.title}</div>

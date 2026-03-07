@@ -10,10 +10,16 @@ const LOGO_SIZE_CLASS = {
   large: 'h-20 w-auto sm:h-24',
 } as const
 
+function telHref(phone: string): string {
+  const digits = phone.replace(/\s/g, '').replace(/[^\d+]/g, '')
+  return digits ? `tel:${digits}` : '#'
+}
+
 type NavbarProps = {
   logoUrl?: string
   logoSize?: 'small' | 'medium' | 'large'
   logoPosition?: 'left' | 'center'
+  phoneNumber?: string
 }
 
 function MenuIcon({ open }: { open: boolean }) {
@@ -38,16 +44,19 @@ function MenuIcon({ open }: { open: boolean }) {
   )
 }
 
-export default function Navbar({ logoUrl = '', logoSize = 'medium', logoPosition = 'left' }: NavbarProps) {
+export default function Navbar({ logoUrl = '', logoSize = 'medium', logoPosition = 'left', phoneNumber = '' }: NavbarProps) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const logoSrc = logoUrl && logoUrl.trim() ? logoUrl.trim() : '/logo/digg-logo.png'
   const sizeClass = LOGO_SIZE_CLASS[logoSize]
   const isExternalLogo = logoSrc.startsWith('http')
+  const showPhone = phoneNumber.trim().length > 0
+  const phoneLink = showPhone ? telHref(phoneNumber) : null
 
   const navLinks = [
     { href: '/', label: 'Home' },
     { href: '/about', label: 'About' },
     { href: '/#products', label: 'Products' },
+    { href: '/insights', label: 'Insights' },
     { href: '/for-agents', label: 'For Agents' },
     { href: '/give', label: 'Give' },
     { href: '/contact', label: 'Contact' },
@@ -82,7 +91,7 @@ export default function Navbar({ logoUrl = '', logoSize = 'medium', logoPosition
   return (
     <nav className="sticky top-0 z-50 bg-[#1B2A6B]/80 backdrop-blur-md border-b border-white/10 shadow-sm">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className={`flex items-center h-24 ${logoPosition === 'center' ? 'justify-between' : ''}`}>
+        <div className={`flex items-center h-16 sm:h-20 lg:h-24 ${logoPosition === 'center' ? 'justify-between' : ''}`}>
           {logoPosition === 'left' && logoEl}
           {logoPosition === 'center' && <div className="flex-1 min-w-0" />}
           {logoPosition === 'center' && logoEl}
@@ -98,13 +107,23 @@ export default function Navbar({ logoUrl = '', logoSize = 'medium', logoPosition
                 </Link>
               </li>
             ))}
+            {showPhone && phoneLink && (
+              <li>
+                <a
+                  href={phoneLink}
+                  className="block py-2 px-3 lg:px-4 rounded-lg text-white hover:text-[#F7941D] hover:bg-white/10 font-medium text-sm lg:text-base transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-[#F7941D] focus-visible:ring-offset-2 whitespace-nowrap"
+                >
+                  Call
+                </a>
+              </li>
+            )}
           </ul>
           </div>
 
           {/* Mobile menu button */}
           <button
             type="button"
-            className="md:hidden p-2.5 -mr-2 text-white rounded-xl hover:bg-white/10 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#F7941D] focus-visible:ring-offset-2 transition-colors"
+            className="md:hidden p-3 -mr-2 min-h-[44px] min-w-[44px] flex items-center justify-center text-white rounded-xl hover:bg-white/10 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#F7941D] focus-visible:ring-offset-2 transition-colors"
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
             aria-label={mobileMenuOpen ? 'Close menu' : 'Open menu'}
             aria-expanded={mobileMenuOpen ? 'true' : 'false'}
@@ -119,12 +138,21 @@ export default function Navbar({ logoUrl = '', logoSize = 'medium', logoPosition
             mobileMenuOpen ? 'max-h-80 opacity-100' : 'max-h-0 opacity-0'
           }`}
         >
+          {showPhone && phoneLink && (
+            <a
+              href={phoneLink}
+              className="flex items-center min-h-[48px] py-3 px-4 mx-2 mt-2 rounded-xl bg-[#F7941D] text-white font-semibold hover:bg-[#e6850a] transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-inset"
+              onClick={() => setMobileMenuOpen(false)}
+            >
+              Call {phoneNumber.trim()}
+            </a>
+          )}
           <ul className="flex flex-col py-4 gap-0.5 border-t border-white/10">
             {navLinks.map(({ href, label }) => (
               <li key={href}>
                 <Link
                   href={href}
-                  className="block py-3 px-4 rounded-lg text-white hover:text-[#F7941D] hover:bg-white/10 font-medium transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-[#F7941D] focus-visible:ring-inset"
+                  className="flex items-center min-h-[44px] py-3 px-4 rounded-lg text-white hover:text-[#F7941D] hover:bg-white/10 font-medium transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-[#F7941D] focus-visible:ring-inset"
                   onClick={() => setMobileMenuOpen(false)}
                 >
                   {label}

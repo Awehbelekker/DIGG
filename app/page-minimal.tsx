@@ -1,3 +1,5 @@
+import Link from 'next/link'
+
 // Minimal homepage for testing - no component imports
 export default function HomePage() {
   return (
@@ -12,12 +14,12 @@ export default function HomePage() {
           <p className="text-gray-600 mb-6">
             We help property owners, investors and developers unlock the financial potential sitting inside their buildings and land.
           </p>
-          <a
+          <Link
             href="/contact"
             className="inline-block bg-[#F7941D] text-white px-8 py-3 rounded font-semibold hover:bg-[#e6850a] transition-colors"
           >
             Talk to Our Team
-          </a>
+          </Link>
         </div>
       </div>
     </div>

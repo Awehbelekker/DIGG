@@ -1,5 +1,6 @@
 import Link from 'next/link'
 import Image from 'next/image'
+import NewsletterSignup from '@/components/public/NewsletterSignup'
 
 const FOOTER_LOGO_SIZE_CLASS = {
   small: 'h-8 w-auto',
@@ -47,20 +48,27 @@ export default function Footer({ logoUrl = '', logoSize = 'medium', logoPosition
             {logoBlock}
             <p className="text-white/80 text-sm">Cape Town, South Africa</p>
           </div>
-          <nav className={`flex flex-wrap gap-6 text-sm ${logoPosition === 'center' ? 'justify-center' : ''}`} aria-label="Footer">
-            <Link href="/about" className="text-white/80 hover:text-white transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-[#1B2A6B] rounded">
+          <nav className={`flex flex-wrap gap-4 sm:gap-6 text-sm ${logoPosition === 'center' ? 'justify-center' : ''}`} aria-label="Footer">
+            <Link href="/about" className="min-h-[44px] flex items-center py-2 text-white/80 hover:text-white transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-[#1B2A6B] rounded">
               About
             </Link>
-            <Link href="/contact" className="text-white/80 hover:text-white transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-[#1B2A6B] rounded">
+            <Link href="/contact" className="min-h-[44px] flex items-center py-2 text-white/80 hover:text-white transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-[#1B2A6B] rounded">
               Contact
             </Link>
-            <Link href="/for-agents" className="text-white/80 hover:text-white transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-[#1B2A6B] rounded">
+            <Link href="/for-agents" className="min-h-[44px] flex items-center py-2 text-white/80 hover:text-white transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-[#1B2A6B] rounded">
               For Agents
             </Link>
           </nav>
         </div>
-        <p className="text-sm text-white/60 mt-10 pt-8 border-t border-white/10">
+        <div className="mt-8 pt-8 border-t border-white/10">
+          <p className="text-sm text-white/80 mb-3">Stay in the loop — property insights and updates.</p>
+          <NewsletterSignup source="footer" />
+        </div>
+        <p className="text-xs sm:text-sm text-white/60 mt-8 sm:mt-10 pt-6 sm:pt-8 border-t border-white/10">
           &copy; {new Date().getFullYear()} DIGG Architecture. All rights reserved.
+        </p>
+        <p className="text-xs text-white/50 mt-2" aria-hidden>
+          Cape Town architecture &amp; property design — income-generating solutions.
         </p>
       </div>
     </footer>

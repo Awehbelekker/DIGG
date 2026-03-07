@@ -198,11 +198,11 @@ export const GOOGLE_FONT_OPTIONS: string[] = [
   'Zilla Slab',
 ]
 
-/** Default heading font when none selected (matches next/font default). */
-export const DEFAULT_HEADING_FONT = 'Playfair Display'
+/** Default heading font when none selected (Montserrat for headings/subheadings). */
+export const DEFAULT_HEADING_FONT = 'Montserrat'
 
-/** Default body font when none selected. */
-export const DEFAULT_BODY_FONT = 'DM Sans'
+/** Default body font when none selected (Lato). */
+export const DEFAULT_BODY_FONT = 'Lato'
 
 /**
  * Build Google Fonts CSS2 URL for one or more families (regular 400, 600, 700).

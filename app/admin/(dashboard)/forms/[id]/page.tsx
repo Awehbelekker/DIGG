@@ -2,6 +2,8 @@ import { createClient } from '@/lib/supabase/server'
 import { notFound } from 'next/navigation'
 import Link from 'next/link'
 import AdminPageHeading from '@/components/admin/AdminPageHeading'
+import FormSubmissionActions from '@/components/admin/FormSubmissionActions'
+import type { FormSubmission } from '@/lib/types/database'
 
 export default async function FormSubmissionDetailPage({
   params,
@@ -18,19 +20,21 @@ export default async function FormSubmissionDetailPage({
 
   if (error || !submission) notFound()
 
-  const data = (submission as any).data || {}
-  const formType = (submission as any).form_type || 'contact'
-  const createdAt = (submission as any).created_at
+  const sub = submission as FormSubmission
+  const data = (sub.data || {}) as Record<string, unknown>
+  const formType = sub.form_type || 'contact'
+  const createdAt = sub.created_at
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-      <div className="mb-6">
+      <div className="mb-6 flex flex-wrap items-center justify-between gap-4">
         <Link
           href="/admin/forms"
           className="text-sm text-[#F7941D] hover:text-[#e6850a] font-medium"
         >
           ← Back to Form Submissions
         </Link>
+        <FormSubmissionActions submission={sub} />
       </div>
       <AdminPageHeading className="mb-8" subtitle="View submission details">
         Form Submission
@@ -40,7 +44,7 @@ export default async function FormSubmissionDetailPage({
         <div className="p-6 border-b border-gray-100 flex flex-wrap items-center justify-between gap-4">
           <div>
             <h2 className="text-xl font-semibold text-[#1B2A6B]" style={{ fontFamily: 'var(--font-heading)' }}>
-              {data.name || 'Unknown'}
+              {String(data.name || 'Unknown')}
             </h2>
             <p className="text-sm text-gray-500 mt-1">
               {new Date(createdAt).toLocaleString()}

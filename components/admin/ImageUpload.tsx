@@ -65,9 +65,9 @@ export default function ImageUpload({ onUpload }: ImageUploadProps) {
       e.target.value = ''
       onUpload()
       alert('Image uploaded successfully!')
-    } catch (error: any) {
-      console.error('Error uploading image:', error)
-      alert('Error uploading image: ' + error.message)
+    } catch (err) {
+      console.error('Error uploading image:', err)
+      alert('Error uploading image: ' + (err instanceof Error ? err.message : String(err)))
     } finally {
       setUploading(false)
     }
@@ -83,7 +83,7 @@ export default function ImageUpload({ onUpload }: ImageUploadProps) {
           </label>
           <select
             value={folder}
-            onChange={(e) => setFolder(e.target.value as any)}
+            onChange={(e) => setFolder(e.target.value as 'hero' | 'logo' | 'team' | 'portfolio')}
             className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-[#F7941D] focus:border-transparent"
           >
             <option value="hero">Hero Images</option>

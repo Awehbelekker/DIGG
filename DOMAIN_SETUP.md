@@ -1,8 +1,40 @@
 # Domain Setup Guide - digg-ct.co.za
 
+**Quick links:** [Vercel Dashboard](https://vercel.com/dashboard) → your **digg** project → **Settings** → **Domains**
+
+---
+
+## If digg-ct.co.za is not connecting
+
+1. **Add the domain in Vercel first**  
+   Project → **Settings** → **Domains** → **Add** → type `digg-ct.co.za` and `www.digg-ct.co.za` (add both). Vercel will show either **nameservers** or **DNS records** to use.
+
+2. **Pick one method and stick to it**
+   - **Option A (recommended):** Change GoDaddy **nameservers** to the two Vercel gives you (e.g. `ns1.vercel-dns.com`, `ns2.vercel-dns.com`). Do **not** add A/CNAME records in GoDaddy if you switch nameservers.
+   - **Option B:** Keep GoDaddy nameservers and in GoDaddy **DNS** add only the **exact** A and CNAME records Vercel shows (see below).
+
+3. **GoDaddy: where to change things**
+   - **Nameservers:** GoDaddy → **My Products** → **Domains** → click **digg-ct.co.za** → scroll to **Nameservers** → **Change** → **Custom** → paste Vercel’s two nameservers → **Save**.
+   - **DNS records (Option B):** Same domain page → **DNS** or **Manage DNS** → add the A and CNAME records Vercel lists.
+
+4. **Typical Vercel records when using GoDaddy DNS (Option B)**
+   - **A record:** Name `@`, Value `76.76.21.21` (or whatever Vercel shows for the root).
+   - **CNAME record:** Name `www`, Value `cname.vercel-dns.com` (or the target Vercel shows for www).
+   - Remove any other A or CNAME for `@` or `www` that point elsewhere, or they will conflict.
+
+5. **Wait and re-check**
+   - Propagation often 15–60 minutes; can be up to 24–48 hours.
+   - In Vercel → **Domains**, status should become **Valid Configuration**. If it says **Invalid** or **Pending**, click the domain to see what’s wrong (e.g. wrong nameservers or missing record).
+   - Test in an incognito window or another device so cache doesn’t hide the fix.
+
+6. **Supabase (after domain works)**  
+   In Supabase → **Authentication** → **URL configuration**, add `https://digg-ct.co.za` and `https://www.digg-ct.co.za` to **Redirect URLs** / **Site URL** if you use auth on the live site.
+
+---
+
 ## Current Setup
 - **Domain:** digg-ct.co.za
-- **Current Nameservers:** GoDaddy (ns77.domaincontrol.com, ns78.domaincontrol.com)
+- **Registrar:** GoDaddy (nameservers: ns77.domaincontrol.com, ns78.domaincontrol.com)
 
 ## Option 1: Use Vercel Nameservers (Recommended)
 

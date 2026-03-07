@@ -48,12 +48,22 @@ export default function PageRowActions({ page }: PageRowActionsProps) {
           Edit
         </Link>
         <a
-          href={`/${page.slug}`}
+          href={`/preview/${page.id}`}
           target="_blank"
           rel="noopener noreferrer"
           className="text-gray-600 hover:text-[#1B2A6B]"
+          title="Preview (works for drafts too)"
         >
           Preview
+        </a>
+        <a
+          href={`/${page.slug}`}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="text-gray-500 hover:text-[#1B2A6B] text-xs"
+          title="View live (published only)"
+        >
+          View live
         </a>
         <button
           type="button"

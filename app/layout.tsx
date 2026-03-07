@@ -1,24 +1,34 @@
 import type { Metadata } from "next";
-import { Playfair_Display, DM_Sans } from "next/font/google";
+import { Montserrat, Lato } from "next/font/google";
 import "./globals.css";
 import Navbar from "@/components/public/Navbar";
 import Footer from "@/components/public/Footer";
 import WhatsAppButton from "@/components/public/WhatsAppButton";
 import FontLoader from "@/components/FontLoader";
+import Analytics from "@/components/Analytics";
 import { getSiteSettings } from "@/lib/site-settings";
 import { googleFontsUrl, DEFAULT_HEADING_FONT, DEFAULT_BODY_FONT } from "@/lib/google-fonts";
 
-const playfair = Playfair_Display({
+const montserrat = Montserrat({
   subsets: ["latin"],
+  weight: ["400", "700"],
   variable: "--font-heading",
   display: "swap",
 });
 
-const dmSans = DM_Sans({
+const lato = Lato({
   subsets: ["latin"],
+  weight: ["400", "700"],
   variable: "--font-body",
   display: "swap",
 });
+
+export const viewport = {
+  width: 'device-width',
+  initialScale: 1,
+  maximumScale: 5,
+  themeColor: '#1B2A6B',
+};
 
 export async function generateMetadata(): Promise<Metadata> {
   const settings = await getSiteSettings();
@@ -48,7 +58,7 @@ export default async function RootLayout({
   const fontStyle =
     useCustomFonts
       ? {
-          "--font-heading": `"${headingFont.replace(/"/g, '\\"')}", Georgia, serif`,
+          "--font-heading": `"${headingFont.replace(/"/g, '\\"')}", system-ui, sans-serif`,
           "--font-body": `"${bodyFont.replace(/"/g, '\\"')}", system-ui, sans-serif`,
         } as React.CSSProperties
       : undefined;
@@ -57,13 +67,11 @@ export default async function RootLayout({
   const logoSize = (settings.logo_size as 'small' | 'medium' | 'large') || 'medium';
   const navbarLogoPosition = (settings.navbar_logo_position as 'left' | 'center') || 'left';
   const footerLogoPosition = (settings.footer_logo_position as 'left' | 'center') || 'left';
+  const phone = (settings.phone && String(settings.phone).trim()) || '';
 
   return (
-    <html lang="en">
-      <body
-        className={`${playfair.variable} ${dmSans.variable} antialiased`}
-        style={fontStyle}
-      >
+    <html lang="en" className={`${montserrat.variable} ${lato.variable}`} style={fontStyle as React.CSSProperties & Record<string, string>}>
+      <body className="antialiased" style={{ fontFamily: 'var(--font-body)' }}>
         {fontFamilies.length > 0 && (
           <FontLoader href={googleFontsUrl(fontFamilies)} />
         )}
@@ -71,14 +79,16 @@ export default async function RootLayout({
           logoUrl={logoUrl}
           logoSize={logoSize}
           logoPosition={navbarLogoPosition}
+          phoneNumber={phone}
         />
-        <main>{children}</main>
+        <main id="main-content" tabIndex={-1}>{children}</main>
         <Footer
           logoUrl={logoUrl}
           logoSize={logoSize}
           logoPosition={footerLogoPosition}
         />
         <WhatsAppButton />
+        <Analytics />
       </body>
     </html>
   );

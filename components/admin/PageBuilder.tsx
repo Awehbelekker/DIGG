@@ -46,25 +46,56 @@ export default function PageBuilder({ sections, onChange }: PageBuilderProps) {
 
   const sectionLabel = (s: PageSection) => SECTION_TYPES.find((t) => t.type === s.type)?.label ?? s.type
 
+  const quickAdd: { type: PageSection['type']; label: string }[] = [
+    { type: 'hero', label: 'Hero' },
+    { type: 'text', label: 'Text' },
+    { type: 'image', label: 'Image' },
+    { type: 'cta', label: 'CTA' },
+  ]
+
   return (
     <div className="space-y-4">
-      <div className="flex flex-wrap items-center gap-2">
-        <label className="text-sm font-medium text-gray-700">Add section</label>
-        <select
-          aria-label="Section type to add"
-          className="px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-[#F7941D] focus:border-transparent"
-          value=""
-          onChange={(e) => {
-            const v = e.target.value as PageSection['type']
-            if (v) addSection(v)
-            e.target.value = ''
-          }}
-        >
-          <option value="">Choose type…</option>
-          {SECTION_TYPES.map(({ type, label }) => (
-            <option key={type} value={type}>{label}</option>
+      <div className="rounded-xl border border-gray-200 bg-gray-50/50 p-4">
+        <p className="text-sm font-medium text-gray-700 mb-2">Add section</p>
+        <div className="flex flex-wrap items-center gap-2 mb-2">
+          {quickAdd.map(({ type, label }) => (
+            <button
+              key={type}
+              type="button"
+              onClick={() => addSection(type)}
+              className="px-3 py-2 rounded-lg border border-gray-300 bg-white text-sm font-medium text-gray-700 hover:bg-[#F7941D] hover:text-white hover:border-[#F7941D] transition-colors"
+            >
+              + {label}
+            </button>
           ))}
-        </select>
+        </div>
+        <div className="flex flex-wrap items-center gap-2">
+          <label className="text-xs text-gray-500">Or choose any:</label>
+          <select
+            aria-label="Section type to add"
+            className="px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-[#F7941D] focus:border-transparent bg-white"
+            value=""
+            onChange={(e) => {
+              const v = e.target.value as PageSection['type']
+              if (v) addSection(v)
+              e.target.value = ''
+            }}
+          >
+            <option value="">Choose type…</option>
+            <optgroup label="Banners & content">
+              <option value="hero">Hero</option>
+              <option value="text">Text</option>
+              <option value="image">Image</option>
+            </optgroup>
+            <optgroup label="Sections">
+              <option value="grid">Feature grid</option>
+              <option value="stats">Stats</option>
+              <option value="products">Products</option>
+              <option value="cta">Call to action</option>
+              <option value="form">Form</option>
+            </optgroup>
+          </select>
+        </div>
       </div>
 
       <div className="space-y-2">
@@ -134,6 +165,7 @@ export default function PageBuilder({ sections, onChange }: PageBuilderProps) {
               Edit section: {sectionLabel(sections[editingIndex])}
             </h3>
             <SectionBlockEditor
+              key={editingIndex}
               section={sections[editingIndex]}
               onSave={(data) => updateSectionData(editingIndex, data)}
               onCancel={() => setEditingIndex(null)}

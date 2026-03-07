@@ -18,7 +18,7 @@ export default async function EditPagePage({ params }: { params: { id: string } 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
       <AdminPageHeading className="mb-8">Edit Page</AdminPageHeading>
-      <PageEditor page={page as any} />
+      <PageEditor page={page as import('@/lib/types/database').Page} />
     </div>
   )
 }

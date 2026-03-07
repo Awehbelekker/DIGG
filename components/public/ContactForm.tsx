@@ -13,9 +13,19 @@ export default function ContactForm() {
   })
   const [loading, setLoading] = useState(false)
   const [submitted, setSubmitted] = useState(false)
+  const [emailError, setEmailError] = useState('')
+
+  const validateEmail = (email: string) => {
+    if (!email.trim()) return ''
+    const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+    return re.test(email) ? '' : 'Please enter a valid email address.'
+  }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
+    const err = validateEmail(formData.email)
+    setEmailError(err)
+    if (err) return
     setLoading(true)
 
     try {
@@ -48,10 +58,10 @@ export default function ContactForm() {
     )
   }
 
-  const inputClass = "w-full px-4 py-2.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#F7941D] focus:border-transparent focus:outline-none transition-shadow"
+  const inputClass = "w-full px-4 py-3 text-base border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#F7941D] focus:border-transparent focus:outline-none transition-shadow"
 
   return (
-    <form onSubmit={handleSubmit} className="max-w-2xl mx-auto bg-white p-8 lg:p-10 rounded-2xl shadow-sm border border-gray-100">
+    <form onSubmit={handleSubmit} className="max-w-2xl mx-auto bg-white p-6 sm:p-8 lg:p-10 rounded-2xl shadow-sm border border-gray-100">
       <h2 className="text-2xl font-bold text-[#1B2A6B] text-center mb-8 tracking-tight">Get in Touch</h2>
       
       <div className="mb-6">
@@ -91,9 +101,20 @@ export default function ContactForm() {
           id="email"
           required
           value={formData.email}
-          onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-          className={inputClass}
+          onChange={(e) => {
+            setFormData({ ...formData, email: e.target.value })
+            if (emailError) setEmailError(validateEmail(e.target.value))
+          }}
+          onBlur={() => setEmailError(validateEmail(formData.email))}
+          className={`${inputClass} ${emailError ? 'border-red-500 focus:ring-red-500' : ''}`}
+          aria-invalid={!!emailError}
+          aria-describedby={emailError ? 'email-error' : undefined}
         />
+        {emailError && (
+          <p id="email-error" className="mt-1.5 text-sm text-red-600" role="alert">
+            {emailError}
+          </p>
+        )}
       </div>
 
       <div className="mb-6">

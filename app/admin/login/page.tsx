@@ -29,8 +29,8 @@ export default function AdminLoginPage() {
         router.push('/admin/dashboard')
         router.refresh()
       }
-    } catch (error: any) {
-      setError(error.message || 'Failed to login')
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to login')
     } finally {
       setLoading(false)
     }

@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import { createClient } from '@/lib/supabase/client'
 
-function buildCSV(submissions: any[]): string {
+function buildCSV(submissions: import('@/lib/types/database').FormSubmission[]): string {
   if (submissions.length === 0) return ''
   const allKeys = new Set<string>()
   submissions.forEach((s) => Object.keys(s.data || {}).forEach((k) => allKeys.add(k)))
