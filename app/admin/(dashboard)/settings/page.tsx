@@ -36,6 +36,10 @@ function parseHomepageProducts(v: unknown): HomepageProductItem[] {
   return []
 }
 
+function strVal(v: unknown): string {
+  return typeof v === 'string' ? v : ''
+}
+
 export default function AdminSettingsPage() {
   const [settings, setSettings] = useState<Record<string, unknown>>({})
   const [loading, setLoading] = useState(true)
@@ -167,12 +171,12 @@ export default function AdminSettingsPage() {
             <div className="flex space-x-2">
               <input
                 type="email"
-                value={settings.contact_email || 'judy@digg-ct.co.za'}
+                value={String(strVal(settings.contact_email) || 'judy@digg-ct.co.za')}
                 onChange={(e) => setSettings({ ...settings, contact_email: e.target.value })}
                 className="flex-1 px-4 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#F7941D] focus:border-transparent"
               />
               <button
-                onClick={() => handleSave('contact_email', settings.contact_email || 'judy@digg-ct.co.za')}
+                onClick={() => handleSave('contact_email', strVal(settings.contact_email) || 'judy@digg-ct.co.za')}
                 disabled={saving}
                 className="px-6 py-2 bg-[#F7941D] text-white rounded-xl font-semibold hover:bg-[#e6850a] transition-colors disabled:opacity-50"
               >
@@ -185,12 +189,12 @@ export default function AdminSettingsPage() {
             <div className="flex space-x-2">
               <input
                 type="tel"
-                value={settings.phone || '082 707 7080'}
+                value={strVal(settings.phone) || '082 707 7080'}
                 onChange={(e) => setSettings({ ...settings, phone: e.target.value })}
                 className="flex-1 px-4 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#F7941D] focus:border-transparent"
               />
               <button
-                onClick={() => handleSave('phone', settings.phone || '082 707 7080')}
+                onClick={() => handleSave('phone', strVal(settings.phone) || '082 707 7080')}
                 disabled={saving}
                 className="px-6 py-2 bg-[#F7941D] text-white rounded-xl font-semibold hover:bg-[#e6850a] transition-colors disabled:opacity-50"
               >
@@ -203,12 +207,12 @@ export default function AdminSettingsPage() {
             <div className="flex space-x-2">
               <input
                 type="text"
-                value={settings.site_name || 'DIGG Architecture'}
+                value={strVal(settings.site_name) || 'DIGG Architecture'}
                 onChange={(e) => setSettings({ ...settings, site_name: e.target.value })}
                 className="flex-1 px-4 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#F7941D] focus:border-transparent"
               />
               <button
-                onClick={() => handleSave('site_name', settings.site_name || 'DIGG Architecture')}
+                onClick={() => handleSave('site_name', strVal(settings.site_name) || 'DIGG Architecture')}
                 disabled={saving}
                 className="px-6 py-2 bg-[#F7941D] text-white rounded-xl font-semibold hover:bg-[#e6850a] transition-colors disabled:opacity-50"
               >
@@ -228,7 +232,7 @@ export default function AdminSettingsPage() {
               <input
                 type="text"
                 placeholder="/logo/digg-logo.png or https://..."
-                value={settings.logo_url ?? ''}
+                value={strVal(settings.logo_url)}
                 onChange={(e) => setSettings({ ...settings, logo_url: e.target.value })}
                 className="flex-1 min-w-[200px] px-4 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#F7941D] focus:border-transparent"
               />
@@ -246,7 +250,7 @@ export default function AdminSettingsPage() {
             <div className="flex flex-wrap gap-2 items-center">
               <select
                 aria-label="Logo size"
-                value={settings.logo_size ?? 'medium'}
+                value={strVal(settings.logo_size) || 'medium'}
                 onChange={(e) => setSettings({ ...settings, logo_size: e.target.value })}
                 className="min-w-[140px] px-4 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#F7941D] focus:border-transparent"
               >
@@ -268,7 +272,7 @@ export default function AdminSettingsPage() {
             <div className="flex flex-wrap gap-2 items-center">
               <select
                 aria-label="Navbar logo position"
-                value={settings.navbar_logo_position ?? 'left'}
+                value={strVal(settings.navbar_logo_position) || 'left'}
                 onChange={(e) => setSettings({ ...settings, navbar_logo_position: e.target.value })}
                 className="min-w-[140px] px-4 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#F7941D] focus:border-transparent"
               >
@@ -289,7 +293,7 @@ export default function AdminSettingsPage() {
             <div className="flex flex-wrap gap-2 items-center">
               <select
                 aria-label="Footer logo position"
-                value={settings.footer_logo_position ?? 'left'}
+                value={strVal(settings.footer_logo_position) || 'left'}
                 onChange={(e) => setSettings({ ...settings, footer_logo_position: e.target.value })}
                 className="min-w-[140px] px-4 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#F7941D] focus:border-transparent"
               >
@@ -315,7 +319,7 @@ export default function AdminSettingsPage() {
             <div className="flex flex-wrap gap-2 items-center">
               <select
                 aria-label="Heading font"
-                value={settings.heading_font ?? DEFAULT_HEADING_FONT}
+                value={strVal(settings.heading_font) || DEFAULT_HEADING_FONT}
                 onChange={(e) => setSettings({ ...settings, heading_font: e.target.value })}
                 className="min-w-[220px] px-4 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#F7941D] focus:border-transparent"
               >
@@ -339,7 +343,7 @@ export default function AdminSettingsPage() {
             <div className="flex flex-wrap gap-2 items-center">
               <select
                 aria-label="Body font"
-                value={settings.body_font ?? DEFAULT_BODY_FONT}
+                value={strVal(settings.body_font) || DEFAULT_BODY_FONT}
                 onChange={(e) => setSettings({ ...settings, body_font: e.target.value })}
                 className="min-w-[220px] px-4 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#F7941D] focus:border-transparent"
               >
@@ -364,20 +368,20 @@ export default function AdminSettingsPage() {
           <h2 className="text-lg font-semibold text-[#1B2A6B]">Homepage content (headlines & copy)</h2>
           <p className="text-sm text-gray-500">Edit the main text on the homepage. Leave blank to use the default copy.</p>
           {[
-            { key: 'hero_title', label: 'Hero headline', value: settings.hero_title ?? '', placeholder: 'Your Property Should Be Working Harder.' },
-            { key: 'hero_subtitle', label: 'Hero subtitle', value: settings.hero_subtitle ?? '', placeholder: 'DIGG is a Cape Town architecture practice...' },
-            { key: 'hero_primary_cta_text', label: 'Hero primary button text', value: settings.hero_primary_cta_text ?? '', placeholder: 'See What We Do' },
-            { key: 'hero_primary_cta_href', label: 'Hero primary button link', value: settings.hero_primary_cta_href ?? '', placeholder: '#products' },
-            { key: 'hero_secondary_cta_text', label: 'Hero secondary button text', value: settings.hero_secondary_cta_text ?? '', placeholder: 'Talk to Our Team' },
-            { key: 'hero_secondary_cta_href', label: 'Hero secondary button link', value: settings.hero_secondary_cta_href ?? '', placeholder: '/contact' },
-            { key: 'selected_work_heading', label: 'Selected Work section heading', value: settings.selected_work_heading ?? '', placeholder: 'Selected Work' },
-            { key: 'selected_work_intro', label: 'Selected Work intro paragraph', value: settings.selected_work_intro ?? '', placeholder: 'A selection of projects...' },
-            { key: 'selected_work_cta_text', label: 'Selected Work link text', value: settings.selected_work_cta_text ?? '', placeholder: 'Discuss your project →' },
-            { key: 'products_heading', label: 'Products section heading', value: settings.products_heading ?? '', placeholder: 'Built Products. Proven Solutions.' },
-            { key: 'products_intro', label: 'Products section intro', value: settings.products_intro ?? '', placeholder: "We've turned decades of..." },
-            { key: 'agents_heading', label: 'Estate agents strip heading', value: settings.agents_heading ?? '', placeholder: 'Are You an Estate Agent?' },
-            { key: 'agents_intro', label: 'Estate agents strip paragraph', value: settings.agents_intro ?? '', placeholder: 'Give your sellers something...' },
-            { key: 'agents_cta_text', label: 'Estate agents button text', value: settings.agents_cta_text ?? '', placeholder: 'Partner With DIGG' },
+            { key: 'hero_title', label: 'Hero headline', value: strVal(settings.hero_title), placeholder: 'Your Property Should Be Working Harder.' },
+            { key: 'hero_subtitle', label: 'Hero subtitle', value: strVal(settings.hero_subtitle), placeholder: 'DIGG is a Cape Town architecture practice...' },
+            { key: 'hero_primary_cta_text', label: 'Hero primary button text', value: strVal(settings.hero_primary_cta_text), placeholder: 'See What We Do' },
+            { key: 'hero_primary_cta_href', label: 'Hero primary button link', value: strVal(settings.hero_primary_cta_href), placeholder: '#products' },
+            { key: 'hero_secondary_cta_text', label: 'Hero secondary button text', value: strVal(settings.hero_secondary_cta_text), placeholder: 'Talk to Our Team' },
+            { key: 'hero_secondary_cta_href', label: 'Hero secondary button link', value: strVal(settings.hero_secondary_cta_href), placeholder: '/contact' },
+            { key: 'selected_work_heading', label: 'Selected Work section heading', value: strVal(settings.selected_work_heading), placeholder: 'Selected Work' },
+            { key: 'selected_work_intro', label: 'Selected Work intro paragraph', value: strVal(settings.selected_work_intro), placeholder: 'A selection of projects...' },
+            { key: 'selected_work_cta_text', label: 'Selected Work link text', value: strVal(settings.selected_work_cta_text), placeholder: 'Discuss your project →' },
+            { key: 'products_heading', label: 'Products section heading', value: strVal(settings.products_heading), placeholder: 'Built Products. Proven Solutions.' },
+            { key: 'products_intro', label: 'Products section intro', value: strVal(settings.products_intro), placeholder: "We've turned decades of..." },
+            { key: 'agents_heading', label: 'Estate agents strip heading', value: strVal(settings.agents_heading), placeholder: 'Are You an Estate Agent?' },
+            { key: 'agents_intro', label: 'Estate agents strip paragraph', value: strVal(settings.agents_intro), placeholder: 'Give your sellers something...' },
+            { key: 'agents_cta_text', label: 'Estate agents button text', value: strVal(settings.agents_cta_text), placeholder: 'Partner With DIGG' },
           ].map(({ key, label, value, placeholder }) => (
             <div key={key}>
               <label className="block text-sm font-medium text-gray-700 mb-2">{label}</label>
@@ -403,7 +407,10 @@ export default function AdminSettingsPage() {
             <label className="block text-sm font-medium text-gray-700 mb-2">Middle strip (3 boxes)</label>
             <p className="text-xs text-gray-500 mb-2">Title and body for each of the three value boxes (e.g. Untapped Value, Intelligent Design, Full-Service Partnership).</p>
             {[0, 1, 2].map((i) => {
-              const strip = Array.isArray(settings.homepage_strip) && settings.homepage_strip[i] ? settings.homepage_strip[i] : { title: '', body: '' }
+              const raw = Array.isArray(settings.homepage_strip) && settings.homepage_strip[i] ? settings.homepage_strip[i] : null
+              const strip = raw && typeof raw === 'object' && 'title' in raw && 'body' in raw
+                ? { title: strVal((raw as Record<string, unknown>).title), body: strVal((raw as Record<string, unknown>).body) }
+                : { title: '', body: '' }
               return (
                 <div key={i} className="mb-4 p-4 rounded-xl bg-gray-50 border border-gray-100">
                   <p className="text-xs font-medium text-gray-500 mb-2">Box {i + 1}</p>
@@ -453,7 +460,7 @@ export default function AdminSettingsPage() {
               <input
                 type="url"
                 placeholder="https://..."
-                value={settings.hero_image_url || ''}
+                value={strVal(settings.hero_image_url)}
                 onChange={(e) => setSettings({ ...settings, hero_image_url: e.target.value })}
                 className="flex-1 px-4 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#F7941D] focus:border-transparent"
               />
@@ -473,7 +480,7 @@ export default function AdminSettingsPage() {
               <input
                 type="url"
                 placeholder="https://... or /logo/favicon.ico"
-                value={settings.favicon_url || ''}
+                value={strVal(settings.favicon_url)}
                 onChange={(e) => setSettings({ ...settings, favicon_url: e.target.value })}
                 className="flex-1 px-4 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#F7941D] focus:border-transparent"
               />
@@ -493,7 +500,7 @@ export default function AdminSettingsPage() {
               <input
                 type="url"
                 placeholder="https://..."
-                value={settings.og_image_url || ''}
+                value={strVal(settings.og_image_url)}
                 onChange={(e) => setSettings({ ...settings, og_image_url: e.target.value })}
                 className="flex-1 px-4 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#F7941D] focus:border-transparent"
               />

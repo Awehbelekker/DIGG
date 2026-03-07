@@ -131,11 +131,11 @@ export default function PageBuilder({ sections, onChange }: PageBuilderProps) {
             </div>
             <div className="min-w-0 flex-1">
               <span className="font-medium text-[#1B2A6B]">{sectionLabel(section)}</span>
-              {section.type === 'hero' && section.data?.title && (
-                <span className="ml-2 text-gray-500 truncate">— {(section.data.title as string).slice(0, 40)}…</span>
+              {section.type === 'hero' && typeof section.data?.title === 'string' && section.data.title && (
+                <span className="ml-2 text-gray-500 truncate">— {section.data.title.slice(0, 40)}…</span>
               )}
-              {section.type === 'text' && section.data?.heading && (
-                <span className="ml-2 text-gray-500 truncate">— {(section.data.heading as string).slice(0, 40)}…</span>
+              {section.type === 'text' && typeof section.data?.heading === 'string' && section.data.heading && (
+                <span className="ml-2 text-gray-500 truncate">— {section.data.heading.slice(0, 40)}…</span>
               )}
             </div>
             <div className="flex flex-shrink-0 gap-1">
