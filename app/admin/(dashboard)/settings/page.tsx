@@ -6,6 +6,7 @@ import AdminPageHeading from '@/components/admin/AdminPageHeading'
 import SettingsUrlValidation from '@/components/admin/SettingsUrlValidation'
 import { GOOGLE_FONT_OPTIONS, DEFAULT_HEADING_FONT, DEFAULT_BODY_FONT } from '@/lib/google-fonts'
 import { showToast } from '@/components/admin/Toast'
+import DropUpload from '@/components/admin/DropUpload'
 
 type SelectedWorkItem = { title: string; place: string; imageUrl?: string; link?: string }
 
@@ -227,24 +228,16 @@ export default function AdminSettingsPage() {
           <h2 className="text-lg font-semibold text-[#1B2A6B]">Logo</h2>
           <p className="text-sm text-gray-500">Logo image, size, and position in navbar and footer.</p>
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">Logo URL</label>
-            <p className="text-xs text-gray-500 mb-1">Leave blank to use the default logo (e.g. /logo/digg-logo.png). Use a full URL or path.</p>
-            <div className="flex flex-wrap gap-2 items-center">
-              <input
-                type="text"
-                placeholder="/logo/digg-logo.png or https://..."
-                value={strVal(settings.logo_url)}
-                onChange={(e) => setSettings({ ...settings, logo_url: e.target.value })}
-                className="flex-1 min-w-[200px] px-4 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#F7941D] focus:border-transparent"
-              />
-              <button
-                onClick={() => handleSave('logo_url', settings.logo_url ?? '')}
-                disabled={saving}
-                className="px-6 py-2 bg-[#F7941D] text-white rounded-xl font-semibold hover:bg-[#e6850a] transition-colors disabled:opacity-50"
-              >
-                Save
-              </button>
-            </div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">Logo</label>
+            <p className="text-xs text-gray-500 mb-1">Drop a logo image or paste a URL. Leave blank for default.</p>
+            <DropUpload
+              compact
+              value={strVal(settings.logo_url)}
+              onChange={(url) => { setSettings({ ...settings, logo_url: url }); handleSave('logo_url', url) }}
+              bucket="logos"
+              folder="logo"
+              label="Logo"
+            />
           </div>
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">Logo size</label>
@@ -455,64 +448,38 @@ export default function AdminSettingsPage() {
         <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 space-y-6">
           <h2 className="text-lg font-semibold text-[#1B2A6B]">Homepage hero & sharing</h2>
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">Hero image URL (homepage)</label>
-            <p className="text-xs text-gray-500 mb-1">Use a full image URL (e.g. from Images after upload, or an external link). Leave blank for gradient.</p>
-            <div className="flex space-x-2">
-              <input
-                type="url"
-                placeholder="https://..."
-                value={strVal(settings.hero_image_url)}
-                onChange={(e) => setSettings({ ...settings, hero_image_url: e.target.value })}
-                className="flex-1 px-4 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#F7941D] focus:border-transparent"
-              />
-              <button
-                onClick={() => handleSave('hero_image_url', settings.hero_image_url || '')}
-                disabled={saving}
-                className="px-6 py-2 bg-[#F7941D] text-white rounded-xl font-semibold hover:bg-[#e6850a] transition-colors disabled:opacity-50"
-              >
-                Save
-              </button>
-            </div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">Hero image (homepage)</label>
+            <p className="text-xs text-gray-500 mb-1">Drop an image or paste URL. Leave blank for gradient.</p>
+            <DropUpload
+              value={strVal(settings.hero_image_url)}
+              onChange={(url) => { setSettings({ ...settings, hero_image_url: url }); handleSave('hero_image_url', url) }}
+              bucket="hero-images"
+              folder="hero"
+              label="Hero"
+            />
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">Favicon URL</label>
-            <p className="text-xs text-gray-500 mb-1">Browser tab icon. Use a direct image URL (e.g. .ico or .png).</p>
-            <div className="flex space-x-2">
-              <input
-                type="url"
-                placeholder="https://... or /logo/favicon.ico"
-                value={strVal(settings.favicon_url)}
-                onChange={(e) => setSettings({ ...settings, favicon_url: e.target.value })}
-                className="flex-1 px-4 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#F7941D] focus:border-transparent"
-              />
-              <button
-                onClick={() => handleSave('favicon_url', settings.favicon_url || '')}
-                disabled={saving}
-                className="px-6 py-2 bg-[#F7941D] text-white rounded-xl font-semibold hover:bg-[#e6850a] transition-colors disabled:opacity-50"
-              >
-                Save
-              </button>
-            </div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">Favicon</label>
+            <p className="text-xs text-gray-500 mb-1">Browser tab icon (.ico or .png).</p>
+            <DropUpload
+              compact
+              value={strVal(settings.favicon_url)}
+              onChange={(url) => { setSettings({ ...settings, favicon_url: url }); handleSave('favicon_url', url) }}
+              bucket="logos"
+              folder="favicon"
+              label="Favicon"
+            />
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">OG image URL (social sharing)</label>
-            <p className="text-xs text-gray-500 mb-1">Image shown when the site is shared (e.g. Facebook, LinkedIn). Recommended 1200×630px.</p>
-            <div className="flex space-x-2">
-              <input
-                type="url"
-                placeholder="https://..."
-                value={strVal(settings.og_image_url)}
-                onChange={(e) => setSettings({ ...settings, og_image_url: e.target.value })}
-                className="flex-1 px-4 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#F7941D] focus:border-transparent"
-              />
-              <button
-                onClick={() => handleSave('og_image_url', settings.og_image_url || '')}
-                disabled={saving}
-                className="px-6 py-2 bg-[#F7941D] text-white rounded-xl font-semibold hover:bg-[#e6850a] transition-colors disabled:opacity-50"
-              >
-                Save
-              </button>
-            </div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">OG image (social sharing)</label>
+            <p className="text-xs text-gray-500 mb-1">Shown when site is shared on social media. Recommended 1200x630.</p>
+            <DropUpload
+              value={strVal(settings.og_image_url)}
+              onChange={(url) => { setSettings({ ...settings, og_image_url: url }); handleSave('og_image_url', url) }}
+              bucket="hero-images"
+              folder="og"
+              label="OG image"
+            />
           </div>
         </div>
 
@@ -539,13 +506,16 @@ export default function AdminSettingsPage() {
                 onChange={(e) => updateSelectedWorkItem(index, { place: e.target.value })}
                 className="w-32 px-3 py-2 border border-gray-300 rounded-lg text-sm"
               />
-              <input
-                type="url"
-                placeholder="Image URL"
-                value={item.imageUrl || ''}
-                onChange={(e) => updateSelectedWorkItem(index, { imageUrl: e.target.value })}
-                className="flex-1 min-w-[180px] px-3 py-2 border border-gray-300 rounded-lg text-sm"
-              />
+              <div className="flex-1 min-w-[180px]">
+                <DropUpload
+                  compact
+                  value={item.imageUrl || ''}
+                  onChange={(url) => updateSelectedWorkItem(index, { imageUrl: url })}
+                  bucket="portfolio"
+                  folder="work"
+                  label="Project"
+                />
+              </div>
               <input
                 type="text"
                 placeholder="Link (optional)"
@@ -607,12 +577,13 @@ export default function AdminSettingsPage() {
                 </label>
                 <button type="button" onClick={() => removeHomepageProduct(index)} className="px-3 py-2 text-red-600 hover:bg-red-50 rounded-lg text-sm">Remove</button>
               </div>
-              <input
-                type="url"
-                placeholder="Image URL"
+              <DropUpload
+                compact
                 value={item.imageUrl || ''}
-                onChange={(e) => updateHomepageProduct(index, { imageUrl: e.target.value })}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm"
+                onChange={(url) => updateHomepageProduct(index, { imageUrl: url })}
+                bucket="portfolio"
+                folder="product"
+                label="Product"
               />
               <textarea
                 placeholder="Description"

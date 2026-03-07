@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import type { PageSection } from '@/lib/types/database'
+import DropUpload from './DropUpload'
 
 type SectionBlockEditorProps = {
   section: PageSection
@@ -54,8 +55,8 @@ export default function SectionBlockEditor({ section, onSave, onCancel }: Sectio
           </div>
         </div>
         <div>
-          <label className={labelClass}>Background image URL</label>
-          <input type="url" value={(data.backgroundImageUrl as string) ?? ''} onChange={(e) => update('backgroundImageUrl', e.target.value)} className={inputClass} placeholder="https://..." />
+          <label className={labelClass}>Background image</label>
+          <DropUpload value={(data.backgroundImageUrl as string) ?? ''} onChange={(url) => update('backgroundImageUrl', url)} bucket="hero-images" folder="hero" />
         </div>
         <EditorFooter onCancel={onCancel} />
       </form>
@@ -90,14 +91,8 @@ export default function SectionBlockEditor({ section, onSave, onCancel }: Sectio
     return (
       <form onSubmit={handleSubmit} className="space-y-4">
         <div>
-          <label className={labelClass}>Image URL</label>
-          <input
-            type="url"
-            value={(data.imageUrl as string) ?? ''}
-            onChange={(e) => update('imageUrl', e.target.value)}
-            className={inputClass}
-            placeholder="https://..."
-          />
+          <label className={labelClass}>Image</label>
+          <DropUpload value={(data.imageUrl as string) ?? ''} onChange={(url) => update('imageUrl', url)} bucket="hero-images" folder="section" />
         </div>
         <div>
           <label className={labelClass}>Alt text (for accessibility)</label>
@@ -167,16 +162,17 @@ export default function SectionBlockEditor({ section, onSave, onCancel }: Sectio
               rows={2}
               className={inputClass}
             />
-            <input
-              type="url"
-              placeholder="Image URL"
+            <DropUpload
+              compact
               value={item.imageUrl ?? ''}
-              onChange={(e) => {
+              onChange={(url) => {
                 const next = [...items]
-                next[i] = { ...next[i], imageUrl: e.target.value }
+                next[i] = { ...next[i], imageUrl: url }
                 update('items', next)
               }}
-              className={inputClass}
+              bucket="portfolio"
+              folder="grid"
+              label="Grid image"
             />
           </div>
         ))}
@@ -265,16 +261,17 @@ export default function SectionBlockEditor({ section, onSave, onCancel }: Sectio
               }}
               className={inputClass}
             />
-            <input
-              type="url"
-              placeholder="Image URL"
+            <DropUpload
+              compact
               value={item.imageUrl ?? ''}
-              onChange={(e) => {
+              onChange={(url) => {
                 const next = [...items]
-                next[i] = { ...next[i], imageUrl: e.target.value }
+                next[i] = { ...next[i], imageUrl: url }
                 update('items', next)
               }}
-              className={inputClass}
+              bucket="portfolio"
+              folder="product"
+              label="Product image"
             />
             <textarea
               placeholder="Description"
