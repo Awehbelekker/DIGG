@@ -63,3 +63,29 @@ ON CONFLICT (slug) DO UPDATE SET title=EXCLUDED.title, meta_title=EXCLUDED.meta_
 INSERT INTO pages (slug, title, meta_title, meta_description, content, published) VALUES
 ('give', 'Give', 'Community | DIGG Architecture Cape Town', 'DIGG gives back through student mentorship, SME support, urban activation at Echium Park, and community gardening.', '{"sections":[{"type":"hero","data":{"title":"Because Architecture Should Serve More Than One Client.","subtitle":"","primaryCTAtext":"Learn More","primaryCTAhref":"/insights","secondaryCTAtext":"Contact","secondaryCTAhref":"/contact","backgroundImageUrl":""}},{"type":"text","data":{"heading":"","body":"The ''G'' in DIGG is the one we''re most proud of.\n\nBuilding a successful practice is not enough on its own. From the beginning, DIGG has been committed to giving back — to the profession, to the community, and to the city we call home. These are not marketing initiatives. They are part of who we are as a team.","alignment":"left"}},{"type":"text","data":{"heading":"Initiative 1 — Student Empowerment","body":"Training the next generation — and paying them for it.\n\nArchitecture students spend years learning theory before earning a cent. We''re building a programme that changes that. We work with students to draft and document existing buildings — feeding real professional work into our network while generating real income for the students who do it. Real experience. Real revenue. No waiting.","alignment":"left"}},{"type":"text","data":{"heading":"Initiative 2 — SME Network Support","body":"Architecture for the businesses that need it most.\n\nSmall and medium businesses are the backbone of Cape Town''s economy — and often the last to get access to proper architectural support. We maintain a network to assist smaller businesses with development, maintenance, upgrades and compliance, at rates and with an approach designed for their scale.","alignment":"left"}},{"type":"text","data":{"heading":"Initiative 3 — Echium Park","body":"Making public space work for everyone.\n\nEchium Park is DIGG''s first defined urban design project — a community space with the potential to become a genuine neighbourhood asset. We''re developing plans to activate this space in a way Cape Town can be proud of. Updates to follow as the project develops.","alignment":"left"}},{"type":"text","data":{"heading":"Initiative 4 — Community Gardening","body":"Growing food. Growing community.\n\nWe''re establishing a community growing group — a practical, hands-on project that brings people together, produces food, and creates green space in an urban environment. Simple. Purposeful. Very DIGG.\n\nFollow our progress on these projects in the Insights section. We''ll document the journey honestly — including the setbacks.","alignment":"left"}}]}'::jsonb, true)
 ON CONFLICT (slug) DO UPDATE SET title=EXCLUDED.title, meta_title=EXCLUDED.meta_title, meta_description=EXCLUDED.meta_description, content=EXCLUDED.content, published=EXCLUDED.published, updated_at=now();
+
+-- 6. Storage buckets for image uploads (hero, logo, team, portfolio)
+INSERT INTO storage.buckets (id, name, public) VALUES ('hero-images', 'hero-images', true) ON CONFLICT (id) DO NOTHING;
+INSERT INTO storage.buckets (id, name, public) VALUES ('logos', 'logos', true) ON CONFLICT (id) DO NOTHING;
+INSERT INTO storage.buckets (id, name, public) VALUES ('team-photos', 'team-photos', true) ON CONFLICT (id) DO NOTHING;
+INSERT INTO storage.buckets (id, name, public) VALUES ('portfolio', 'portfolio', true) ON CONFLICT (id) DO NOTHING;
+
+CREATE POLICY "Public read hero-images" ON storage.objects FOR SELECT USING (bucket_id = 'hero-images');
+CREATE POLICY "Public read logos" ON storage.objects FOR SELECT USING (bucket_id = 'logos');
+CREATE POLICY "Public read team-photos" ON storage.objects FOR SELECT USING (bucket_id = 'team-photos');
+CREATE POLICY "Public read portfolio" ON storage.objects FOR SELECT USING (bucket_id = 'portfolio');
+
+CREATE POLICY "Auth upload hero-images" ON storage.objects FOR INSERT WITH CHECK (bucket_id = 'hero-images' AND auth.role() = 'authenticated');
+CREATE POLICY "Auth upload logos" ON storage.objects FOR INSERT WITH CHECK (bucket_id = 'logos' AND auth.role() = 'authenticated');
+CREATE POLICY "Auth upload team-photos" ON storage.objects FOR INSERT WITH CHECK (bucket_id = 'team-photos' AND auth.role() = 'authenticated');
+CREATE POLICY "Auth upload portfolio" ON storage.objects FOR INSERT WITH CHECK (bucket_id = 'portfolio' AND auth.role() = 'authenticated');
+
+CREATE POLICY "Auth update hero-images" ON storage.objects FOR UPDATE USING (bucket_id = 'hero-images' AND auth.role() = 'authenticated');
+CREATE POLICY "Auth update logos" ON storage.objects FOR UPDATE USING (bucket_id = 'logos' AND auth.role() = 'authenticated');
+CREATE POLICY "Auth update team-photos" ON storage.objects FOR UPDATE USING (bucket_id = 'team-photos' AND auth.role() = 'authenticated');
+CREATE POLICY "Auth update portfolio" ON storage.objects FOR UPDATE USING (bucket_id = 'portfolio' AND auth.role() = 'authenticated');
+
+CREATE POLICY "Auth delete hero-images" ON storage.objects FOR DELETE USING (bucket_id = 'hero-images' AND auth.role() = 'authenticated');
+CREATE POLICY "Auth delete logos" ON storage.objects FOR DELETE USING (bucket_id = 'logos' AND auth.role() = 'authenticated');
+CREATE POLICY "Auth delete team-photos" ON storage.objects FOR DELETE USING (bucket_id = 'team-photos' AND auth.role() = 'authenticated');
+CREATE POLICY "Auth delete portfolio" ON storage.objects FOR DELETE USING (bucket_id = 'portfolio' AND auth.role() = 'authenticated');
