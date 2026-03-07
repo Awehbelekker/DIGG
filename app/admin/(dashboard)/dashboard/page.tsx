@@ -71,7 +71,9 @@ export default async function AdminDashboard() {
                 <div className="flex justify-between items-start">
                   <div>
                     <p className="font-semibold text-[#1B2A6B]">
-                      {submission.data.name || 'Unknown'}
+                      {typeof (submission.data as Record<string, unknown>)?.name === 'string'
+                        ? (submission.data as Record<string, unknown>).name
+                        : 'Unknown'}
                     </p>
                     <p className="text-sm text-gray-600">
                       {submission.form_type === 'contact' ? 'Contact Form' : 'Agent Registration'}
