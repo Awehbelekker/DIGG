@@ -205,6 +205,24 @@ export default function GrapesjsEditor({ page }: GrapesjsEditorProps) {
 
   useEffect(() => { saveRef.current = handleSave }, [handleSave])
 
+  useEffect(() => {
+    const nav = document.querySelector('nav.bg-\\[\\#1B2A6B\\]') as HTMLElement | null
+    const main = document.querySelector('main') as HTMLElement | null
+    const wrapper = main?.parentElement as HTMLElement | null
+
+    if (nav) nav.style.display = 'none'
+    if (main) { main.style.padding = '0'; main.style.margin = '0' }
+    if (wrapper) wrapper.style.background = 'transparent'
+    document.body.style.overflow = 'hidden'
+
+    return () => {
+      if (nav) nav.style.display = ''
+      if (main) { main.style.padding = ''; main.style.margin = '' }
+      if (wrapper) wrapper.style.background = ''
+      document.body.style.overflow = ''
+    }
+  }, [])
+
   const onEditor = useCallback((editor: Editor) => {
     editorRef.current = editor
 

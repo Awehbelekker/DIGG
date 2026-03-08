@@ -138,14 +138,22 @@ h2, h3, h4, h5, h6 {
   position: relative !important;
 }
 
-/* Let GrapesJS render its own native panels (commands, options, devices) */
+/* Make the GrapesJS native toolbar clearly visible */
+.gjs-pn-commands,
+.gjs-pn-options {
+  background-color: #353535 !important;
+}
+
+.gjs-pn-devices-c {
+  background-color: #353535 !important;
+}
 
 /* Sidebar */
 .gjs-pn-views-container {
   overflow-y: auto;
 }
 
-/* Style our injected panel buttons so they blend with the GrapesJS toolbar */
+/* Style our injected panel buttons */
 .gjs-pn-options .gjs-pn-btn {
   padding: 0 2px;
 }

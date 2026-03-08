@@ -23,7 +23,7 @@ export default function Footer({ logoUrl = '', logoSize = 'medium', logoPosition
   const isExternalLogo = logoSrc.startsWith('http')
 
   const logoBlock = (
-    <Link href="/" className="inline-flex items-center bg-white/90 rounded-xl p-1.5 mb-3" aria-label="DIGG Home">
+    <Link href="/" className="inline-flex items-center mb-3" aria-label="DIGG Home">
       {isExternalLogo ? (
         // eslint-disable-next-line @next/next/no-img-element
         <img

@@ -66,7 +66,7 @@ export default function Navbar({ logoUrl = '', logoSize = 'medium', logoPosition
   const logoEl = (
     <Link
       href="/"
-      className="flex items-center bg-white/90 rounded-xl p-1 sm:p-1.5 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#F7941D] focus-visible:ring-offset-2 shrink-0"
+      className="flex items-center focus:outline-none focus-visible:ring-2 focus-visible:ring-[#F7941D] focus-visible:ring-offset-2 shrink-0"
       aria-label="DIGG Home"
     >
       {isExternalLogo ? (
