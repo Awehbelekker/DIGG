@@ -6,6 +6,12 @@ import ContactForm from './ContactForm'
 import AgentForm from './AgentForm'
 import RevealSection from './RevealSection'
 import ImageWithPlaceholder from './ImageWithPlaceholder'
+import Testimonial from './Testimonial'
+import VideoEmbed from './VideoEmbed'
+import Gallery from './Gallery'
+import TwoColumn from './TwoColumn'
+import LogoBar from './LogoBar'
+import FAQ from './FAQ'
 
 type SectionRendererProps = { section: PageSection }
 
@@ -79,6 +85,18 @@ export default function SectionRenderer({ section }: SectionRendererProps) {
     )
   }
 
+  if (type === 'two_column') {
+    return (
+      <TwoColumn
+        heading={(data.heading as string) || ''}
+        body={(data.body as string) || ''}
+        imageUrl={(data.imageUrl as string) || ''}
+        imageAlt={(data.imageAlt as string) || ''}
+        reversed={!!data.reversed}
+      />
+    )
+  }
+
   if (type === 'grid') {
     const title = (data.title as string) || ''
     const items = (data.items as { title: string; description: string; imageUrl?: string }[]) ?? []
@@ -110,6 +128,11 @@ export default function SectionRenderer({ section }: SectionRendererProps) {
         </div>
       </RevealSection>
     )
+  }
+
+  if (type === 'gallery') {
+    const images = (data.images as { url: string; alt?: string }[]) ?? []
+    return <Gallery title={(data.title as string) || ''} images={images} />
   }
 
   if (type === 'stats') {
@@ -164,6 +187,38 @@ export default function SectionRenderer({ section }: SectionRendererProps) {
     )
   }
 
+  if (type === 'testimonial') {
+    return (
+      <Testimonial
+        quote={(data.quote as string) || ''}
+        author={(data.author as string) || ''}
+        role={(data.role as string) || ''}
+        company={(data.company as string) || ''}
+        photoUrl={(data.photoUrl as string) || ''}
+      />
+    )
+  }
+
+  if (type === 'video') {
+    return (
+      <VideoEmbed
+        heading={(data.heading as string) || ''}
+        videoUrl={(data.videoUrl as string) || ''}
+        caption={(data.caption as string) || ''}
+      />
+    )
+  }
+
+  if (type === 'logos') {
+    const logos = (data.logos as { name: string; imageUrl?: string }[]) ?? []
+    return <LogoBar title={(data.title as string) || ''} logos={logos} />
+  }
+
+  if (type === 'faq') {
+    const items = (data.items as { question: string; answer: string }[]) ?? []
+    return <FAQ title={(data.title as string) || ''} items={items} />
+  }
+
   if (type === 'cta') {
     const title = (data.title as string) || ''
     const description = (data.description as string) || ''
@@ -182,6 +237,17 @@ export default function SectionRenderer({ section }: SectionRendererProps) {
           </Link>
         </div>
       </RevealSection>
+    )
+  }
+
+  if (type === 'divider') {
+    const size = (data.size as string) || 'md'
+    const showLine = data.showLine !== false
+    const py = size === 'sm' ? 'py-4' : size === 'lg' ? 'py-16' : 'py-8'
+    return (
+      <div className={py}>
+        {showLine && <hr className="max-w-7xl mx-auto border-gray-200" />}
+      </div>
     )
   }
 

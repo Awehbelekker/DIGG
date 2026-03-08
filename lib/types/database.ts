@@ -15,8 +15,25 @@ export interface PageContent {
   sections: PageSection[]
 }
 
+export type SectionType =
+  | 'hero'
+  | 'text'
+  | 'image'
+  | 'grid'
+  | 'stats'
+  | 'products'
+  | 'cta'
+  | 'form'
+  | 'testimonial'
+  | 'video'
+  | 'gallery'
+  | 'two_column'
+  | 'logos'
+  | 'faq'
+  | 'divider'
+
 export interface PageSection {
-  type: 'hero' | 'text' | 'image' | 'grid' | 'stats' | 'products' | 'cta' | 'form'
+  type: SectionType
   data: Record<string, unknown>
 }
 

@@ -123,3 +123,10 @@ h2, h3, h4, h5, h6 {
   border-radius: inherit;
   overflow: hidden;
 }
+
+/* Insert section bar — visible on hover in the gap */
+.insert-section-bar {
+  min-height: 16px;
+  position: relative;
+  z-index: 10;
+}

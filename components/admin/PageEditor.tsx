@@ -1,13 +1,14 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useCallback, useRef, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import { showToast } from '@/components/admin/Toast'
-import { Page } from '@/lib/types/database'
-import { getRecommendedStartingSections } from '@/lib/section-config'
-import PageBuilder from '@/components/admin/PageBuilder'
-import LivePreview from '@/components/admin/LivePreview'
+import type { Page, PageSection } from '@/lib/types/database'
+import useHistory from '@/hooks/useHistory'
+import EditorTopBar, { type DeviceMode } from './EditorTopBar'
+import SettingsDrawer from './SettingsDrawer'
+import LivePreview from './LivePreview'
 
 interface PageEditorProps {
   page?: Page
@@ -16,211 +17,171 @@ interface PageEditorProps {
 export default function PageEditor({ page }: PageEditorProps) {
   const router = useRouter()
   const supabase = createClient()
-  const [loading, setLoading] = useState(false)
-  const [formData, setFormData] = useState({
-    slug: page?.slug || '',
-    title: page?.title || '',
-    meta_title: page?.meta_title || '',
-    meta_description: page?.meta_description || '',
-    meta_og_image: page?.meta_og_image || '',
-    published: page?.published ?? true,
-    content: page?.content || { sections: getRecommendedStartingSections() }
-  })
+  const [saving, setSaving] = useState(false)
+  const [device, setDevice] = useState<DeviceMode>('desktop')
+  const [settingsOpen, setSettingsOpen] = useState(false)
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setLoading(true)
+  const [title, setTitle] = useState(page?.title || 'Untitled page')
+  const [slug, setSlug] = useState(page?.slug || '')
+  const [metaTitle, setMetaTitle] = useState(page?.meta_title || '')
+  const [metaDescription, setMetaDescription] = useState(page?.meta_description || '')
+  const [metaOgImage, setMetaOgImage] = useState(page?.meta_og_image || '')
+  const [published, setPublished] = useState(page?.published ?? true)
 
+  const initialSections = (page?.content?.sections as PageSection[]) ?? []
+  const history = useHistory<PageSection[]>(initialSections)
+  const lastSavedRef = useRef(JSON.stringify(initialSections))
+
+  const hasUnsaved = JSON.stringify(history.state) !== lastSavedRef.current
+    || title !== (page?.title || 'Untitled page')
+    || slug !== (page?.slug || '')
+
+  const pushSections = useCallback((sections: PageSection[]) => {
+    history.push(sections)
+  }, [history])
+
+  const handleUpdateSection = useCallback((index: number, data: Record<string, unknown>) => {
+    const next = [...history.state]
+    next[index] = { ...next[index], data }
+    pushSections(next)
+  }, [history.state, pushSections])
+
+  const handleInsertSection = useCallback((index: number, section: PageSection) => {
+    const next = [...history.state]
+    next.splice(index, 0, section)
+    pushSections(next)
+  }, [history.state, pushSections])
+
+  const handleInsertMultipleSections = useCallback((index: number, sections: PageSection[]) => {
+    const next = [...history.state]
+    next.splice(index, 0, ...sections)
+    pushSections(next)
+  }, [history.state, pushSections])
+
+  const handleMoveSection = useCallback((from: number, to: number) => {
+    if (to < 0 || to >= history.state.length) return
+    const next = [...history.state]
+    const [moved] = next.splice(from, 1)
+    next.splice(to, 0, moved)
+    pushSections(next)
+  }, [history.state, pushSections])
+
+  const handleDuplicateSection = useCallback((index: number) => {
+    const next = [...history.state]
+    const clone = JSON.parse(JSON.stringify(next[index]))
+    next.splice(index + 1, 0, clone)
+    pushSections(next)
+  }, [history.state, pushSections])
+
+  const handleDeleteSection = useCallback((index: number) => {
+    const next = history.state.filter((_, i) => i !== index)
+    pushSections(next)
+  }, [history.state, pushSections])
+
+  const handleSave = useCallback(async () => {
+    if (!slug.trim()) {
+      showToast('Please set a page slug in Settings before saving.', 'error')
+      setSettingsOpen(true)
+      return
+    }
+    setSaving(true)
     try {
+      const payload = {
+        slug,
+        title,
+        meta_title: metaTitle || null,
+        meta_description: metaDescription || null,
+        meta_og_image: metaOgImage || null,
+        published,
+        content: { sections: history.state },
+        updated_at: new Date().toISOString(),
+      }
       if (page) {
-        // Update existing page
-        const { error } = await supabase
-          .from('pages')
-          .update({
-            ...formData,
-            updated_at: new Date().toISOString()
-          })
-          .eq('id', page.id)
-
+        const { error } = await supabase.from('pages').update(payload).eq('id', page.id)
         if (error) throw error
       } else {
-        // Create new page
-        const { error } = await supabase
-          .from('pages')
-          .insert([formData])
-
+        const { error } = await supabase.from('pages').insert([payload])
         if (error) throw error
       }
-
+      lastSavedRef.current = JSON.stringify(history.state)
       showToast('Page saved!')
-      router.push('/admin/pages')
-      router.refresh()
+      if (!page) {
+        router.push('/admin/pages')
+        router.refresh()
+      }
     } catch (err) {
-      console.error('Error saving page:', err)
-      showToast('Error saving page: ' + (err instanceof Error ? err.message : String(err)), 'error')
+      showToast('Error: ' + (err instanceof Error ? err.message : String(err)), 'error')
     } finally {
-      setLoading(false)
+      setSaving(false)
     }
-  }
+  }, [slug, title, metaTitle, metaDescription, metaOgImage, published, history.state, page, supabase, router])
 
-  const previewSlug = formData.slug?.trim()
+  useEffect(() => {
+    const handler = (e: KeyboardEvent) => {
+      if ((e.ctrlKey || e.metaKey) && e.key === 's') {
+        e.preventDefault()
+        handleSave()
+      }
+    }
+    window.addEventListener('keydown', handler)
+    return () => window.removeEventListener('keydown', handler)
+  }, [handleSave])
+
+  const canvasWidth = device === 'tablet' ? '768px' : device === 'mobile' ? '375px' : '100%'
 
   return (
-    <div className="grid grid-cols-1 xl:grid-cols-[1fr,minmax(320px,40%)] gap-6">
-      <form onSubmit={handleSubmit} className="bg-white rounded-lg shadow-md p-6">
-        <div className="space-y-6">
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            Slug *
-          </label>
-          <input
-            type="text"
-            required
-            value={formData.slug}
-            onChange={(e) => setFormData({ ...formData, slug: e.target.value })}
-            className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-[#F7941D] focus:border-transparent"
-            placeholder="home, about, contact"
-          />
-          <p className="mt-1 text-sm text-gray-500">URL-friendly identifier (e.g., &quot;about&quot;, &quot;contact&quot;)</p>
-        </div>
+    <div className="fixed inset-0 z-40 flex flex-col bg-gray-100">
+      <EditorTopBar
+        title={title}
+        onTitleChange={setTitle}
+        device={device}
+        onDeviceChange={setDevice}
+        canUndo={history.canUndo}
+        canRedo={history.canRedo}
+        onUndo={history.undo}
+        onRedo={history.redo}
+        published={published}
+        onPublishedChange={setPublished}
+        saving={saving}
+        onSave={handleSave}
+        onOpenSettings={() => setSettingsOpen(true)}
+        hasUnsaved={hasUnsaved}
+      />
 
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            Title *
-          </label>
-          <input
-            type="text"
-            required
-            value={formData.title}
-            onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-            className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-[#F7941D] focus:border-transparent"
-          />
-        </div>
-
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            Meta Title
-          </label>
-          <input
-            type="text"
-            value={formData.meta_title || ''}
-            onChange={(e) => setFormData({ ...formData, meta_title: e.target.value })}
-            className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-[#F7941D] focus:border-transparent"
-            placeholder="SEO title (optional)"
-          />
-        </div>
-
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            Meta Description
-          </label>
-          <textarea
-            value={formData.meta_description || ''}
-            onChange={(e) => setFormData({ ...formData, meta_description: e.target.value })}
-            rows={3}
-            className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-[#F7941D] focus:border-transparent"
-            placeholder="SEO description (optional)"
-          />
-        </div>
-
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            OG Image URL
-          </label>
-          <input
-            type="url"
-            value={formData.meta_og_image || ''}
-            onChange={(e) => setFormData({ ...formData, meta_og_image: e.target.value })}
-            className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-[#F7941D] focus:border-transparent"
-            placeholder="https://… (optional, for social sharing)"
-          />
-        </div>
-
-        <div className="flex items-center">
-          <input
-            type="checkbox"
-            id="published"
-            checked={formData.published}
-            onChange={(e) => setFormData({ ...formData, published: e.target.checked })}
-            className="h-4 w-4 text-[#F7941D] focus:ring-[#F7941D] border-gray-300 rounded"
-          />
-          <label htmlFor="published" className="ml-2 block text-sm text-gray-700">
-            Published
-          </label>
-        </div>
-
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            Page content
-          </label>
-          <p className="mb-3 text-sm text-gray-500">
-            Add sections and edit them below. Reorder with the arrows; use Edit to change content.
-          </p>
-          <PageBuilder
-            sections={formData.content.sections}
-            onChange={(sections) => setFormData({ ...formData, content: { sections } })}
-          />
-        </div>
-
-        <div className="flex justify-end gap-3 flex-wrap">
-          {page && (
-            <a
-              href={`/preview/${page.id}`}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="px-6 py-2 border border-amber-300 rounded-md text-amber-800 bg-amber-50 hover:bg-amber-100"
-            >
-              Preview draft
-            </a>
-          )}
-          {previewSlug && (
-            <a
-              href={`/${formData.slug}`}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="px-6 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50"
-            >
-              Open in new tab
-            </a>
-          )}
-          <button
-            type="button"
-            onClick={() => router.push('/admin/pages')}
-            className="px-6 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50"
-          >
-            Cancel
-          </button>
-          <button
-            type="submit"
-            disabled={loading}
-            className="px-6 py-2 bg-[#F7941D] text-white rounded-md font-semibold hover:bg-[#e6850a] transition-colors disabled:opacity-50"
-          >
-            {loading ? 'Saving...' : page ? 'Update Page' : 'Create Page'}
-          </button>
-        </div>
-      </div>
-    </form>
-
-      {/* Live preview pane — click on text or images to edit inline */}
-      <div className="bg-white rounded-lg shadow-md overflow-hidden sticky top-4">
-        <div className="px-4 py-2 border-b border-gray-200 bg-gray-50 flex items-center justify-between">
-          <span className="text-sm font-medium text-gray-700">Live preview</span>
-          {previewSlug && (
-            <span className="text-xs text-gray-500 truncate max-w-[180px]">/{previewSlug}</span>
-          )}
-        </div>
-        <div className="max-h-[80vh] overflow-y-auto overflow-x-hidden">
+      {/* Canvas */}
+      <div className="flex-1 overflow-y-auto">
+        <div
+          className="mx-auto transition-all duration-300 min-h-full"
+          style={{
+            maxWidth: canvasWidth,
+            ...(device !== 'desktop' ? { boxShadow: '0 0 40px rgba(0,0,0,0.1)', background: 'white' } : {}),
+          }}
+        >
           <LivePreview
-            sections={formData.content.sections}
-            slug={previewSlug}
-            onUpdateSection={(index, data) => {
-              const next = [...formData.content.sections]
-              next[index] = { ...next[index], data }
-              setFormData({ ...formData, content: { sections: next } })
-            }}
+            sections={history.state}
+            onUpdateSection={handleUpdateSection}
+            onInsertSection={handleInsertSection}
+            onInsertMultipleSections={handleInsertMultipleSections}
+            onMoveSection={handleMoveSection}
+            onDuplicateSection={handleDuplicateSection}
+            onDeleteSection={handleDeleteSection}
           />
         </div>
       </div>
+
+      {/* Settings Drawer */}
+      <SettingsDrawer
+        open={settingsOpen}
+        onClose={() => setSettingsOpen(false)}
+        slug={slug}
+        onSlugChange={setSlug}
+        metaTitle={metaTitle}
+        onMetaTitleChange={setMetaTitle}
+        metaDescription={metaDescription}
+        onMetaDescriptionChange={setMetaDescription}
+        metaOgImage={metaOgImage}
+        onMetaOgImageChange={setMetaOgImage}
+      />
     </div>
   )
 }
