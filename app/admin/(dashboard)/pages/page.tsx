@@ -1,104 +1,38 @@
 import { createClient } from '@/lib/supabase/server'
+import { redirect } from 'next/navigation'
 import Link from 'next/link'
 import AdminPageHeading from '@/components/admin/AdminPageHeading'
 import PageRowActions from '@/components/admin/PageRowActions'
 
-export default async function AdminPagesPage() {
+export default async function VisualBuilderPage() {
   const supabase = await createClient()
   const { data: pages } = await supabase
     .from('pages')
     .select('*')
     .order('updated_at', { ascending: false })
 
-  return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-      <div className="flex justify-between items-center mb-8">
-        <AdminPageHeading subtitle="Create, edit and manage every page on your site.">Pages</AdminPageHeading>
-        <Link
-          href="/admin/pages/new"
-          className="bg-[#F7941D] text-white px-6 py-2 rounded font-semibold hover:bg-[#e6850a] transition-colors"
-        >
-          Create New Page
-        </Link>
-      </div>
+  if (pages && pages.length > 0) {
+    redirect(`/admin/pages/${pages[0].id}`)
+  }
 
-      {pages && pages.length > 0 ? (
-        <div className="bg-white rounded-lg shadow-md overflow-hidden">
-          <table className="min-w-full divide-y divide-gray-200">
-            <thead className="bg-gray-50">
-              <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Title
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Slug
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Editor
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Status
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Updated
-                </th>
-                <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Actions
-                </th>
-              </tr>
-            </thead>
-            <tbody className="bg-white divide-y divide-gray-200">
-              {pages.map((page: import('@/lib/types/database').Page) => (
-                <tr key={page.id}>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="text-sm font-medium text-gray-900">
-                      {page.title}
-                      {page.slug === 'home' && (
-                        <span className="ml-2 text-xs bg-[#1B2A6B] text-white px-2 py-0.5 rounded-full">Homepage</span>
-                      )}
-                    </div>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="text-sm text-gray-500">/{page.slug === 'home' ? '' : page.slug}</div>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
-                      (page.editor_type || 'sections') === 'grapesjs'
-                        ? 'bg-orange-100 text-[#F7941D]'
-                        : 'bg-blue-100 text-[#1B2A6B]'
-                    }`}>
-                      {(page.editor_type || 'sections') === 'grapesjs' ? 'Visual Builder' : 'Sections'}
-                    </span>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
-                      page.published
-                        ? 'bg-green-100 text-green-800'
-                        : 'bg-gray-100 text-gray-800'
-                    }`}>
-                      {page.published ? 'Published' : 'Draft'}
-                    </span>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                    {new Date(page.updated_at).toLocaleDateString()}
-                  </td>
-                  <PageRowActions page={{ id: page.id, title: page.title, slug: page.slug }} />
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      ) : (
-        <div className="bg-white rounded-lg shadow-md p-12 text-center">
-          <p className="text-gray-500 mb-4">No pages yet</p>
-          <Link
-            href="/admin/pages/new"
-            className="inline-block bg-[#F7941D] text-white px-6 py-2 rounded font-semibold hover:bg-[#e6850a] transition-colors"
-          >
-            Create Your First Page
-          </Link>
-        </div>
-      )}
+  return (
+    <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-20 text-center">
+      <div className="w-20 h-20 bg-gradient-to-br from-[#F7941D] to-[#e6850a] rounded-2xl flex items-center justify-center mx-auto mb-6">
+        <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2">
+          <rect x="3" y="3" width="18" height="18" rx="2" />
+          <line x1="9" y1="3" x2="9" y2="21" />
+          <line x1="3" y1="9" x2="21" y2="9" />
+        </svg>
+      </div>
+      <AdminPageHeading subtitle="Start building your website with the drag-and-drop visual editor.">
+        Visual Builder
+      </AdminPageHeading>
+      <Link
+        href="/admin/pages/new"
+        className="inline-block mt-8 bg-[#F7941D] text-white px-8 py-3 rounded-xl font-semibold hover:bg-[#e6850a] transition-colors text-lg"
+      >
+        Create Your First Page
+      </Link>
     </div>
   )
 }

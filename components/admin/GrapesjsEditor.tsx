@@ -33,6 +33,8 @@ export default function GrapesjsEditor({ page }: GrapesjsEditorProps) {
   const [metaDescription, setMetaDescription] = useState(page?.meta_description || '')
   const [metaOgImage, setMetaOgImage] = useState(page?.meta_og_image || '')
   const [siteTheme, setSiteTheme] = useState({ headingFont: 'Montserrat', bodyFont: 'Lato' })
+  const [allPages, setAllPages] = useState<{ id: string; title: string; slug: string }[]>([])
+  const [pageSwitcherOpen, setPageSwitcherOpen] = useState(false)
 
   useEffect(() => {
     supabase
@@ -49,6 +51,16 @@ export default function GrapesjsEditor({ page }: GrapesjsEditorProps) {
           headingFont: map.heading_font || 'Montserrat',
           bodyFont: map.body_font || 'Lato',
         })
+      })
+  }, [supabase])
+
+  useEffect(() => {
+    supabase
+      .from('pages')
+      .select('id, title, slug')
+      .order('updated_at', { ascending: false })
+      .then(({ data }) => {
+        if (data) setAllPages(data)
       })
   }, [supabase])
 
@@ -242,17 +254,77 @@ export default function GrapesjsEditor({ page }: GrapesjsEditorProps) {
     }
   }, [uploadSingleFile])
 
+  useEffect(() => {
+    if (!pageSwitcherOpen) return
+    const close = () => setPageSwitcherOpen(false)
+    const timer = setTimeout(() => document.addEventListener('click', close), 0)
+    return () => { clearTimeout(timer); document.removeEventListener('click', close) }
+  }, [pageSwitcherOpen])
+
   return (
     <div className="fixed inset-0 z-40 flex flex-col bg-gray-100">
       {/* Top bar */}
       <div className="h-14 bg-[#1B2A6B] flex items-center px-4 gap-3 shrink-0 shadow-lg z-50">
         <button
-          onClick={() => router.push('/admin/pages')}
+          onClick={() => router.push('/admin/dashboard')}
           className="text-white/70 hover:text-white transition-colors"
-          title="Back to pages"
+          title="Back to admin"
         >
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M19 12H5m7-7l-7 7 7 7"/></svg>
         </button>
+
+        <div className="h-6 w-px bg-white/20" />
+
+        {/* Page switcher */}
+        <div className="relative">
+          <button
+            onClick={() => setPageSwitcherOpen(!pageSwitcherOpen)}
+            className="flex items-center gap-2 bg-white/10 hover:bg-white/20 rounded-lg px-3 py-1.5 transition-colors"
+          >
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="9" y1="3" x2="9" y2="21"/></svg>
+            <span className="text-white text-sm font-medium max-w-[140px] truncate">{title || 'Select page'}</span>
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2"><path d="M6 9l6 6 6-6"/></svg>
+          </button>
+
+          {pageSwitcherOpen && (
+            <div className="absolute top-full left-0 mt-1 w-72 bg-white rounded-xl shadow-2xl border border-gray-200 overflow-hidden z-[70]">
+              <div className="p-2 border-b border-gray-100">
+                <p className="text-[10px] uppercase tracking-wider text-gray-400 font-semibold px-2 py-1">Pages</p>
+              </div>
+              <div className="max-h-64 overflow-y-auto">
+                {allPages.map((p) => (
+                  <button
+                    key={p.id}
+                    onClick={() => {
+                      setPageSwitcherOpen(false)
+                      if (p.id !== page?.id) {
+                        router.push(`/admin/pages/${p.id}`)
+                      }
+                    }}
+                    className={`w-full text-left px-4 py-2.5 text-sm hover:bg-gray-50 transition-colors flex items-center justify-between ${
+                      p.id === page?.id ? 'bg-blue-50 text-[#1B2A6B] font-semibold' : 'text-gray-700'
+                    }`}
+                  >
+                    <span className="truncate">{p.title}</span>
+                    <span className="text-[10px] text-gray-400 ml-2 shrink-0">/{p.slug === 'home' ? '' : p.slug}</span>
+                  </button>
+                ))}
+              </div>
+              <div className="p-2 border-t border-gray-100">
+                <button
+                  onClick={() => {
+                    setPageSwitcherOpen(false)
+                    router.push('/admin/pages/new')
+                  }}
+                  className="w-full text-left px-4 py-2.5 text-sm text-[#F7941D] font-semibold hover:bg-orange-50 rounded-lg transition-colors flex items-center gap-2"
+                >
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                  New Page
+                </button>
+              </div>
+            </div>
+          )}
+        </div>
 
         <div className="h-6 w-px bg-white/20" />
 
@@ -262,7 +334,7 @@ export default function GrapesjsEditor({ page }: GrapesjsEditorProps) {
           onChange={(e) => setTitle(e.target.value)}
           aria-label="Page title"
           placeholder="Page title"
-          className="bg-transparent text-white font-semibold text-sm border-none outline-none focus:ring-1 focus:ring-[#5BC8E8] rounded px-2 py-1 w-48"
+          className="bg-transparent text-white/60 text-sm border-none outline-none focus:text-white focus:ring-1 focus:ring-[#5BC8E8] rounded px-2 py-1 w-40"
         />
 
         <div className="flex-1" />
