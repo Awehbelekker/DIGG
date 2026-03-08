@@ -33,7 +33,7 @@ INSERT INTO pages (slug, title, meta_title, meta_description, content, published
         "type": "text",
         "data": {
           "heading": "Judy''s Story — The Principal",
-          "body": "Twelve years. Every scale. Every sector.\n\nDIGG is led by Judy Downing — a SACAP-registered architect (PAT44740093) who holds a BSc Architecture (Hons) from the University of Pretoria and has spent over a decade working at the highest levels of the profession.\n\nHer career spans the full spectrum of architecture — from luxury coastal residences to a 300,000m² mixed-use mega-development in Cape Town. From a SAPOA award-winning office refurbishment in Johannesburg to a 14km² ultra-luxury Aman resort in Saudi Arabia, coordinated under world-renowned designer Jean-Michel Gathy. From 1,000+ group housing units to a complex international cold-storage facility where she personally eliminated over 2,000 BIM coordination clashes in under a month.\n\nShe has worked at South Africa''s leading practices — Swart & Associates, ARC Architects, Boogertman & Partners, Neo Architects, CNR Architects — across commercial, residential, industrial, retail, hospitality and government projects. What that means for you: Judy and our team bring the precision of a billion-rand project to every brief we take on, regardless of size.",
+          "body": "Twelve years. Every scale. Every sector.\n\nDIGG is led by Judy Downing — a SACAP-registered architect (PAT44740093) who holds a BSc Architecture (Hons) from the University of Pretoria and has spent over a decade working at the highest levels of the profession.\n\nHer career spans the full spectrum of architecture — from luxury coastal residences to a 300,000m² mixed-use mega-development in Cape Town. From a 14km² ultra-luxury Aman resort in Saudi Arabia, coordinated under world-renowned designer Jean-Michel Gathy. From 1,000+ group housing units to a complex international cold-storage facility where she personally eliminated over 2,000 BIM coordination clashes in under a month.\n\nShe has worked at South Africa''s leading practices — Swart & Associates, ARC Architects, Boogertman & Partners, Neo Architects, CNR Architects — across commercial, residential, industrial, retail, hospitality and government projects. What that means for you: Judy and our team bring the precision of a billion-rand project to every brief we take on, regardless of size.",
           "alignment": "left"
         }
       },
@@ -62,7 +62,6 @@ INSERT INTO pages (slug, title, meta_title, meta_description, content, published
             {"title": "BSc Architecture (Hons)", "description": "University of Pretoria"},
             {"title": "12+ Years", "description": "Professional Experience"},
             {"title": "International Projects", "description": "South Africa, Saudi Arabia, Ghana"},
-            {"title": "SAPOA Award Winner", "description": "66 Grayston Office Refurbishment"},
             {"title": "Active Investors", "description": "Cape Town property since 2016"},
             {"title": "Specialist Software", "description": "Revit, BIM 360, Navisworks, Enscape, Twin Motion"}
           ]

@@ -21,9 +21,9 @@ INSERT INTO pages (slug, title, meta_title, meta_description, content, published
       "data": {
         "title": "Selected Work",
         "items": [
-          {"title": "Residential — Income Unit", "description": "Cape Town", "imageUrl": ""},
-          {"title": "Rezoning & As-Built", "description": "Western Cape", "imageUrl": ""},
-          {"title": "Multi-Unit Development", "description": "Cape Town", "imageUrl": ""}
+          {"title": "Residential — Income Unit", "description": "Cape Town"},
+          {"title": "Rezoning & As-Built", "description": "Western Cape"},
+          {"title": "Multi-Unit Development", "description": "Cape Town"}
         ]
       }
     },
