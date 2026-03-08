@@ -12,6 +12,7 @@ import { createClient } from '@/lib/supabase/client'
 import { showToast } from '@/components/admin/Toast'
 import diggBlocksPlugin from '@/lib/grapesjs/blocks'
 import { sectionsToHtml } from '@/lib/grapesjs/sections-to-html'
+import { GOOGLE_FONT_OPTIONS, googleFontsUrl } from '@/lib/google-fonts'
 import type { Page, PageSection } from '@/lib/types/database'
 
 interface GrapesjsEditorProps {
@@ -269,7 +270,7 @@ export default function GrapesjsEditor({ page }: GrapesjsEditorProps) {
             undoManager: { trackSelection: false },
             canvas: {
               styles: [
-                'https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&family=Lato:wght@400;700&display=swap',
+                googleFontsUrl(GOOGLE_FONT_OPTIONS),
               ],
             },
             deviceManager: {
@@ -277,6 +278,60 @@ export default function GrapesjsEditor({ page }: GrapesjsEditorProps) {
                 { name: 'desktop', width: '' },
                 { name: 'tablet', width: '768px', widthMedia: '992px' },
                 { name: 'mobile', width: '375px', widthMedia: '480px' },
+              ],
+            },
+            styleManager: {
+              sectors: [
+                {
+                  name: 'Typography',
+                  open: true,
+                  properties: [
+                    {
+                      property: 'font-family',
+                      type: 'select',
+                      defaults: 'Montserrat, sans-serif',
+                      options: [
+                        { id: 'Arial, Helvetica, sans-serif', label: 'Arial' },
+                        { id: 'Georgia, serif', label: 'Georgia' },
+                        { id: 'Times New Roman, serif', label: 'Times New Roman' },
+                        { id: 'Courier New, monospace', label: 'Courier New' },
+                        ...GOOGLE_FONT_OPTIONS.map(f => ({
+                          id: `"${f}", sans-serif`,
+                          label: f,
+                        })),
+                      ],
+                    },
+                    'font-size', 'font-weight', 'letter-spacing',
+                    'color', 'line-height', 'text-align', 'text-decoration',
+                    'text-transform', 'text-shadow',
+                  ],
+                },
+                {
+                  name: 'General',
+                  open: false,
+                  properties: [
+                    'display', 'float', 'position',
+                    'top', 'right', 'bottom', 'left',
+                  ],
+                },
+                {
+                  name: 'Dimension',
+                  open: false,
+                  properties: ['width', 'height', 'max-width', 'min-height', 'margin', 'padding'],
+                },
+                {
+                  name: 'Decorations',
+                  open: false,
+                  properties: [
+                    'opacity', 'border-radius', 'border', 'box-shadow',
+                    'background', 'background-color',
+                  ],
+                },
+                {
+                  name: 'Extra',
+                  open: false,
+                  properties: ['transition', 'perspective', 'transform'],
+                },
               ],
             },
             plugins: [
