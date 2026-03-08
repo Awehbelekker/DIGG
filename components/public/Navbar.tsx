@@ -74,7 +74,7 @@ export default function Navbar({ logoUrl = '', logoSize = 'medium', logoPosition
         <img
           src={logoSrc}
           alt="DIGG — Develop · Invest · Grow · Give"
-          className={`${sizeClass} object-contain mix-blend-multiply dark:mix-blend-screen`}
+          className={`${sizeClass} object-contain`}
         />
       ) : (
         <Image
@@ -82,7 +82,7 @@ export default function Navbar({ logoUrl = '', logoSize = 'medium', logoPosition
           alt="DIGG — Develop · Invest · Grow · Give"
           width={280}
           height={96}
-          className={`${sizeClass} object-contain mix-blend-multiply dark:mix-blend-screen`}
+          className={`${sizeClass} object-contain`}
           priority
         />
       )}

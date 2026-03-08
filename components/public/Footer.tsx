@@ -29,7 +29,7 @@ export default function Footer({ logoUrl = '', logoSize = 'medium', logoPosition
         <img
           src={logoSrc}
           alt="DIGG — Develop · Invest · Grow · Give"
-          className={`${sizeClass} object-contain brightness-0 invert opacity-95`}
+          className={`${sizeClass} object-contain`}
         />
       ) : (
         <Image
@@ -37,7 +37,7 @@ export default function Footer({ logoUrl = '', logoSize = 'medium', logoPosition
           alt="DIGG — Develop · Invest · Grow · Give"
           width={160}
           height={56}
-          className={`${sizeClass} object-contain brightness-0 invert opacity-95`}
+          className={`${sizeClass} object-contain`}
         />
       )}
     </Link>
