@@ -101,6 +101,25 @@ export default function GrapesjsEditor({ page }: GrapesjsEditorProps) {
     return () => window.removeEventListener('keydown', handler)
   }, [handleSave])
 
+  const uploadSingleFile = useCallback(async (file: File): Promise<string | null> => {
+    const ext = file.name.split('.').pop() || 'jpg'
+    const path = `grapesjs/${Date.now()}_${Math.random().toString(36).slice(2, 8)}.${ext}`
+
+    const { error } = await supabase.storage
+      .from('hero-images')
+      .upload(path, file, { cacheControl: '3600', upsert: false })
+
+    if (error) {
+      showToast(`Upload failed: ${error.message}`, 'error')
+      return null
+    }
+
+    const { data: publicData } = supabase.storage
+      .from('hero-images')
+      .getPublicUrl(path)
+    return publicData.publicUrl
+  }, [supabase])
+
   const onEditor = useCallback((editor: Editor) => {
     editorRef.current = editor
 
@@ -114,7 +133,53 @@ export default function GrapesjsEditor({ page }: GrapesjsEditorProps) {
         editor.setComponents(html)
       }
     }
-  }, [page])
+
+    const canvasDoc = editor.Canvas.getDocument()
+    const canvasBody = editor.Canvas.getBody()
+    if (canvasDoc && canvasBody) {
+      const prevent = (e: Event) => { e.preventDefault(); e.stopPropagation() }
+      canvasDoc.addEventListener('dragover', prevent)
+      canvasDoc.addEventListener('dragenter', prevent)
+      canvasDoc.addEventListener('drop', async (e: Event) => {
+        const de = e as DragEvent
+        de.preventDefault()
+        de.stopPropagation()
+        const files = de.dataTransfer?.files
+        if (!files || files.length === 0) return
+
+        const imageFiles = Array.from(files).filter(f => f.type.startsWith('image/'))
+        if (imageFiles.length === 0) return
+
+        showToast(`Uploading ${imageFiles.length} image${imageFiles.length > 1 ? 's' : ''}...`, 'info')
+
+        for (const file of imageFiles) {
+          const url = await uploadSingleFile(file)
+          if (url) {
+            editor.AssetManager.add([{ src: url, type: 'image' as const }])
+            const selected = editor.getSelected()
+            if (selected && selected.get('type') === 'image') {
+              selected.addAttributes({ src: url })
+            } else {
+              editor.addComponents({
+                type: 'image',
+                attributes: { src: url },
+                style: {
+                  width: '100%',
+                  'max-width': '800px',
+                  height: 'auto',
+                  display: 'block',
+                  margin: '1rem auto',
+                  'border-radius': '0.75rem',
+                },
+              })
+            }
+          }
+        }
+
+        showToast('Images uploaded!', 'info')
+      })
+    }
+  }, [page, uploadSingleFile])
 
   const uploadFile = useCallback(async (e: DragEvent | Event) => {
     const files = (e as DragEvent).dataTransfer
@@ -123,30 +188,15 @@ export default function GrapesjsEditor({ page }: GrapesjsEditorProps) {
     if (!files) return
 
     const urls: string[] = []
-    for (let i = 0; i < files.length; i++) {
-      const file = files[i]
-      const ext = file.name.split('.').pop() || 'jpg'
-      const path = `grapesjs/${Date.now()}_${Math.random().toString(36).slice(2, 8)}.${ext}`
-
-      const { error } = await supabase.storage
-        .from('hero-images')
-        .upload(path, file, { cacheControl: '3600', upsert: false })
-
-      if (error) {
-        showToast(`Upload failed: ${error.message}`, 'error')
-        continue
-      }
-
-      const { data: publicData } = supabase.storage
-        .from('hero-images')
-        .getPublicUrl(path)
-      urls.push(publicData.publicUrl)
+    for (const file of Array.from(files)) {
+      const url = await uploadSingleFile(file)
+      if (url) urls.push(url)
     }
 
     if (editorRef.current && urls.length) {
       editorRef.current.AssetManager.add(urls.map(u => ({ src: u, type: 'image' as const })))
     }
-  }, [supabase])
+  }, [uploadSingleFile])
 
   return (
     <div className="fixed inset-0 z-40 flex flex-col bg-gray-100">
