@@ -87,7 +87,7 @@ export default function AdminSettingsPage() {
           key,
           value: typeof value === 'string' ? value : JSON.stringify(value),
           updated_at: new Date().toISOString()
-        })
+        }, { onConflict: 'key' })
 
       if (error) throw error
 
