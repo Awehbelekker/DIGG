@@ -20,6 +20,7 @@
     "grapesjs-plugin-forms": "^2.0.6",
     "grapesjs-preset-webpage": "^1.0.3",
     "grapesjs-style-bg": "^2.0.2",
+    "grapesjs-tabs": "^1.0.6",
     "next": "16.1.6",
     "react": "19.2.3",
     "react-dom": "19.2.3"

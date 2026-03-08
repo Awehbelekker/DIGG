@@ -274,4 +274,135 @@ export default function diggBlocksPlugin(editor: Editor) {
     content: '<div style="height:4rem;"></div>',
     media: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><line x1="12" y1="4" x2="12" y2="20"/><polyline points="8,8 12,4 16,8"/><polyline points="8,16 12,20 16,16"/></svg>',
   })
+
+  bm.add('pricing-table', {
+    label: 'Pricing Table',
+    category: 'DIGG Sections',
+    content: `
+      <section style="padding:4rem 1rem;background:#FAFAFA;">
+        <div style="max-width:72rem;margin:0 auto;">
+          <h2 style="font-size:2rem;font-weight:700;color:#1B2A6B;text-align:center;margin-bottom:0.5rem;">Pricing</h2>
+          <p style="text-align:center;color:#666;margin-bottom:2.5rem;">Choose the plan that fits your needs</p>
+          <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:2rem;">
+            <div style="background:white;padding:2rem;border-radius:1rem;box-shadow:0 1px 3px rgba(0,0,0,0.08);text-align:center;">
+              <h3 style="font-size:1.1rem;font-weight:700;color:#1B2A6B;margin-bottom:0.5rem;">Starter</h3>
+              <div style="font-size:2.5rem;font-weight:700;color:#1B2A6B;margin-bottom:1rem;">R2,500<span style="font-size:0.9rem;font-weight:400;color:#999;">/mo</span></div>
+              <ul style="text-align:left;color:#555;font-size:0.9rem;line-height:2;list-style:none;padding:0;margin-bottom:1.5rem;">
+                <li>&#10003; Basic consultation</li><li>&#10003; Concept design</li><li>&#10003; Email support</li>
+              </ul>
+              <a href="#" style="display:block;padding:0.75rem;border:2px solid #1B2A6B;border-radius:0.75rem;color:#1B2A6B;font-weight:600;text-decoration:none;">Get Started</a>
+            </div>
+            <div style="background:#1B2A6B;padding:2rem;border-radius:1rem;box-shadow:0 4px 20px rgba(27,42,107,0.3);text-align:center;color:white;transform:scale(1.05);">
+              <div style="font-size:0.7rem;text-transform:uppercase;letter-spacing:0.1em;background:#F7941D;display:inline-block;padding:0.25rem 1rem;border-radius:2rem;margin-bottom:0.75rem;font-weight:700;">Most Popular</div>
+              <h3 style="font-size:1.1rem;font-weight:700;margin-bottom:0.5rem;">Professional</h3>
+              <div style="font-size:2.5rem;font-weight:700;margin-bottom:1rem;">R7,500<span style="font-size:0.9rem;font-weight:400;opacity:0.7;">/mo</span></div>
+              <ul style="text-align:left;font-size:0.9rem;line-height:2;list-style:none;padding:0;margin-bottom:1.5rem;opacity:0.9;">
+                <li>&#10003; Full design service</li><li>&#10003; 3D renders</li><li>&#10003; Priority support</li><li>&#10003; Project management</li>
+              </ul>
+              <a href="#" style="display:block;padding:0.75rem;background:#F7941D;border-radius:0.75rem;color:white;font-weight:600;text-decoration:none;">Get Started</a>
+            </div>
+            <div style="background:white;padding:2rem;border-radius:1rem;box-shadow:0 1px 3px rgba(0,0,0,0.08);text-align:center;">
+              <h3 style="font-size:1.1rem;font-weight:700;color:#1B2A6B;margin-bottom:0.5rem;">Enterprise</h3>
+              <div style="font-size:2.5rem;font-weight:700;color:#1B2A6B;margin-bottom:1rem;">Custom</div>
+              <ul style="text-align:left;color:#555;font-size:0.9rem;line-height:2;list-style:none;padding:0;margin-bottom:1.5rem;">
+                <li>&#10003; Everything in Pro</li><li>&#10003; Dedicated manager</li><li>&#10003; Custom integrations</li><li>&#10003; SLA guarantee</li>
+              </ul>
+              <a href="#" style="display:block;padding:0.75rem;border:2px solid #1B2A6B;border-radius:0.75rem;color:#1B2A6B;font-weight:600;text-decoration:none;">Contact Us</a>
+            </div>
+          </div>
+        </div>
+      </section>
+    `,
+    media: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="3" width="6" height="18" rx="1"/><rect x="9" y="1" width="6" height="22" rx="1"/><rect x="16" y="3" width="6" height="18" rx="1"/></svg>',
+  })
+
+  bm.add('team-grid', {
+    label: 'Team Grid',
+    category: 'DIGG Sections',
+    content: `
+      <section style="padding:4rem 1rem;background:white;">
+        <div style="max-width:72rem;margin:0 auto;">
+          <h2 style="font-size:2rem;font-weight:700;color:#1B2A6B;text-align:center;margin-bottom:0.5rem;">Our Team</h2>
+          <p style="text-align:center;color:#666;margin-bottom:2.5rem;">Meet the people behind the projects</p>
+          <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:2rem;">
+            <div style="text-align:center;">
+              <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=300&h=300&fit=crop" alt="Team" style="width:140px;height:140px;border-radius:50%;object-fit:cover;margin:0 auto 1rem auto;display:block;" />
+              <h3 style="font-size:1.1rem;font-weight:700;color:#1B2A6B;margin-bottom:0.25rem;">John Smith</h3>
+              <p style="color:#F7941D;font-size:0.85rem;font-weight:500;">Director</p>
+            </div>
+            <div style="text-align:center;">
+              <img src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=300&h=300&fit=crop" alt="Team" style="width:140px;height:140px;border-radius:50%;object-fit:cover;margin:0 auto 1rem auto;display:block;" />
+              <h3 style="font-size:1.1rem;font-weight:700;color:#1B2A6B;margin-bottom:0.25rem;">Sarah Williams</h3>
+              <p style="color:#F7941D;font-size:0.85rem;font-weight:500;">Lead Architect</p>
+            </div>
+            <div style="text-align:center;">
+              <img src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=300&h=300&fit=crop" alt="Team" style="width:140px;height:140px;border-radius:50%;object-fit:cover;margin:0 auto 1rem auto;display:block;" />
+              <h3 style="font-size:1.1rem;font-weight:700;color:#1B2A6B;margin-bottom:0.25rem;">Mike Johnson</h3>
+              <p style="color:#F7941D;font-size:0.85rem;font-weight:500;">Project Manager</p>
+            </div>
+            <div style="text-align:center;">
+              <img src="https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=300&h=300&fit=crop" alt="Team" style="width:140px;height:140px;border-radius:50%;object-fit:cover;margin:0 auto 1rem auto;display:block;" />
+              <h3 style="font-size:1.1rem;font-weight:700;color:#1B2A6B;margin-bottom:0.25rem;">Lisa Chen</h3>
+              <p style="color:#F7941D;font-size:0.85rem;font-weight:500;">Interior Designer</p>
+            </div>
+          </div>
+        </div>
+      </section>
+    `,
+    media: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="8" cy="6" r="3"/><circle cx="16" cy="6" r="3"/><path d="M2 20c0-3.3 2.7-6 6-6s6 2.7 6 6"/><path d="M10 20c0-3.3 2.7-6 6-6s6 2.7 6 6"/></svg>',
+  })
+
+  bm.add('map-embed', {
+    label: 'Map',
+    category: 'DIGG Sections',
+    content: `
+      <section style="padding:4rem 1rem;background:white;">
+        <div style="max-width:72rem;margin:0 auto;">
+          <h2 style="font-size:2rem;font-weight:700;color:#1B2A6B;text-align:center;margin-bottom:2rem;">Find Us</h2>
+          <div style="border-radius:1rem;overflow:hidden;box-shadow:0 4px 20px rgba(0,0,0,0.1);">
+            <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3310.2!2d18.42!3d-33.92!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zMzPCsDU1JzEyLjAiUyAxOMKwMjUnMTIuMCJF!5e0!3m2!1sen!2sza!4v1600000000000" style="width:100%;height:400px;border:none;" allowfullscreen loading="lazy"></iframe>
+          </div>
+        </div>
+      </section>
+    `,
+    media: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>',
+  })
+
+  bm.add('banner-strip', {
+    label: 'Banner Strip',
+    category: 'DIGG Sections',
+    content: `
+      <div style="background:#F7941D;padding:0.875rem 1rem;text-align:center;">
+        <p style="color:white;font-weight:600;font-size:0.95rem;margin:0;">Special Offer: Get 20% off all services this month. <a href="#" style="color:white;text-decoration:underline;font-weight:700;">Learn more</a></p>
+      </div>
+    `,
+    media: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="9" width="20" height="6" rx="1"/><line x1="6" y1="12" x2="18" y2="12"/></svg>',
+  })
+
+  bm.add('three-column-text', {
+    label: '3-Col Text',
+    category: 'DIGG Sections',
+    content: `
+      <section style="padding:4rem 1rem;background:white;">
+        <div style="max-width:72rem;margin:0 auto;display:grid;grid-template-columns:repeat(3,1fr);gap:2.5rem;">
+          <div>
+            <div style="width:48px;height:48px;background:#5BC8E8;border-radius:0.75rem;display:flex;align-items:center;justify-content:center;margin-bottom:1rem;color:white;font-size:1.5rem;font-weight:700;">1</div>
+            <h3 style="font-size:1.2rem;font-weight:700;color:#1B2A6B;margin-bottom:0.5rem;">First Step</h3>
+            <p style="color:#666;line-height:1.6;font-size:0.95rem;">Describe the first step of your process or the first benefit you offer.</p>
+          </div>
+          <div>
+            <div style="width:48px;height:48px;background:#F7941D;border-radius:0.75rem;display:flex;align-items:center;justify-content:center;margin-bottom:1rem;color:white;font-size:1.5rem;font-weight:700;">2</div>
+            <h3 style="font-size:1.2rem;font-weight:700;color:#1B2A6B;margin-bottom:0.5rem;">Second Step</h3>
+            <p style="color:#666;line-height:1.6;font-size:0.95rem;">Describe the second step of your process or another key benefit.</p>
+          </div>
+          <div>
+            <div style="width:48px;height:48px;background:#1B2A6B;border-radius:0.75rem;display:flex;align-items:center;justify-content:center;margin-bottom:1rem;color:white;font-size:1.5rem;font-weight:700;">3</div>
+            <h3 style="font-size:1.2rem;font-weight:700;color:#1B2A6B;margin-bottom:0.5rem;">Third Step</h3>
+            <p style="color:#666;line-height:1.6;font-size:0.95rem;">Describe the third step to complete the flow for your users.</p>
+          </div>
+        </div>
+      </section>
+    `,
+    media: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="4" width="5" height="16" rx="1"/><rect x="9.5" y="4" width="5" height="16" rx="1"/><rect x="17" y="4" width="5" height="16" rx="1"/></svg>',
+  })
 }
