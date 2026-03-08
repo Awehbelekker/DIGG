@@ -1,3 +1,5 @@
+export type EditorType = 'sections' | 'grapesjs'
+
 export interface Page {
   id: string
   slug: string
@@ -7,6 +9,10 @@ export interface Page {
   meta_description: string | null
   meta_og_image: string | null
   published: boolean
+  editor_type: EditorType
+  gjs_data: Record<string, unknown> | null
+  content_html: string | null
+  content_css: string | null
   created_at: string
   updated_at: string
 }

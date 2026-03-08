@@ -2,6 +2,7 @@ import { createClient } from '@/lib/supabase/server'
 import { notFound } from 'next/navigation'
 import type { Metadata } from 'next'
 import SectionRenderer from '@/components/public/SectionRenderer'
+import GjsPageRenderer from '@/components/public/GjsPageRenderer'
 
 type Props = { params: Promise<{ slug: string }> }
 
@@ -38,6 +39,15 @@ export default async function DynamicPage({ params }: Props) {
     .single()
 
   if (error || !page) notFound()
+
+  if ((page.editor_type as string) === 'grapesjs') {
+    return (
+      <GjsPageRenderer
+        html={(page.content_html as string) || ''}
+        css={(page.content_css as string) || ''}
+      />
+    )
+  }
 
   const content = page.content as { sections?: Array<{ type: string; data: Record<string, unknown> }> } | null
   const sections = content?.sections ?? []

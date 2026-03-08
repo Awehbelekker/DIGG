@@ -34,6 +34,9 @@ export default async function AdminPagesPage() {
                   Slug
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Editor
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Status
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
@@ -57,6 +60,15 @@ export default async function AdminPagesPage() {
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div className="text-sm text-gray-500">/{page.slug === 'home' ? '' : page.slug}</div>
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
+                      (page.editor_type || 'sections') === 'grapesjs'
+                        ? 'bg-orange-100 text-[#F7941D]'
+                        : 'bg-blue-100 text-[#1B2A6B]'
+                    }`}>
+                      {(page.editor_type || 'sections') === 'grapesjs' ? 'Visual Builder' : 'Sections'}
+                    </span>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${

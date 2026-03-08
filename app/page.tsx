@@ -1,6 +1,7 @@
 import { createClient } from '@/lib/supabase/server'
 import { notFound } from 'next/navigation'
 import SectionRenderer from '@/components/public/SectionRenderer'
+import GjsPageRenderer from '@/components/public/GjsPageRenderer'
 import type { PageSection } from '@/lib/types/database'
 
 export default async function HomePage() {
@@ -13,6 +14,15 @@ export default async function HomePage() {
     .single()
 
   if (!page) notFound()
+
+  if ((page.editor_type as string) === 'grapesjs') {
+    return (
+      <GjsPageRenderer
+        html={(page.content_html as string) || ''}
+        css={(page.content_css as string) || ''}
+      />
+    )
+  }
 
   const content = page.content as { sections?: Array<{ type: string; data: Record<string, unknown> }> } | null
   const sections = content?.sections ?? []

@@ -9,8 +9,17 @@
     "lint": "eslint"
   },
   "dependencies": {
+    "@grapesjs/react": "^2.0.0",
     "@supabase/ssr": "^0.8.0",
     "@supabase/supabase-js": "^2.98.0",
+    "grapesjs": "^0.22.14",
+    "grapesjs-blocks-basic": "^1.0.2",
+    "grapesjs-component-countdown": "^1.0.2",
+    "grapesjs-custom-code": "^1.0.2",
+    "grapesjs-navbar": "^1.0.2",
+    "grapesjs-plugin-forms": "^2.0.6",
+    "grapesjs-preset-webpage": "^1.0.3",
+    "grapesjs-style-bg": "^2.0.2",
     "next": "16.1.6",
     "react": "19.2.3",
     "react-dom": "19.2.3"
