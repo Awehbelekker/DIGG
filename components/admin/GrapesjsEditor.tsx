@@ -525,7 +525,7 @@ export default function GrapesjsEditor({ page }: GrapesjsEditorProps) {
       <input ref={themeInputRef} type="file" accept=".html,.htm" className="hidden" onChange={handleThemeUpload} />
 
       {/* Top bar */}
-      <div className="h-14 bg-[#1B2A6B] flex items-center px-3 gap-2 shrink-0 shadow-lg z-50">
+      <div className="h-14 bg-[#1B2A6B] flex items-center px-3 gap-2 shrink-0 shadow-lg" style={{ zIndex: 100 }}>
         <button
           onClick={() => router.push('/admin/dashboard')}
           className="text-white/70 hover:text-white transition-colors p-1"
@@ -863,7 +863,7 @@ export default function GrapesjsEditor({ page }: GrapesjsEditorProps) {
       )}
 
       {/* GrapesJS editor area */}
-      <div className="flex-1 overflow-hidden">
+      <div className="flex-1 overflow-hidden relative" style={{ zIndex: 1 }}>
         <GjsEditor
           grapesjs={grapesjs}
           grapesjsCss="https://unpkg.com/grapesjs/dist/css/grapes.min.css"
