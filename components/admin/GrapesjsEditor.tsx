@@ -502,13 +502,13 @@ export default function GrapesjsEditor({ page }: GrapesjsEditorProps) {
   }, [mobilePanelsOpen])
 
   return (
-    <div className="fixed inset-0 z-40 bg-gray-100">
+    <div className="fixed inset-0 flex flex-col bg-gray-100" style={{ zIndex: 40 }}>
       {/* Hidden file inputs */}
       <input ref={fileInputRef} type="file" accept="image/*" multiple className="hidden" onChange={handleFileSelected} />
       <input ref={themeInputRef} type="file" accept=".html,.htm" className="hidden" onChange={handleThemeUpload} />
 
-      {/* Top bar */}
-      <div className="absolute top-0 left-0 right-0 h-12 bg-[#1B2A6B] flex items-center shadow-lg" style={{ zIndex: 100 }}>
+      {/* Top bar - flex child, always on top */}
+      <div className="h-12 shrink-0 bg-[#1B2A6B] flex items-center shadow-lg" style={{ zIndex: 9999, position: 'relative' }}>
 
         {/* Left pinned: back + page switcher */}
         <div className="flex items-center gap-1 pl-2 pr-1 shrink-0">
@@ -852,8 +852,8 @@ export default function GrapesjsEditor({ page }: GrapesjsEditorProps) {
         </div>
       )}
 
-      {/* GrapesJS editor area - starts below the 48px top bar */}
-      <div className="absolute left-0 right-0 bottom-0" style={{ top: '48px', zIndex: 1 }}>
+      {/* GrapesJS editor area - fills remaining height below toolbar */}
+      <div className="flex-1 min-h-0 relative overflow-hidden">
         <GjsEditor
           grapesjs={grapesjs}
           grapesjsCss="https://unpkg.com/grapesjs/dist/css/grapes.min.css"

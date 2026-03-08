@@ -133,6 +133,11 @@ h2, h3, h4, h5, h6 {
 
 /* ===== GrapesJS Editor Layout Overrides ===== */
 
+/* Force GrapesJS editor to stay in its container */
+.gjs-editor {
+  position: relative !important;
+}
+
 /* Hide GrapesJS native top toolbar panels - our custom bar replaces them */
 .gjs-pn-commands,
 .gjs-pn-options,

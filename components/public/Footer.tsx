@@ -23,13 +23,13 @@ export default function Footer({ logoUrl = '', logoSize = 'medium', logoPosition
   const isExternalLogo = logoSrc.startsWith('http')
 
   const logoBlock = (
-    <Link href="/" className="inline-block mb-3" aria-label="DIGG Home">
+    <Link href="/" className="inline-flex items-center bg-white/90 rounded-xl p-1.5 mb-3" aria-label="DIGG Home">
       {isExternalLogo ? (
         // eslint-disable-next-line @next/next/no-img-element
         <img
           src={logoSrc}
           alt="DIGG — Develop · Invest · Grow · Give"
-          className={`${sizeClass} object-contain`}
+          className={`${sizeClass} object-contain rounded-lg`}
         />
       ) : (
         <Image
@@ -37,7 +37,7 @@ export default function Footer({ logoUrl = '', logoSize = 'medium', logoPosition
           alt="DIGG — Develop · Invest · Grow · Give"
           width={160}
           height={56}
-          className={`${sizeClass} object-contain`}
+          className={`${sizeClass} object-contain rounded-lg`}
         />
       )}
     </Link>
