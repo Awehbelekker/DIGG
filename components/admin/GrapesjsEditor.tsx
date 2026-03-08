@@ -194,6 +194,24 @@ export default function GrapesjsEditor({ page }: GrapesjsEditorProps) {
       }
     }
 
+    // Auto-switch sidebar to Style Manager when an element is selected
+    editor.on('component:selected', () => {
+      const smBtn = editor.Panels.getButton('views', 'open-sm')
+      if (smBtn && !smBtn.get('active')) {
+        smBtn.set('active', true)
+      }
+    })
+
+    // Switch back to Blocks panel when nothing is selected
+    editor.on('component:deselected', () => {
+      if (!editor.getSelected()) {
+        const blkBtn = editor.Panels.getButton('views', 'open-blocks')
+        if (blkBtn && !blkBtn.get('active')) {
+          blkBtn.set('active', true)
+        }
+      }
+    })
+
     const canvasDoc = editor.Canvas.getDocument()
     const canvasBody = editor.Canvas.getBody()
     if (canvasDoc && canvasBody) {
