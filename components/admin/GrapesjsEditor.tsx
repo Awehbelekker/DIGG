@@ -519,13 +519,13 @@ export default function GrapesjsEditor({ page }: GrapesjsEditorProps) {
   }, [pageSwitcherOpen])
 
   return (
-    <div className="fixed inset-0 z-40 flex flex-col bg-gray-100">
+    <div className="fixed inset-0 z-40 bg-gray-100">
       {/* Hidden file inputs */}
       <input ref={fileInputRef} type="file" accept="image/*" multiple className="hidden" onChange={handleFileSelected} />
       <input ref={themeInputRef} type="file" accept=".html,.htm" className="hidden" onChange={handleThemeUpload} />
 
-      {/* Top bar */}
-      <div className="h-14 bg-[#1B2A6B] flex items-center px-3 gap-2 shrink-0 shadow-lg" style={{ zIndex: 100 }}>
+      {/* Top bar - absolute positioned at top */}
+      <div className="absolute top-0 left-0 right-0 h-14 bg-[#1B2A6B] flex items-center px-3 gap-2 shadow-lg" style={{ zIndex: 100 }}>
         <button
           onClick={() => router.push('/admin/dashboard')}
           className="text-white/70 hover:text-white transition-colors p-1"
@@ -862,8 +862,8 @@ export default function GrapesjsEditor({ page }: GrapesjsEditorProps) {
         </div>
       )}
 
-      {/* GrapesJS editor area */}
-      <div className="flex-1 overflow-hidden relative" style={{ zIndex: 1 }}>
+      {/* GrapesJS editor area - starts below the 56px top bar */}
+      <div className="absolute left-0 right-0 bottom-0" style={{ top: '56px', zIndex: 1 }}>
         <GjsEditor
           grapesjs={grapesjs}
           grapesjsCss="https://unpkg.com/grapesjs/dist/css/grapes.min.css"
