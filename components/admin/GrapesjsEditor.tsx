@@ -502,13 +502,16 @@ export default function GrapesjsEditor({ page }: GrapesjsEditorProps) {
   }, [mobilePanelsOpen])
 
   return (
-    <div className="fixed inset-0 flex flex-col bg-gray-100" style={{ zIndex: 40 }}>
+    <>
       {/* Hidden file inputs */}
       <input ref={fileInputRef} type="file" accept="image/*" multiple className="hidden" onChange={handleFileSelected} />
       <input ref={themeInputRef} type="file" accept=".html,.htm" className="hidden" onChange={handleThemeUpload} />
 
-      {/* Top bar - flex child, always on top */}
-      <div className="h-12 shrink-0 bg-[#1B2A6B] flex items-center shadow-lg" style={{ zIndex: 9999, position: 'relative' }}>
+      {/* Top bar - fixed to viewport top */}
+      <div
+        className="bg-[#1B2A6B] flex items-center shadow-lg"
+        style={{ position: 'fixed', top: 0, left: 0, right: 0, height: 48, zIndex: 99999 }}
+      >
 
         {/* Left pinned: back + page switcher */}
         <div className="flex items-center gap-1 pl-2 pr-1 shrink-0">
@@ -740,7 +743,7 @@ export default function GrapesjsEditor({ page }: GrapesjsEditorProps) {
 
       {/* Import Code Modal */}
       {importOpen && (
-        <div className="fixed inset-0 z-[60] flex items-center justify-center p-4" onClick={() => setImportOpen(false)}>
+        <div className="fixed inset-0 flex items-center justify-center p-4" style={{ zIndex: 100000 }} onClick={() => setImportOpen(false)}>
           <div className="absolute inset-0 bg-black/40" />
           <div className="relative bg-white rounded-2xl shadow-2xl max-w-2xl w-full p-6" onClick={e => e.stopPropagation()}>
             <div className="flex items-center justify-between mb-4">
@@ -790,7 +793,7 @@ export default function GrapesjsEditor({ page }: GrapesjsEditorProps) {
 
       {/* Settings drawer */}
       {settingsOpen && (
-        <div className="fixed inset-0 z-[60]" onClick={() => setSettingsOpen(false)}>
+        <div className="fixed inset-0" style={{ zIndex: 100000 }} onClick={() => setSettingsOpen(false)}>
           <div className="absolute inset-0 bg-black/30" />
           <div
             className="absolute right-0 top-0 bottom-0 w-96 bg-white shadow-2xl p-6 overflow-y-auto"
@@ -852,8 +855,8 @@ export default function GrapesjsEditor({ page }: GrapesjsEditorProps) {
         </div>
       )}
 
-      {/* GrapesJS editor area - fills remaining height below toolbar */}
-      <div className="flex-1 min-h-0 relative overflow-hidden">
+      {/* GrapesJS editor area - fixed below toolbar, fills rest of viewport */}
+      <div style={{ position: 'fixed', top: 48, left: 0, right: 0, bottom: 0, zIndex: 40 }}>
         <GjsEditor
           grapesjs={grapesjs}
           grapesjsCss="https://unpkg.com/grapesjs/dist/css/grapes.min.css"
@@ -961,6 +964,6 @@ export default function GrapesjsEditor({ page }: GrapesjsEditorProps) {
           onEditor={onEditor}
         />
       </div>
-    </div>
+    </>
   )
 }
