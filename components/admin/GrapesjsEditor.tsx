@@ -33,7 +33,6 @@ export default function GrapesjsEditor({ page }: GrapesjsEditorProps) {
   const [title, setTitle] = useState(page?.title || 'Untitled page')
   const [slug, setSlug] = useState(page?.slug || '')
   const [published, setPublished] = useState(page?.published ?? true)
-  const [activeDevice, setActiveDevice] = useState<'desktop' | 'tablet' | 'mobile'>('desktop')
   const [settingsOpen, setSettingsOpen] = useState(false)
   const [importOpen, setImportOpen] = useState(false)
   const [importCode, setImportCode] = useState('')
@@ -43,10 +42,6 @@ export default function GrapesjsEditor({ page }: GrapesjsEditorProps) {
   const [siteTheme, setSiteTheme] = useState({ headingFont: 'Montserrat', bodyFont: 'Lato' })
   const [allPages, setAllPages] = useState<{ id: string; title: string; slug: string }[]>([])
   const [pageSwitcherOpen, setPageSwitcherOpen] = useState(false)
-  const [canUndo, setCanUndo] = useState(false)
-  const [canRedo, setCanRedo] = useState(false)
-  const [hasSelection, setHasSelection] = useState(false)
-  const [previewing, setPreviewing] = useState(false)
   const [mobilePanelsOpen, setMobilePanelsOpen] = useState(false)
   const saveRef = useRef<() => void>(() => {})
 
@@ -77,13 +72,6 @@ export default function GrapesjsEditor({ page }: GrapesjsEditorProps) {
         if (data) setAllPages(data)
       })
   }, [supabase])
-
-  const handleDeviceChange = useCallback((device: 'desktop' | 'tablet' | 'mobile') => {
-    setActiveDevice(device)
-    if (editorRef.current) {
-      editorRef.current.setDevice(device)
-    }
-  }, [])
 
   const handleSave = useCallback(async () => {
     if (!slug.trim()) {
@@ -178,7 +166,16 @@ export default function GrapesjsEditor({ page }: GrapesjsEditorProps) {
     const { data: publicData } = supabase.storage
       .from('hero-images')
       .getPublicUrl(path)
-    return publicData.publicUrl
+    const publicUrl = publicData.publicUrl
+
+    await supabase.from('images').insert({
+      filename: file.name,
+      url: publicUrl,
+      folder: 'editor',
+      alt_text: '',
+    })
+
+    return publicUrl
   }, [supabase])
 
   useEffect(() => {
@@ -222,51 +219,112 @@ export default function GrapesjsEditor({ page }: GrapesjsEditorProps) {
       }
     }
 
+    // ---- Custom commands for panel buttons ----
+    editor.Commands.add('digg:save', { run: () => saveRef.current() })
+    editor.Commands.add('digg:upload-image', { run: () => fileInputRef.current?.click() })
+    editor.Commands.add('digg:import-code', { run: () => setImportOpen(true) })
+    editor.Commands.add('digg:upload-theme', { run: () => themeInputRef.current?.click() })
+    editor.Commands.add('digg:settings', { run: () => setSettingsOpen(true) })
+    editor.Commands.add('digg:blocks', {
+      run: (ed: Editor) => {
+        ed.select()
+        const btn = ed.Panels.getButton('views', 'open-blocks')
+        if (btn) btn.set('active', true)
+      },
+    })
+
+    // ---- Inject buttons into the GrapesJS native toolbar ----
+    const s = 'display:inline-flex;align-items:center;gap:3px;font-size:11px;white-space:nowrap;cursor:pointer;'
+
+    editor.Panels.addButton('options', {
+      id: 'digg-save',
+      label: `<span style="${s}font-weight:700;background:#F7941D;color:#fff;padding:3px 10px;border-radius:4px;">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v11a2 2 0 01-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+        Save</span>`,
+      command: 'digg:save',
+      attributes: { title: 'Save page (Ctrl+S)' },
+    })
+
+    editor.Panels.addButton('options', {
+      id: 'digg-settings',
+      label: `<span style="${s}padding:3px 6px;" title="Settings">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg></span>`,
+      command: 'digg:settings',
+      attributes: { title: 'Page settings (slug, SEO)' },
+    })
+
+    editor.Panels.addButton('options', {
+      id: 'digg-blocks',
+      label: `<span style="${s}font-weight:600;background:rgba(91,200,232,0.2);color:#5BC8E8;padding:3px 8px;border-radius:4px;">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        Blocks</span>`,
+      command: 'digg:blocks',
+      attributes: { title: 'Show content blocks' },
+    })
+
+    editor.Panels.addButton('options', {
+      id: 'digg-image',
+      label: `<span style="${s}font-weight:500;padding:3px 6px;">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>
+        Image</span>`,
+      command: 'digg:upload-image',
+      attributes: { title: 'Upload image' },
+    })
+
+    editor.Panels.addButton('options', {
+      id: 'digg-code',
+      label: `<span style="${s}font-weight:500;padding:3px 6px;">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
+        Code</span>`,
+      command: 'digg:import-code',
+      attributes: { title: 'Import HTML code' },
+    })
+
+    editor.Panels.addButton('options', {
+      id: 'digg-theme',
+      label: `<span style="${s}font-weight:500;padding:3px 6px;">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+        Theme</span>`,
+      command: 'digg:upload-theme',
+      attributes: { title: 'Upload HTML template' },
+    })
+
+    // ---- Pre-load images from media library into AssetManager ----
+    supabase
+      .from('images')
+      .select('url, filename, alt_text')
+      .then(({ data }) => {
+        if (data && data.length > 0) {
+          editor.AssetManager.add(
+            data.map((img) => ({ src: img.url, name: img.filename || '' }))
+          )
+        }
+      })
+
     // Auto-switch sidebar to Style Manager when an element is selected
     editor.on('component:selected', () => {
-      setHasSelection(true)
       const smBtn = editor.Panels.getButton('views', 'open-sm')
-      if (smBtn && !smBtn.get('active')) {
-        smBtn.set('active', true)
-      }
+      if (smBtn && !smBtn.get('active')) smBtn.set('active', true)
     })
 
-    // Switch back to Blocks panel when nothing is selected
     editor.on('component:deselected', () => {
       if (!editor.getSelected()) {
-        setHasSelection(false)
         const blkBtn = editor.Panels.getButton('views', 'open-blocks')
-        if (blkBtn && !blkBtn.get('active')) {
-          blkBtn.set('active', true)
-        }
+        if (blkBtn && !blkBtn.get('active')) blkBtn.set('active', true)
       }
     })
-
-    // Track undo/redo availability
-    const updateUndoState = () => {
-      const um = editor.UndoManager
-      setCanUndo(um.hasUndo())
-      setCanRedo(um.hasRedo())
-    }
-    editor.on('change:changesCount', updateUndoState)
 
     const canvasDoc = editor.Canvas.getDocument()
     const canvasBody = editor.Canvas.getBody()
     if (canvasDoc && canvasBody) {
-      // Block all link clicks inside the canvas from navigating the browser
       canvasDoc.addEventListener('click', (e: Event) => {
         const target = e.target as HTMLElement
         const link = target.closest('a')
-        if (link) {
-          e.preventDefault()
-          e.stopPropagation()
-        }
+        if (link) { e.preventDefault(); e.stopPropagation() }
       }, true)
 
-      // Also block form submissions from navigating
       canvasDoc.addEventListener('submit', (e: Event) => {
-        e.preventDefault()
-        e.stopPropagation()
+        e.preventDefault(); e.stopPropagation()
       }, true)
 
       const prevent = (e: Event) => { e.preventDefault(); e.stopPropagation() }
@@ -282,8 +340,7 @@ export default function GrapesjsEditor({ page }: GrapesjsEditorProps) {
         const imageFiles = Array.from(files).filter(f => f.type.startsWith('image/'))
         if (imageFiles.length === 0) return
 
-        showToast(`Uploading ${imageFiles.length} image${imageFiles.length > 1 ? 's' : ''}...`, 'info')
-
+        showToast(`Uploading ${imageFiles.length} image(s)...`, 'info')
         for (const file of imageFiles) {
           const url = await uploadSingleFile(file)
           if (url) {
@@ -295,23 +352,15 @@ export default function GrapesjsEditor({ page }: GrapesjsEditorProps) {
               editor.addComponents({
                 type: 'image',
                 attributes: { src: url },
-                style: {
-                  width: '100%',
-                  'max-width': '800px',
-                  height: 'auto',
-                  display: 'block',
-                  margin: '1rem auto',
-                  'border-radius': '0.75rem',
-                },
+                style: { width: '100%', 'max-width': '800px', height: 'auto', display: 'block', margin: '1rem auto', 'border-radius': '0.75rem' },
               })
             }
           }
         }
-
         showToast('Images uploaded!', 'info')
       })
     }
-  }, [page, uploadSingleFile])
+  }, [page, uploadSingleFile, supabase])
 
   const uploadFile = useCallback(async (e: DragEvent | Event) => {
     const files = (e as DragEvent).dataTransfer
@@ -329,10 +378,6 @@ export default function GrapesjsEditor({ page }: GrapesjsEditorProps) {
       editorRef.current.AssetManager.add(urls.map(u => ({ src: u, type: 'image' as const })))
     }
   }, [uploadSingleFile])
-
-  const handleUploadImage = useCallback(() => {
-    fileInputRef.current?.click()
-  }, [])
 
   const handleFileSelected = useCallback(async (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files
@@ -361,14 +406,6 @@ export default function GrapesjsEditor({ page }: GrapesjsEditorProps) {
     if (fileInputRef.current) fileInputRef.current.value = ''
   }, [uploadSingleFile])
 
-  const handleUndo = useCallback(() => {
-    editorRef.current?.UndoManager.undo()
-  }, [])
-
-  const handleRedo = useCallback(() => {
-    editorRef.current?.UndoManager.redo()
-  }, [])
-
   const handleImportCode = useCallback(() => {
     if (!importCode.trim() || !editorRef.current) return
     editorRef.current.setComponents(importCode)
@@ -385,98 +422,6 @@ export default function GrapesjsEditor({ page }: GrapesjsEditorProps) {
     editorRef.current.setComponents(text)
     showToast('Theme applied! Edit it to make it yours.')
     if (themeInputRef.current) themeInputRef.current.value = ''
-  }, [])
-
-  const handleShowBlocks = useCallback(() => {
-    const editor = editorRef.current
-    if (!editor) return
-    editor.select(null as unknown as ReturnType<Editor['getSelected']>)
-    const blkBtn = editor.Panels.getButton('views', 'open-blocks')
-    if (blkBtn) blkBtn.set('active', true)
-  }, [])
-
-  const blockCanvasLinks = useCallback((doc: Document) => {
-    doc.addEventListener('click', (e: Event) => {
-      const target = e.target as HTMLElement
-      const link = target.closest('a')
-      if (link) {
-        e.preventDefault()
-        e.stopPropagation()
-      }
-    }, true)
-    doc.addEventListener('submit', (e: Event) => {
-      e.preventDefault()
-      e.stopPropagation()
-    }, true)
-  }, [])
-
-  const handlePreview = useCallback(() => {
-    const editor = editorRef.current
-    if (!editor) return
-    if (previewing) {
-      editor.stopCommand('preview')
-      setPreviewing(false)
-    } else {
-      editor.runCommand('preview')
-      setPreviewing(true)
-      // Re-apply link blocking after preview mode activates
-      setTimeout(() => {
-        const canvasDoc = editor.Canvas.getDocument()
-        if (canvasDoc) blockCanvasLinks(canvasDoc)
-      }, 100)
-    }
-  }, [previewing, blockCanvasLinks])
-
-  const handleDuplicate = useCallback(() => {
-    const editor = editorRef.current
-    if (!editor) return
-    const selected = editor.getSelected()
-    if (!selected) return
-    const parent = selected.parent()
-    if (!parent) return
-    const index = parent.components().indexOf(selected)
-    const clone = selected.clone()
-    parent.components().add(clone, { at: index + 1 })
-    editor.select(clone)
-    showToast('Duplicated!')
-  }, [])
-
-  const handleDeleteSelected = useCallback(() => {
-    const editor = editorRef.current
-    if (!editor) return
-    const selected = editor.getSelected()
-    if (!selected) return
-    selected.remove()
-    showToast('Deleted')
-  }, [])
-
-  const handleMoveUp = useCallback(() => {
-    const editor = editorRef.current
-    if (!editor) return
-    const selected = editor.getSelected()
-    if (!selected) return
-    const parent = selected.parent()
-    if (!parent) return
-    const index = parent.components().indexOf(selected)
-    if (index <= 0) return
-    parent.components().remove(selected)
-    parent.components().add(selected, { at: index - 1 })
-    editor.select(selected)
-  }, [])
-
-  const handleMoveDown = useCallback(() => {
-    const editor = editorRef.current
-    if (!editor) return
-    const selected = editor.getSelected()
-    if (!selected) return
-    const parent = selected.parent()
-    if (!parent) return
-    const comps = parent.components()
-    const index = comps.indexOf(selected)
-    if (index >= comps.length - 1) return
-    comps.remove(selected)
-    comps.add(selected, { at: index + 1 })
-    editor.select(selected)
   }, [])
 
   const handleClearCanvas = useCallback(() => {
@@ -507,238 +452,105 @@ export default function GrapesjsEditor({ page }: GrapesjsEditorProps) {
       <input ref={fileInputRef} type="file" accept="image/*" multiple className="hidden" onChange={handleFileSelected} />
       <input ref={themeInputRef} type="file" accept=".html,.htm" className="hidden" onChange={handleThemeUpload} />
 
-      {/* Top bar - fixed to viewport top */}
+      {/* Minimal info bar — only back, page, status, save */}
       <div
-        className="bg-[#1B2A6B] flex items-center shadow-lg"
-        style={{ position: 'fixed', top: 0, left: 0, right: 0, height: 48, zIndex: 99999 }}
+        className="bg-[#1B2A6B] flex items-center px-2 gap-1.5 shadow-lg"
+        style={{ position: 'fixed', top: 0, left: 0, right: 0, height: 36, zIndex: 99999 }}
       >
+        <button
+          onClick={() => router.push('/admin/dashboard')}
+          className="text-white/70 hover:text-white p-1"
+          title="Back to admin"
+        >
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M19 12H5m7-7l-7 7 7 7"/></svg>
+        </button>
 
-        {/* Left pinned: back + page switcher */}
-        <div className="flex items-center gap-1 pl-2 pr-1 shrink-0">
+        <div className="relative">
           <button
-            onClick={() => router.push('/admin/dashboard')}
-            className="text-white/70 hover:text-white transition-colors p-1.5 min-w-[36px] min-h-[36px] flex items-center justify-center"
-            title="Back to admin"
+            onClick={() => setPageSwitcherOpen(!pageSwitcherOpen)}
+            className="flex items-center gap-1 bg-white/10 hover:bg-white/20 rounded px-2 py-0.5 text-white text-[11px] font-medium max-w-[160px]"
           >
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M19 12H5m7-7l-7 7 7 7"/></svg>
+            <span className="truncate">{title || 'Select page'}</span>
+            <svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" className="shrink-0"><path d="M6 9l6 6 6-6"/></svg>
           </button>
 
-          <div className="relative">
-            <button
-              onClick={() => setPageSwitcherOpen(!pageSwitcherOpen)}
-              className="flex items-center gap-1.5 bg-white/10 hover:bg-white/20 rounded-lg px-2.5 py-1.5 transition-colors min-h-[36px]"
-            >
-              <span className="text-white text-xs font-medium max-w-[100px] sm:max-w-[140px] truncate">{title || 'Select page'}</span>
-              <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2"><path d="M6 9l6 6 6-6"/></svg>
-            </button>
-
-            {pageSwitcherOpen && (
-              <div className="absolute top-full left-0 mt-1 w-72 bg-white rounded-xl shadow-2xl border border-gray-200 overflow-hidden z-[70]">
-                <div className="p-2 border-b border-gray-100">
-                  <p className="text-[10px] uppercase tracking-wider text-gray-400 font-semibold px-2 py-1">Your Pages</p>
-                </div>
-                <div className="max-h-64 overflow-y-auto">
-                  {allPages.map((p) => (
-                    <button
-                      key={p.id}
-                      onClick={() => {
-                        setPageSwitcherOpen(false)
-                        if (p.id !== page?.id) {
-                          window.location.href = `/admin/pages/${p.id}`
-                        }
-                      }}
-                      className={`w-full text-left px-4 py-2.5 text-sm hover:bg-gray-50 transition-colors flex items-center justify-between ${
-                        p.id === page?.id ? 'bg-blue-50 text-[#1B2A6B] font-semibold' : 'text-gray-700'
-                      }`}
-                    >
-                      <span className="truncate">{p.title}</span>
-                      <span className="text-[10px] text-gray-400 ml-2 shrink-0">/{p.slug === 'home' ? '' : p.slug}</span>
-                    </button>
-                  ))}
-                </div>
-                <div className="p-2 border-t border-gray-100">
-                  <button
-                    onClick={() => { setPageSwitcherOpen(false); router.push('/admin/pages/new') }}
-                    className="w-full text-left px-4 py-2.5 text-sm text-[#F7941D] font-semibold hover:bg-orange-50 rounded-lg transition-colors flex items-center gap-2"
-                  >
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-                    New Page
-                  </button>
-                </div>
+          {pageSwitcherOpen && (
+            <div className="absolute top-full left-0 mt-1 w-72 bg-white rounded-xl shadow-2xl border border-gray-200 overflow-hidden" style={{ zIndex: 100001 }}>
+              <div className="p-2 border-b border-gray-100">
+                <p className="text-[10px] uppercase tracking-wider text-gray-400 font-semibold px-2 py-1">Your Pages</p>
               </div>
-            )}
-          </div>
-        </div>
-
-        <div className="h-5 w-px bg-white/20 shrink-0" />
-
-        {/* Scrollable middle: all tools */}
-        <div className="flex-1 overflow-x-auto toolbar-scroll">
-          <div className="flex items-center gap-1 px-1 min-w-max">
-
-            <input
-              type="text"
-              value={title}
-              onChange={(e) => setTitle(e.target.value)}
-              aria-label="Page title"
-              placeholder="Page title"
-              className="bg-transparent text-white/60 text-xs border-none outline-none focus:text-white focus:ring-1 focus:ring-[#5BC8E8] rounded px-2 py-1 w-24 hidden sm:block"
-            />
-
-            {/* Undo / Redo */}
-            <div className="flex items-center">
-              <button
-                onClick={handleUndo}
-                disabled={!canUndo}
-                className="p-1.5 rounded-lg text-white/70 hover:text-white hover:bg-white/10 disabled:text-white/20 transition-colors min-w-[32px] min-h-[32px] flex items-center justify-center"
-                title="Undo (Ctrl+Z)"
-              >
-                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M3 10h10a5 5 0 015 5v2"/><polyline points="3 10 7 6"/><polyline points="3 10 7 14"/></svg>
-              </button>
-              <button
-                onClick={handleRedo}
-                disabled={!canRedo}
-                className="p-1.5 rounded-lg text-white/70 hover:text-white hover:bg-white/10 disabled:text-white/20 transition-colors min-w-[32px] min-h-[32px] flex items-center justify-center"
-                title="Redo (Ctrl+Shift+Z)"
-              >
-                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M21 10H11a5 5 0 00-5 5v2"/><polyline points="21 10 17 6"/><polyline points="21 10 17 14"/></svg>
-              </button>
-            </div>
-
-            <div className="h-5 w-px bg-white/20 shrink-0" />
-
-            {/* Add Elements */}
-            <button
-              onClick={handleShowBlocks}
-              className="flex items-center gap-1 bg-[#5BC8E8]/20 hover:bg-[#5BC8E8]/30 rounded-lg px-2.5 py-1.5 text-[#5BC8E8] text-[11px] font-semibold transition-colors whitespace-nowrap min-h-[32px]"
-              title="Show drag-and-drop content blocks"
-            >
-              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-              <span className="hidden xs:inline">Add</span> Elements
-            </button>
-
-            {/* Quick actions */}
-            <button
-              onClick={handleUploadImage}
-              className="flex items-center gap-1 bg-white/10 hover:bg-white/20 rounded-lg px-2 py-1.5 text-white text-[11px] font-medium transition-colors whitespace-nowrap min-h-[32px]"
-              title="Upload an image to the page"
-            >
-              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>
-              <span className="hidden sm:inline">Image</span>
-            </button>
-
-            <button
-              onClick={() => setImportOpen(true)}
-              className="flex items-center gap-1 bg-white/10 hover:bg-white/20 rounded-lg px-2 py-1.5 text-white text-[11px] font-medium transition-colors whitespace-nowrap min-h-[32px]"
-              title="Paste HTML or code to build the page"
-            >
-              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
-              <span className="hidden sm:inline">Code</span>
-            </button>
-
-            <button
-              onClick={() => themeInputRef.current?.click()}
-              className="flex items-center gap-1 bg-white/10 hover:bg-white/20 rounded-lg px-2 py-1.5 text-white text-[11px] font-medium transition-colors whitespace-nowrap min-h-[32px]"
-              title="Upload an HTML template file"
-            >
-              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
-              <span className="hidden sm:inline">Theme</span>
-            </button>
-
-            {/* Contextual element actions */}
-            {hasSelection && (
-              <>
-                <div className="h-5 w-px bg-white/20 shrink-0" />
-                <div className="flex items-center gap-0.5 bg-white/10 rounded-lg p-0.5">
-                  <button onClick={handleMoveUp} className="p-1 rounded text-white/70 hover:text-white hover:bg-white/10 transition-colors min-w-[28px] min-h-[28px] flex items-center justify-center" title="Move up">
-                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="18 15 12 9 6 15"/></svg>
+              <div className="max-h-64 overflow-y-auto">
+                {allPages.map((p) => (
+                  <button
+                    key={p.id}
+                    onClick={() => {
+                      setPageSwitcherOpen(false)
+                      if (p.id !== page?.id) {
+                        window.location.href = `/admin/pages/${p.id}`
+                      }
+                    }}
+                    className={`w-full text-left px-4 py-2.5 text-sm hover:bg-gray-50 transition-colors flex items-center justify-between ${
+                      p.id === page?.id ? 'bg-blue-50 text-[#1B2A6B] font-semibold' : 'text-gray-700'
+                    }`}
+                  >
+                    <span className="truncate">{p.title}</span>
+                    <span className="text-[10px] text-gray-400 ml-2 shrink-0">/{p.slug === 'home' ? '' : p.slug}</span>
                   </button>
-                  <button onClick={handleMoveDown} className="p-1 rounded text-white/70 hover:text-white hover:bg-white/10 transition-colors min-w-[28px] min-h-[28px] flex items-center justify-center" title="Move down">
-                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="6 9 12 15 18 9"/></svg>
-                  </button>
-                  <button onClick={handleDuplicate} className="p-1 rounded text-white/70 hover:text-white hover:bg-white/10 transition-colors min-w-[28px] min-h-[28px] flex items-center justify-center" title="Duplicate">
-                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
-                  </button>
-                  <button onClick={handleDeleteSelected} className="p-1 rounded text-red-400 hover:text-red-300 hover:bg-red-500/20 transition-colors min-w-[28px] min-h-[28px] flex items-center justify-center" title="Delete (Del)">
-                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2"/></svg>
-                  </button>
-                </div>
-              </>
-            )}
-
-            <div className="h-5 w-px bg-white/20 shrink-0" />
-
-            {/* Preview */}
-            <button
-              onClick={handlePreview}
-              className={`flex items-center gap-1 px-2 py-1.5 rounded-lg text-[11px] font-medium transition-colors whitespace-nowrap min-h-[32px] ${
-                previewing ? 'bg-[#5BC8E8] text-white' : 'bg-white/10 hover:bg-white/20 text-white'
-              }`}
-              title="Preview page (hide editor outlines)"
-            >
-              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
-              <span className="hidden sm:inline">{previewing ? 'Exit' : 'Preview'}</span>
-            </button>
-
-            {/* Device toggles */}
-            <div className="hidden sm:flex items-center gap-0.5 bg-white/10 rounded-lg p-0.5">
-              {(['desktop', 'tablet', 'mobile'] as const).map((d) => (
+                ))}
+              </div>
+              <div className="p-2 border-t border-gray-100">
                 <button
-                  key={d}
-                  onClick={() => handleDeviceChange(d)}
-                  title={`Preview on ${d}`}
-                  className={`px-1.5 py-1 rounded text-[10px] font-medium transition-colors min-w-[28px] min-h-[28px] flex items-center justify-center ${
-                    activeDevice === d ? 'bg-white text-[#1B2A6B]' : 'text-white/70 hover:text-white'
-                  }`}
+                  onClick={() => { setPageSwitcherOpen(false); router.push('/admin/pages/new') }}
+                  className="w-full text-left px-4 py-2.5 text-sm text-[#F7941D] font-semibold hover:bg-orange-50 rounded-lg transition-colors flex items-center gap-2"
                 >
-                  {d === 'desktop' ? '\uD83D\uDDA5' : d === 'tablet' ? '\uD83D\uDCF1' : '\uD83D\uDCF2'}
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                  New Page
                 </button>
-              ))}
+              </div>
             </div>
-          </div>
+          )}
         </div>
 
-        {/* Right pinned: settings, status, save, panel toggle */}
-        <div className="flex items-center gap-1 pl-1 pr-2 shrink-0">
-          <button
-            onClick={() => setSettingsOpen(!settingsOpen)}
-            className="text-white/70 hover:text-white transition-colors p-1.5 min-w-[32px] min-h-[32px] flex items-center justify-center"
-            title="Page settings (slug, SEO)"
-          >
-            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="3"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>
-          </button>
+        <input
+          type="text"
+          value={title}
+          onChange={(e) => setTitle(e.target.value)}
+          aria-label="Page title"
+          placeholder="Page title"
+          className="bg-transparent text-white/50 text-[10px] border-none outline-none focus:text-white rounded px-1 py-0.5 w-20 hidden sm:block"
+        />
 
-          <button
-            onClick={() => setPublished(!published)}
-            className={`px-2 py-1 rounded text-[10px] font-semibold transition-colors min-h-[28px] ${
-              published ? 'bg-green-500 text-white' : 'bg-gray-500 text-white'
-            }`}
-          >
-            {published ? 'Live' : 'Draft'}
-          </button>
+        <div className="flex-1" />
 
-          <button
-            onClick={handleSave}
-            disabled={saving}
-            className="bg-[#F7941D] text-white px-3 py-1.5 rounded-lg text-[11px] font-semibold hover:bg-[#e6850a] disabled:opacity-50 transition-colors whitespace-nowrap min-h-[32px]"
-          >
-            {saving ? '...' : 'Save'}
-          </button>
+        <button
+          onClick={() => setPublished(!published)}
+          className={`px-2 py-0.5 rounded text-[10px] font-semibold ${
+            published ? 'bg-green-500/80 text-white' : 'bg-gray-500/80 text-white'
+          }`}
+        >
+          {published ? 'Live' : 'Draft'}
+        </button>
 
-          {/* Mobile: toggle right panels */}
-          <button
-            onClick={() => setMobilePanelsOpen(!mobilePanelsOpen)}
-            className="sm:hidden flex items-center justify-center p-1.5 rounded-lg text-white/70 hover:text-white hover:bg-white/10 transition-colors min-w-[32px] min-h-[32px]"
-            title="Toggle editing panels"
-          >
-            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-              {mobilePanelsOpen
-                ? <path d="M18 6L6 18M6 6l12 12"/>
-                : <><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></>
-              }
-            </svg>
-          </button>
-        </div>
+        <button
+          onClick={handleSave}
+          disabled={saving}
+          className="bg-[#F7941D] text-white px-3 py-0.5 rounded text-[11px] font-semibold hover:bg-[#e6850a] disabled:opacity-50"
+        >
+          {saving ? '...' : 'Save'}
+        </button>
+
+        <button
+          onClick={() => setMobilePanelsOpen(!mobilePanelsOpen)}
+          className="sm:hidden text-white/70 hover:text-white p-1"
+          title="Toggle panels"
+        >
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+            {mobilePanelsOpen
+              ? <path d="M18 6L6 18M6 6l12 12"/>
+              : <><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></>
+            }
+          </svg>
+        </button>
       </div>
 
       {/* Import Code Modal */}
@@ -763,29 +575,9 @@ export default function GrapesjsEditor({ page }: GrapesjsEditorProps) {
               className="w-full px-4 py-3 border border-gray-300 rounded-xl font-mono text-sm focus:ring-2 focus:ring-[#F7941D] focus:border-transparent resize-none"
             />
             <div className="flex gap-3 mt-4">
-              <button
-                onClick={handleImportCode}
-                disabled={!importCode.trim()}
-                className="bg-[#F7941D] text-white px-6 py-2.5 rounded-xl font-semibold hover:bg-[#e6850a] disabled:opacity-40 transition-colors"
-              >
-                Import & Replace
-              </button>
-              <button
-                onClick={() => {
-                  if (!importCode.trim() || !editorRef.current) return
-                  editorRef.current.addComponents(importCode)
-                  setImportOpen(false)
-                  setImportCode('')
-                  showToast('Code added to page!')
-                }}
-                disabled={!importCode.trim()}
-                className="bg-[#1B2A6B] text-white px-6 py-2.5 rounded-xl font-semibold hover:bg-[#152155] disabled:opacity-40 transition-colors"
-              >
-                Add Below Existing
-              </button>
-              <button onClick={() => setImportOpen(false)} className="px-6 py-2.5 text-gray-500 font-medium hover:text-gray-700">
-                Cancel
-              </button>
+              <button onClick={handleImportCode} disabled={!importCode.trim()} className="bg-[#F7941D] text-white px-6 py-2.5 rounded-xl font-semibold hover:bg-[#e6850a] disabled:opacity-40 transition-colors">Import & Replace</button>
+              <button onClick={() => { if (!importCode.trim() || !editorRef.current) return; editorRef.current.addComponents(importCode); setImportOpen(false); setImportCode(''); showToast('Code added!') }} disabled={!importCode.trim()} className="bg-[#1B2A6B] text-white px-6 py-2.5 rounded-xl font-semibold hover:bg-[#152155] disabled:opacity-40 transition-colors">Add Below</button>
+              <button onClick={() => setImportOpen(false)} className="px-6 py-2.5 text-gray-500 font-medium hover:text-gray-700">Cancel</button>
             </div>
           </div>
         </div>
@@ -795,59 +587,40 @@ export default function GrapesjsEditor({ page }: GrapesjsEditorProps) {
       {settingsOpen && (
         <div className="fixed inset-0" style={{ zIndex: 100000 }} onClick={() => setSettingsOpen(false)}>
           <div className="absolute inset-0 bg-black/30" />
-          <div
-            className="absolute right-0 top-0 bottom-0 w-96 bg-white shadow-2xl p-6 overflow-y-auto"
-            onClick={(e) => e.stopPropagation()}
-          >
+          <div className="absolute right-0 top-0 bottom-0 w-96 bg-white shadow-2xl p-6 overflow-y-auto" onClick={(e) => e.stopPropagation()}>
             <div className="flex items-center justify-between mb-6">
               <h3 className="text-lg font-bold text-[#1B2A6B]">Page Settings</h3>
               <button onClick={() => setSettingsOpen(false)} className="text-gray-400 hover:text-gray-600" aria-label="Close settings">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M18 6L6 18M6 6l12 12"/></svg>
               </button>
             </div>
-
             <label className="block mb-4">
               <span className="text-sm font-medium text-gray-700">URL Slug</span>
-              <input type="text" value={slug} onChange={(e) => setSlug(e.target.value)}
-                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-[#F7941D] focus:border-transparent" />
+              <input type="text" value={slug} onChange={(e) => setSlug(e.target.value)} className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-[#F7941D] focus:border-transparent" />
               <span className="text-xs text-gray-400 mt-1 block">yoursite.com/{slug || 'page-url'}</span>
             </label>
-
             <label className="block mb-4">
               <span className="text-sm font-medium text-gray-700">Meta Title (SEO)</span>
-              <input type="text" value={metaTitle} onChange={(e) => setMetaTitle(e.target.value)} placeholder={title}
-                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-[#F7941D] focus:border-transparent" />
+              <input type="text" value={metaTitle} onChange={(e) => setMetaTitle(e.target.value)} placeholder={title} className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-[#F7941D] focus:border-transparent" />
             </label>
-
             <label className="block mb-4">
               <span className="text-sm font-medium text-gray-700">Meta Description (SEO)</span>
-              <textarea value={metaDescription} onChange={(e) => setMetaDescription(e.target.value)} rows={3} placeholder="Describe this page for search engines..."
-                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-[#F7941D] focus:border-transparent" />
+              <textarea value={metaDescription} onChange={(e) => setMetaDescription(e.target.value)} rows={3} placeholder="Describe this page for search engines..." className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-[#F7941D] focus:border-transparent" />
             </label>
-
             <label className="block mb-4">
               <span className="text-sm font-medium text-gray-700">Social Share Image URL</span>
-              <input type="text" value={metaOgImage} onChange={(e) => setMetaOgImage(e.target.value)} placeholder="https://..."
-                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-[#F7941D] focus:border-transparent" />
+              <input type="text" value={metaOgImage} onChange={(e) => setMetaOgImage(e.target.value)} placeholder="https://..." className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-[#F7941D] focus:border-transparent" />
             </label>
-
             <div className="mt-6 pt-4 border-t border-gray-100">
-              <button
-                onClick={handleClearCanvas}
-                className="w-full text-left px-4 py-3 text-sm text-red-600 hover:bg-red-50 rounded-lg transition-colors font-medium"
-              >
-                Clear All Page Content
-              </button>
+              <button onClick={handleClearCanvas} className="w-full text-left px-4 py-3 text-sm text-red-600 hover:bg-red-50 rounded-lg transition-colors font-medium">Clear All Page Content</button>
             </div>
-
             <div className="mt-4 pt-4 border-t border-gray-100">
               <p className="text-xs font-semibold text-gray-500 mb-2">Keyboard Shortcuts</p>
               <div className="grid grid-cols-2 gap-y-1 text-xs text-gray-400">
-                <span>Ctrl + S</span><span>Save page</span>
+                <span>Ctrl + S</span><span>Save</span>
                 <span>Ctrl + Z</span><span>Undo</span>
                 <span>Ctrl + Shift + Z</span><span>Redo</span>
-                <span>Ctrl + C / V</span><span>Copy / Paste</span>
-                <span>Delete / Backspace</span><span>Remove selected</span>
+                <span>Delete</span><span>Remove selected</span>
                 <span>Escape</span><span>Deselect</span>
               </div>
             </div>
@@ -855,8 +628,8 @@ export default function GrapesjsEditor({ page }: GrapesjsEditorProps) {
         </div>
       )}
 
-      {/* GrapesJS editor area - fixed below toolbar, fills rest of viewport */}
-      <div style={{ position: 'fixed', top: 48, left: 0, right: 0, bottom: 0, zIndex: 40 }}>
+      {/* GrapesJS editor — below the 36px info bar, fills the rest */}
+      <div style={{ position: 'fixed', top: 36, left: 0, right: 0, bottom: 0, zIndex: 40 }}>
         <GjsEditor
           grapesjs={grapesjs}
           grapesjsCss="https://unpkg.com/grapesjs/dist/css/grapes.min.css"

@@ -133,38 +133,24 @@ h2, h3, h4, h5, h6 {
 
 /* ===== GrapesJS Editor Layout Overrides ===== */
 
-/* Force GrapesJS editor to stay in its container */
+/* Keep GrapesJS inside its container */
 .gjs-editor {
   position: relative !important;
 }
 
-/* Hide GrapesJS native top toolbar panels - our custom bar replaces them */
-.gjs-pn-commands,
-.gjs-pn-options,
-.gjs-pn-devices-c {
-  display: none !important;
-}
+/* Let GrapesJS render its own native panels (commands, options, devices) */
 
-/* Canvas fills from the top since native toolbar is hidden */
-.gjs-cv-canvas {
-  top: 0 !important;
-}
-
-/* Ensure the right sidebar panels are visible and well-positioned */
+/* Sidebar */
 .gjs-pn-views-container {
   overflow-y: auto;
 }
 
-/* Hide scrollbar on custom toolbar */
-.toolbar-scroll::-webkit-scrollbar {
-  display: none;
-}
-.toolbar-scroll {
-  -ms-overflow-style: none;
-  scrollbar-width: none;
+/* Style our injected panel buttons so they blend with the GrapesJS toolbar */
+.gjs-pn-options .gjs-pn-btn {
+  padding: 0 2px;
 }
 
-/* Tablet: shrink right sidebar */
+/* Tablet: compact right sidebar */
 @media (max-width: 768px) {
   .gjs-pn-views-container {
     width: 200px !important;
@@ -180,7 +166,7 @@ h2, h3, h4, h5, h6 {
   .gjs-pn-views-container {
     position: fixed !important;
     right: 0 !important;
-    top: 48px !important;
+    top: 36px !important;
     bottom: 0 !important;
     width: 280px !important;
     z-index: 55 !important;
