@@ -47,6 +47,7 @@ export default function GrapesjsEditor({ page }: GrapesjsEditorProps) {
   const [canRedo, setCanRedo] = useState(false)
   const [hasSelection, setHasSelection] = useState(false)
   const [previewing, setPreviewing] = useState(false)
+  const saveRef = useRef<() => void>(() => {})
 
   useEffect(() => {
     supabase
@@ -188,6 +189,8 @@ export default function GrapesjsEditor({ page }: GrapesjsEditorProps) {
     `
   }, [siteTheme])
 
+  useEffect(() => { saveRef.current = handleSave }, [handleSave])
+
   const onEditor = useCallback((editor: Editor) => {
     editorRef.current = editor
 
@@ -201,6 +204,47 @@ export default function GrapesjsEditor({ page }: GrapesjsEditorProps) {
         editor.setComponents(html)
       }
     }
+
+    // ---- Inject custom commands ----
+    editor.Commands.add('save-page', { run: () => saveRef.current() })
+    editor.Commands.add('back-to-blocks', {
+      run: (ed: Editor) => {
+        ed.select()
+        const blkBtn = ed.Panels.getButton('views', 'open-blocks')
+        if (blkBtn) blkBtn.set('active', true)
+      },
+    })
+    editor.Commands.add('deselect-all', {
+      run: (ed: Editor) => { ed.select() },
+    })
+
+    // ---- Add buttons to the GrapesJS "options" panel ----
+    editor.Panels.addButton('options', {
+      id: 'save-page',
+      label: `<span style="display:flex;align-items:center;gap:4px;background:#F7941D;color:#fff;padding:3px 12px;border-radius:6px;font-size:12px;font-weight:600;white-space:nowrap;">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v11a2 2 0 01-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+        Save</span>`,
+      command: 'save-page',
+      attributes: { title: 'Save page (Ctrl+S)' },
+    })
+
+    editor.Panels.addButton('options', {
+      id: 'back-to-blocks',
+      label: `<span style="display:flex;align-items:center;gap:4px;background:#5BC8E8;color:#fff;padding:3px 10px;border-radius:6px;font-size:12px;font-weight:600;white-space:nowrap;">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        Blocks</span>`,
+      command: 'back-to-blocks',
+      attributes: { title: 'Back to content blocks' },
+    })
+
+    editor.Panels.addButton('options', {
+      id: 'deselect-all',
+      label: `<span style="display:flex;align-items:center;gap:4px;padding:3px 8px;border-radius:6px;font-size:12px;font-weight:500;color:#666;white-space:nowrap;">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6L6 18M6 6l12 12"/></svg>
+        Deselect</span>`,
+      command: 'deselect-all',
+      attributes: { title: 'Deselect / close editing panel (Esc)' },
+    })
 
     // Auto-switch sidebar to Style Manager when an element is selected
     editor.on('component:selected', () => {
