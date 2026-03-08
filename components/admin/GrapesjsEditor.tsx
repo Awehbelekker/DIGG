@@ -39,6 +39,8 @@ export default function GrapesjsEditor({ page }: GrapesjsEditorProps) {
   const [siteTheme, setSiteTheme] = useState({ headingFont: 'Montserrat', bodyFont: 'Lato' })
   const [allPages, setAllPages] = useState<{ id: string; title: string; slug: string }[]>([])
   const [pageSwitcherOpen, setPageSwitcherOpen] = useState(false)
+  const [canUndo, setCanUndo] = useState(false)
+  const [canRedo, setCanRedo] = useState(false)
 
   useEffect(() => {
     supabase
@@ -212,6 +214,14 @@ export default function GrapesjsEditor({ page }: GrapesjsEditorProps) {
       }
     })
 
+    // Track undo/redo availability
+    const updateUndoState = () => {
+      const um = editor.UndoManager
+      setCanUndo(um.hasUndo())
+      setCanRedo(um.hasRedo())
+    }
+    editor.on('change:changesCount', updateUndoState)
+
     const canvasDoc = editor.Canvas.getDocument()
     const canvasBody = editor.Canvas.getBody()
     if (canvasDoc && canvasBody) {
@@ -306,6 +316,14 @@ export default function GrapesjsEditor({ page }: GrapesjsEditorProps) {
     showToast('Image added to page!')
     if (fileInputRef.current) fileInputRef.current.value = ''
   }, [uploadSingleFile])
+
+  const handleUndo = useCallback(() => {
+    editorRef.current?.UndoManager.undo()
+  }, [])
+
+  const handleRedo = useCallback(() => {
+    editorRef.current?.UndoManager.redo()
+  }, [])
 
   const handleImportCode = useCallback(() => {
     if (!importCode.trim() || !editorRef.current) return
@@ -404,6 +422,28 @@ export default function GrapesjsEditor({ page }: GrapesjsEditorProps) {
           placeholder="Page title"
           className="bg-transparent text-white/60 text-xs border-none outline-none focus:text-white focus:ring-1 focus:ring-[#5BC8E8] rounded px-2 py-1 w-28"
         />
+
+        <div className="h-6 w-px bg-white/20" />
+
+        {/* Undo / Redo */}
+        <div className="flex items-center gap-0.5">
+          <button
+            onClick={handleUndo}
+            disabled={!canUndo}
+            className="p-1.5 rounded-lg text-white/70 hover:text-white hover:bg-white/10 disabled:text-white/20 disabled:hover:bg-transparent transition-colors"
+            title="Undo (Ctrl+Z)"
+          >
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M3 10h10a5 5 0 015 5v2"/><polyline points="3 10 7 6"/><polyline points="3 10 7 14"/></svg>
+          </button>
+          <button
+            onClick={handleRedo}
+            disabled={!canRedo}
+            className="p-1.5 rounded-lg text-white/70 hover:text-white hover:bg-white/10 disabled:text-white/20 disabled:hover:bg-transparent transition-colors"
+            title="Redo (Ctrl+Shift+Z)"
+          >
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M21 10H11a5 5 0 00-5 5v2"/><polyline points="21 10 17 6"/><polyline points="21 10 17 14"/></svg>
+          </button>
+        </div>
 
         <div className="h-6 w-px bg-white/20" />
 
