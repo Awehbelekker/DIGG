@@ -47,6 +47,7 @@ export default function GrapesjsEditor({ page }: GrapesjsEditorProps) {
   const [canRedo, setCanRedo] = useState(false)
   const [hasSelection, setHasSelection] = useState(false)
   const [previewing, setPreviewing] = useState(false)
+  const [mobilePanelsOpen, setMobilePanelsOpen] = useState(false)
   const saveRef = useRef<() => void>(() => {})
 
   useEffect(() => {
@@ -204,47 +205,6 @@ export default function GrapesjsEditor({ page }: GrapesjsEditorProps) {
         editor.setComponents(html)
       }
     }
-
-    // ---- Inject custom commands ----
-    editor.Commands.add('save-page', { run: () => saveRef.current() })
-    editor.Commands.add('back-to-blocks', {
-      run: (ed: Editor) => {
-        ed.select()
-        const blkBtn = ed.Panels.getButton('views', 'open-blocks')
-        if (blkBtn) blkBtn.set('active', true)
-      },
-    })
-    editor.Commands.add('deselect-all', {
-      run: (ed: Editor) => { ed.select() },
-    })
-
-    // ---- Add buttons to the GrapesJS "options" panel ----
-    editor.Panels.addButton('options', {
-      id: 'save-page',
-      label: `<span style="display:flex;align-items:center;gap:4px;background:#F7941D;color:#fff;padding:3px 12px;border-radius:6px;font-size:12px;font-weight:600;white-space:nowrap;">
-        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v11a2 2 0 01-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
-        Save</span>`,
-      command: 'save-page',
-      attributes: { title: 'Save page (Ctrl+S)' },
-    })
-
-    editor.Panels.addButton('options', {
-      id: 'back-to-blocks',
-      label: `<span style="display:flex;align-items:center;gap:4px;background:#5BC8E8;color:#fff;padding:3px 10px;border-radius:6px;font-size:12px;font-weight:600;white-space:nowrap;">
-        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-        Blocks</span>`,
-      command: 'back-to-blocks',
-      attributes: { title: 'Back to content blocks' },
-    })
-
-    editor.Panels.addButton('options', {
-      id: 'deselect-all',
-      label: `<span style="display:flex;align-items:center;gap:4px;padding:3px 8px;border-radius:6px;font-size:12px;font-weight:500;color:#666;white-space:nowrap;">
-        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6L6 18M6 6l12 12"/></svg>
-        Deselect</span>`,
-      command: 'deselect-all',
-      attributes: { title: 'Deselect / close editing panel (Esc)' },
-    })
 
     // Auto-switch sidebar to Style Manager when an element is selected
     editor.on('component:selected', () => {
@@ -518,234 +478,248 @@ export default function GrapesjsEditor({ page }: GrapesjsEditorProps) {
     return () => { clearTimeout(timer); document.removeEventListener('click', close) }
   }, [pageSwitcherOpen])
 
+  useEffect(() => {
+    const views = document.querySelector('.gjs-pn-views')
+    const container = document.querySelector('.gjs-pn-views-container')
+    if (views) views.classList.toggle('mobile-panels-open', mobilePanelsOpen)
+    if (container) container.classList.toggle('mobile-panels-open', mobilePanelsOpen)
+  }, [mobilePanelsOpen])
+
   return (
     <div className="fixed inset-0 z-40 bg-gray-100">
       {/* Hidden file inputs */}
       <input ref={fileInputRef} type="file" accept="image/*" multiple className="hidden" onChange={handleFileSelected} />
       <input ref={themeInputRef} type="file" accept=".html,.htm" className="hidden" onChange={handleThemeUpload} />
 
-      {/* Top bar - absolute positioned at top */}
-      <div className="absolute top-0 left-0 right-0 h-14 bg-[#1B2A6B] flex items-center px-3 gap-2 shadow-lg" style={{ zIndex: 100 }}>
-        <button
-          onClick={() => router.push('/admin/dashboard')}
-          className="text-white/70 hover:text-white transition-colors p-1"
-          title="Back to admin"
-        >
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M19 12H5m7-7l-7 7 7 7"/></svg>
-        </button>
+      {/* Top bar */}
+      <div className="absolute top-0 left-0 right-0 h-12 bg-[#1B2A6B] flex items-center shadow-lg" style={{ zIndex: 100 }}>
 
-        <div className="h-6 w-px bg-white/20" />
-
-        {/* Page switcher */}
-        <div className="relative">
+        {/* Left pinned: back + page switcher */}
+        <div className="flex items-center gap-1 pl-2 pr-1 shrink-0">
           <button
-            onClick={() => setPageSwitcherOpen(!pageSwitcherOpen)}
-            className="flex items-center gap-2 bg-white/10 hover:bg-white/20 rounded-lg px-3 py-1.5 transition-colors"
+            onClick={() => router.push('/admin/dashboard')}
+            className="text-white/70 hover:text-white transition-colors p-1.5 min-w-[36px] min-h-[36px] flex items-center justify-center"
+            title="Back to admin"
           >
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="9" y1="3" x2="9" y2="21"/></svg>
-            <span className="text-white text-sm font-medium max-w-[120px] truncate">{title || 'Select page'}</span>
-            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2"><path d="M6 9l6 6 6-6"/></svg>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M19 12H5m7-7l-7 7 7 7"/></svg>
           </button>
 
-          {pageSwitcherOpen && (
-            <div className="absolute top-full left-0 mt-1 w-72 bg-white rounded-xl shadow-2xl border border-gray-200 overflow-hidden z-[70]">
-              <div className="p-2 border-b border-gray-100">
-                <p className="text-[10px] uppercase tracking-wider text-gray-400 font-semibold px-2 py-1">Your Pages</p>
-              </div>
-              <div className="max-h-64 overflow-y-auto">
-                {allPages.map((p) => (
-                  <button
-                    key={p.id}
-                    onClick={() => {
-                      setPageSwitcherOpen(false)
-                      if (p.id !== page?.id) {
-                        window.location.href = `/admin/pages/${p.id}`
-                      }
-                    }}
-                    className={`w-full text-left px-4 py-2.5 text-sm hover:bg-gray-50 transition-colors flex items-center justify-between ${
-                      p.id === page?.id ? 'bg-blue-50 text-[#1B2A6B] font-semibold' : 'text-gray-700'
-                    }`}
-                  >
-                    <span className="truncate">{p.title}</span>
-                    <span className="text-[10px] text-gray-400 ml-2 shrink-0">/{p.slug === 'home' ? '' : p.slug}</span>
-                  </button>
-                ))}
-              </div>
-              <div className="p-2 border-t border-gray-100">
-                <button
-                  onClick={() => { setPageSwitcherOpen(false); router.push('/admin/pages/new') }}
-                  className="w-full text-left px-4 py-2.5 text-sm text-[#F7941D] font-semibold hover:bg-orange-50 rounded-lg transition-colors flex items-center gap-2"
-                >
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-                  New Page
-                </button>
-              </div>
-            </div>
-          )}
-        </div>
-
-        <input
-          type="text"
-          value={title}
-          onChange={(e) => setTitle(e.target.value)}
-          aria-label="Page title"
-          placeholder="Page title"
-          className="bg-transparent text-white/60 text-xs border-none outline-none focus:text-white focus:ring-1 focus:ring-[#5BC8E8] rounded px-2 py-1 w-28"
-        />
-
-        <div className="h-6 w-px bg-white/20" />
-
-        {/* Undo / Redo */}
-        <div className="flex items-center gap-0.5">
-          <button
-            onClick={handleUndo}
-            disabled={!canUndo}
-            className="p-1.5 rounded-lg text-white/70 hover:text-white hover:bg-white/10 disabled:text-white/20 disabled:hover:bg-transparent transition-colors"
-            title="Undo (Ctrl+Z)"
-          >
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M3 10h10a5 5 0 015 5v2"/><polyline points="3 10 7 6"/><polyline points="3 10 7 14"/></svg>
-          </button>
-          <button
-            onClick={handleRedo}
-            disabled={!canRedo}
-            className="p-1.5 rounded-lg text-white/70 hover:text-white hover:bg-white/10 disabled:text-white/20 disabled:hover:bg-transparent transition-colors"
-            title="Redo (Ctrl+Shift+Z)"
-          >
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M21 10H11a5 5 0 00-5 5v2"/><polyline points="21 10 17 6"/><polyline points="21 10 17 14"/></svg>
-          </button>
-        </div>
-
-        <div className="h-6 w-px bg-white/20" />
-
-        {/* Add Elements - always visible way to get back to blocks */}
-        <button
-          onClick={handleShowBlocks}
-          className="flex items-center gap-1.5 bg-[#5BC8E8]/20 hover:bg-[#5BC8E8]/30 rounded-lg px-3 py-1.5 text-[#5BC8E8] text-xs font-semibold transition-colors"
-          title="Show drag-and-drop content blocks"
-        >
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-          Add Elements
-        </button>
-
-        {/* Quick action buttons */}
-        <button
-          onClick={handleUploadImage}
-          className="flex items-center gap-1.5 bg-white/10 hover:bg-white/20 rounded-lg px-3 py-1.5 text-white text-xs font-medium transition-colors"
-          title="Upload an image to the page"
-        >
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>
-          Image
-        </button>
-
-        <button
-          onClick={() => setImportOpen(true)}
-          className="flex items-center gap-1.5 bg-white/10 hover:bg-white/20 rounded-lg px-3 py-1.5 text-white text-xs font-medium transition-colors"
-          title="Paste HTML or code to build the page"
-        >
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
-          Code
-        </button>
-
-        <button
-          onClick={() => themeInputRef.current?.click()}
-          className="flex items-center gap-1.5 bg-white/10 hover:bg-white/20 rounded-lg px-3 py-1.5 text-white text-xs font-medium transition-colors"
-          title="Upload an HTML template file"
-        >
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
-          Theme
-        </button>
-
-        {/* Contextual element actions - only when something is selected */}
-        {hasSelection && (
-          <>
-            <div className="h-6 w-px bg-white/20" />
-            <div className="flex items-center gap-0.5 bg-white/10 rounded-lg p-0.5">
-              <button
-                onClick={handleMoveUp}
-                className="p-1.5 rounded text-white/70 hover:text-white hover:bg-white/10 transition-colors"
-                title="Move up"
-              >
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="18 15 12 9 6 15"/></svg>
-              </button>
-              <button
-                onClick={handleMoveDown}
-                className="p-1.5 rounded text-white/70 hover:text-white hover:bg-white/10 transition-colors"
-                title="Move down"
-              >
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="6 9 12 15 18 9"/></svg>
-              </button>
-              <button
-                onClick={handleDuplicate}
-                className="p-1.5 rounded text-white/70 hover:text-white hover:bg-white/10 transition-colors"
-                title="Duplicate"
-              >
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
-              </button>
-              <button
-                onClick={handleDeleteSelected}
-                className="p-1.5 rounded text-red-400 hover:text-red-300 hover:bg-red-500/20 transition-colors"
-                title="Delete (Del)"
-              >
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2"/></svg>
-              </button>
-            </div>
-          </>
-        )}
-
-        <div className="flex-1" />
-
-        {/* Preview */}
-        <button
-          onClick={handlePreview}
-          className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${
-            previewing ? 'bg-[#5BC8E8] text-white' : 'bg-white/10 hover:bg-white/20 text-white'
-          }`}
-          title="Preview page (hide editor outlines)"
-        >
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
-          {previewing ? 'Exit Preview' : 'Preview'}
-        </button>
-
-        {/* Device toggles */}
-        <div className="flex items-center gap-0.5 bg-white/10 rounded-lg p-0.5">
-          {(['desktop', 'tablet', 'mobile'] as const).map((d) => (
+          <div className="relative">
             <button
-              key={d}
-              onClick={() => handleDeviceChange(d)}
-              title={`Preview on ${d}`}
-              className={`px-2 py-1 rounded text-[11px] font-medium transition-colors ${
-                activeDevice === d ? 'bg-white text-[#1B2A6B]' : 'text-white/70 hover:text-white'
-              }`}
+              onClick={() => setPageSwitcherOpen(!pageSwitcherOpen)}
+              className="flex items-center gap-1.5 bg-white/10 hover:bg-white/20 rounded-lg px-2.5 py-1.5 transition-colors min-h-[36px]"
             >
-              {d === 'desktop' ? '\uD83D\uDDA5' : d === 'tablet' ? '\uD83D\uDCF1' : '\uD83D\uDCF2'}
+              <span className="text-white text-xs font-medium max-w-[100px] sm:max-w-[140px] truncate">{title || 'Select page'}</span>
+              <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2"><path d="M6 9l6 6 6-6"/></svg>
             </button>
-          ))}
+
+            {pageSwitcherOpen && (
+              <div className="absolute top-full left-0 mt-1 w-72 bg-white rounded-xl shadow-2xl border border-gray-200 overflow-hidden z-[70]">
+                <div className="p-2 border-b border-gray-100">
+                  <p className="text-[10px] uppercase tracking-wider text-gray-400 font-semibold px-2 py-1">Your Pages</p>
+                </div>
+                <div className="max-h-64 overflow-y-auto">
+                  {allPages.map((p) => (
+                    <button
+                      key={p.id}
+                      onClick={() => {
+                        setPageSwitcherOpen(false)
+                        if (p.id !== page?.id) {
+                          window.location.href = `/admin/pages/${p.id}`
+                        }
+                      }}
+                      className={`w-full text-left px-4 py-2.5 text-sm hover:bg-gray-50 transition-colors flex items-center justify-between ${
+                        p.id === page?.id ? 'bg-blue-50 text-[#1B2A6B] font-semibold' : 'text-gray-700'
+                      }`}
+                    >
+                      <span className="truncate">{p.title}</span>
+                      <span className="text-[10px] text-gray-400 ml-2 shrink-0">/{p.slug === 'home' ? '' : p.slug}</span>
+                    </button>
+                  ))}
+                </div>
+                <div className="p-2 border-t border-gray-100">
+                  <button
+                    onClick={() => { setPageSwitcherOpen(false); router.push('/admin/pages/new') }}
+                    className="w-full text-left px-4 py-2.5 text-sm text-[#F7941D] font-semibold hover:bg-orange-50 rounded-lg transition-colors flex items-center gap-2"
+                  >
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                    New Page
+                  </button>
+                </div>
+              </div>
+            )}
+          </div>
         </div>
 
-        <button
-          onClick={() => setSettingsOpen(!settingsOpen)}
-          className="text-white/70 hover:text-white transition-colors p-1"
-          title="Page settings (slug, SEO)"
-        >
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="3"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>
-        </button>
+        <div className="h-5 w-px bg-white/20 shrink-0" />
 
-        <button
-          onClick={() => setPublished(!published)}
-          className={`px-2.5 py-1 rounded text-[11px] font-semibold transition-colors ${
-            published ? 'bg-green-500 text-white' : 'bg-gray-500 text-white'
-          }`}
-        >
-          {published ? 'Live' : 'Draft'}
-        </button>
+        {/* Scrollable middle: all tools */}
+        <div className="flex-1 overflow-x-auto toolbar-scroll">
+          <div className="flex items-center gap-1 px-1 min-w-max">
 
-        <button
-          onClick={handleSave}
-          disabled={saving}
-          className="bg-[#F7941D] text-white px-4 py-1.5 rounded-lg text-xs font-semibold hover:bg-[#e6850a] disabled:opacity-50 transition-colors"
-        >
-          {saving ? 'Saving...' : 'Save'}
-        </button>
+            <input
+              type="text"
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
+              aria-label="Page title"
+              placeholder="Page title"
+              className="bg-transparent text-white/60 text-xs border-none outline-none focus:text-white focus:ring-1 focus:ring-[#5BC8E8] rounded px-2 py-1 w-24 hidden sm:block"
+            />
+
+            {/* Undo / Redo */}
+            <div className="flex items-center">
+              <button
+                onClick={handleUndo}
+                disabled={!canUndo}
+                className="p-1.5 rounded-lg text-white/70 hover:text-white hover:bg-white/10 disabled:text-white/20 transition-colors min-w-[32px] min-h-[32px] flex items-center justify-center"
+                title="Undo (Ctrl+Z)"
+              >
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M3 10h10a5 5 0 015 5v2"/><polyline points="3 10 7 6"/><polyline points="3 10 7 14"/></svg>
+              </button>
+              <button
+                onClick={handleRedo}
+                disabled={!canRedo}
+                className="p-1.5 rounded-lg text-white/70 hover:text-white hover:bg-white/10 disabled:text-white/20 transition-colors min-w-[32px] min-h-[32px] flex items-center justify-center"
+                title="Redo (Ctrl+Shift+Z)"
+              >
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M21 10H11a5 5 0 00-5 5v2"/><polyline points="21 10 17 6"/><polyline points="21 10 17 14"/></svg>
+              </button>
+            </div>
+
+            <div className="h-5 w-px bg-white/20 shrink-0" />
+
+            {/* Add Elements */}
+            <button
+              onClick={handleShowBlocks}
+              className="flex items-center gap-1 bg-[#5BC8E8]/20 hover:bg-[#5BC8E8]/30 rounded-lg px-2.5 py-1.5 text-[#5BC8E8] text-[11px] font-semibold transition-colors whitespace-nowrap min-h-[32px]"
+              title="Show drag-and-drop content blocks"
+            >
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+              <span className="hidden xs:inline">Add</span> Elements
+            </button>
+
+            {/* Quick actions */}
+            <button
+              onClick={handleUploadImage}
+              className="flex items-center gap-1 bg-white/10 hover:bg-white/20 rounded-lg px-2 py-1.5 text-white text-[11px] font-medium transition-colors whitespace-nowrap min-h-[32px]"
+              title="Upload an image to the page"
+            >
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>
+              <span className="hidden sm:inline">Image</span>
+            </button>
+
+            <button
+              onClick={() => setImportOpen(true)}
+              className="flex items-center gap-1 bg-white/10 hover:bg-white/20 rounded-lg px-2 py-1.5 text-white text-[11px] font-medium transition-colors whitespace-nowrap min-h-[32px]"
+              title="Paste HTML or code to build the page"
+            >
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
+              <span className="hidden sm:inline">Code</span>
+            </button>
+
+            <button
+              onClick={() => themeInputRef.current?.click()}
+              className="flex items-center gap-1 bg-white/10 hover:bg-white/20 rounded-lg px-2 py-1.5 text-white text-[11px] font-medium transition-colors whitespace-nowrap min-h-[32px]"
+              title="Upload an HTML template file"
+            >
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+              <span className="hidden sm:inline">Theme</span>
+            </button>
+
+            {/* Contextual element actions */}
+            {hasSelection && (
+              <>
+                <div className="h-5 w-px bg-white/20 shrink-0" />
+                <div className="flex items-center gap-0.5 bg-white/10 rounded-lg p-0.5">
+                  <button onClick={handleMoveUp} className="p-1 rounded text-white/70 hover:text-white hover:bg-white/10 transition-colors min-w-[28px] min-h-[28px] flex items-center justify-center" title="Move up">
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="18 15 12 9 6 15"/></svg>
+                  </button>
+                  <button onClick={handleMoveDown} className="p-1 rounded text-white/70 hover:text-white hover:bg-white/10 transition-colors min-w-[28px] min-h-[28px] flex items-center justify-center" title="Move down">
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="6 9 12 15 18 9"/></svg>
+                  </button>
+                  <button onClick={handleDuplicate} className="p-1 rounded text-white/70 hover:text-white hover:bg-white/10 transition-colors min-w-[28px] min-h-[28px] flex items-center justify-center" title="Duplicate">
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
+                  </button>
+                  <button onClick={handleDeleteSelected} className="p-1 rounded text-red-400 hover:text-red-300 hover:bg-red-500/20 transition-colors min-w-[28px] min-h-[28px] flex items-center justify-center" title="Delete (Del)">
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2"/></svg>
+                  </button>
+                </div>
+              </>
+            )}
+
+            <div className="h-5 w-px bg-white/20 shrink-0" />
+
+            {/* Preview */}
+            <button
+              onClick={handlePreview}
+              className={`flex items-center gap-1 px-2 py-1.5 rounded-lg text-[11px] font-medium transition-colors whitespace-nowrap min-h-[32px] ${
+                previewing ? 'bg-[#5BC8E8] text-white' : 'bg-white/10 hover:bg-white/20 text-white'
+              }`}
+              title="Preview page (hide editor outlines)"
+            >
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+              <span className="hidden sm:inline">{previewing ? 'Exit' : 'Preview'}</span>
+            </button>
+
+            {/* Device toggles */}
+            <div className="hidden sm:flex items-center gap-0.5 bg-white/10 rounded-lg p-0.5">
+              {(['desktop', 'tablet', 'mobile'] as const).map((d) => (
+                <button
+                  key={d}
+                  onClick={() => handleDeviceChange(d)}
+                  title={`Preview on ${d}`}
+                  className={`px-1.5 py-1 rounded text-[10px] font-medium transition-colors min-w-[28px] min-h-[28px] flex items-center justify-center ${
+                    activeDevice === d ? 'bg-white text-[#1B2A6B]' : 'text-white/70 hover:text-white'
+                  }`}
+                >
+                  {d === 'desktop' ? '\uD83D\uDDA5' : d === 'tablet' ? '\uD83D\uDCF1' : '\uD83D\uDCF2'}
+                </button>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        {/* Right pinned: settings, status, save, panel toggle */}
+        <div className="flex items-center gap-1 pl-1 pr-2 shrink-0">
+          <button
+            onClick={() => setSettingsOpen(!settingsOpen)}
+            className="text-white/70 hover:text-white transition-colors p-1.5 min-w-[32px] min-h-[32px] flex items-center justify-center"
+            title="Page settings (slug, SEO)"
+          >
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="3"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>
+          </button>
+
+          <button
+            onClick={() => setPublished(!published)}
+            className={`px-2 py-1 rounded text-[10px] font-semibold transition-colors min-h-[28px] ${
+              published ? 'bg-green-500 text-white' : 'bg-gray-500 text-white'
+            }`}
+          >
+            {published ? 'Live' : 'Draft'}
+          </button>
+
+          <button
+            onClick={handleSave}
+            disabled={saving}
+            className="bg-[#F7941D] text-white px-3 py-1.5 rounded-lg text-[11px] font-semibold hover:bg-[#e6850a] disabled:opacity-50 transition-colors whitespace-nowrap min-h-[32px]"
+          >
+            {saving ? '...' : 'Save'}
+          </button>
+
+          {/* Mobile: toggle right panels */}
+          <button
+            onClick={() => setMobilePanelsOpen(!mobilePanelsOpen)}
+            className="sm:hidden flex items-center justify-center p-1.5 rounded-lg text-white/70 hover:text-white hover:bg-white/10 transition-colors min-w-[32px] min-h-[32px]"
+            title="Toggle editing panels"
+          >
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              {mobilePanelsOpen
+                ? <path d="M18 6L6 18M6 6l12 12"/>
+                : <><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></>
+              }
+            </svg>
+          </button>
+        </div>
       </div>
 
       {/* Import Code Modal */}
@@ -862,8 +836,8 @@ export default function GrapesjsEditor({ page }: GrapesjsEditorProps) {
         </div>
       )}
 
-      {/* GrapesJS editor area - starts below the 56px top bar */}
-      <div className="absolute left-0 right-0 bottom-0" style={{ top: '56px', zIndex: 1 }}>
+      {/* GrapesJS editor area - starts below the 48px top bar */}
+      <div className="absolute left-0 right-0 bottom-0" style={{ top: '48px', zIndex: 1 }}>
         <GjsEditor
           grapesjs={grapesjs}
           grapesjsCss="https://unpkg.com/grapesjs/dist/css/grapes.min.css"
