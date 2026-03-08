@@ -23,12 +23,16 @@ export default function GrapesjsEditor({ page }: GrapesjsEditorProps) {
   const router = useRouter()
   const supabase = createClient()
   const editorRef = useRef<Editor | null>(null)
+  const fileInputRef = useRef<HTMLInputElement>(null)
+  const themeInputRef = useRef<HTMLInputElement>(null)
   const [saving, setSaving] = useState(false)
   const [title, setTitle] = useState(page?.title || 'Untitled page')
   const [slug, setSlug] = useState(page?.slug || '')
   const [published, setPublished] = useState(page?.published ?? true)
   const [activeDevice, setActiveDevice] = useState<'desktop' | 'tablet' | 'mobile'>('desktop')
   const [settingsOpen, setSettingsOpen] = useState(false)
+  const [importOpen, setImportOpen] = useState(false)
+  const [importCode, setImportCode] = useState('')
   const [metaTitle, setMetaTitle] = useState(page?.meta_title || '')
   const [metaDescription, setMetaDescription] = useState(page?.meta_description || '')
   const [metaOgImage, setMetaOgImage] = useState(page?.meta_og_image || '')
@@ -128,8 +132,8 @@ export default function GrapesjsEditor({ page }: GrapesjsEditorProps) {
         handleSave()
       }
     }
-    window.addEventListener('keydown', handler)
-    return () => window.removeEventListener('keydown', handler)
+    globalThis.addEventListener('keydown', handler)
+    return () => globalThis.removeEventListener('keydown', handler)
   }, [handleSave])
 
   const uploadSingleFile = useCallback(async (file: File): Promise<string | null> => {
@@ -254,6 +258,55 @@ export default function GrapesjsEditor({ page }: GrapesjsEditorProps) {
     }
   }, [uploadSingleFile])
 
+  const handleUploadImage = useCallback(() => {
+    fileInputRef.current?.click()
+  }, [])
+
+  const handleFileSelected = useCallback(async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files
+    if (!files || files.length === 0) return
+
+    showToast('Uploading...', 'info')
+    for (const file of Array.from(files)) {
+      const url = await uploadSingleFile(file)
+      if (url && editorRef.current) {
+        editorRef.current.AssetManager.add([{ src: url, type: 'image' as const }])
+        editorRef.current.addComponents({
+          type: 'image',
+          attributes: { src: url },
+          style: {
+            width: '100%',
+            'max-width': '800px',
+            height: 'auto',
+            display: 'block',
+            margin: '1rem auto',
+            'border-radius': '0.75rem',
+          },
+        })
+      }
+    }
+    showToast('Image added to page!')
+    if (fileInputRef.current) fileInputRef.current.value = ''
+  }, [uploadSingleFile])
+
+  const handleImportCode = useCallback(() => {
+    if (!importCode.trim() || !editorRef.current) return
+    editorRef.current.setComponents(importCode)
+    setImportOpen(false)
+    setImportCode('')
+    showToast('Code imported!')
+  }, [importCode])
+
+  const handleThemeUpload = useCallback(async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (!file || !editorRef.current) return
+
+    const text = await file.text()
+    editorRef.current.setComponents(text)
+    showToast('Theme applied! Edit it to make it yours.')
+    if (themeInputRef.current) themeInputRef.current.value = ''
+  }, [])
+
   useEffect(() => {
     if (!pageSwitcherOpen) return
     const close = () => setPageSwitcherOpen(false)
@@ -263,14 +316,18 @@ export default function GrapesjsEditor({ page }: GrapesjsEditorProps) {
 
   return (
     <div className="fixed inset-0 z-40 flex flex-col bg-gray-100">
+      {/* Hidden file inputs */}
+      <input ref={fileInputRef} type="file" accept="image/*" multiple className="hidden" onChange={handleFileSelected} />
+      <input ref={themeInputRef} type="file" accept=".html,.htm" className="hidden" onChange={handleThemeUpload} />
+
       {/* Top bar */}
-      <div className="h-14 bg-[#1B2A6B] flex items-center px-4 gap-3 shrink-0 shadow-lg z-50">
+      <div className="h-14 bg-[#1B2A6B] flex items-center px-3 gap-2 shrink-0 shadow-lg z-50">
         <button
           onClick={() => router.push('/admin/dashboard')}
-          className="text-white/70 hover:text-white transition-colors"
+          className="text-white/70 hover:text-white transition-colors p-1"
           title="Back to admin"
         >
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M19 12H5m7-7l-7 7 7 7"/></svg>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M19 12H5m7-7l-7 7 7 7"/></svg>
         </button>
 
         <div className="h-6 w-px bg-white/20" />
@@ -281,15 +338,15 @@ export default function GrapesjsEditor({ page }: GrapesjsEditorProps) {
             onClick={() => setPageSwitcherOpen(!pageSwitcherOpen)}
             className="flex items-center gap-2 bg-white/10 hover:bg-white/20 rounded-lg px-3 py-1.5 transition-colors"
           >
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="9" y1="3" x2="9" y2="21"/></svg>
-            <span className="text-white text-sm font-medium max-w-[140px] truncate">{title || 'Select page'}</span>
-            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2"><path d="M6 9l6 6 6-6"/></svg>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="9" y1="3" x2="9" y2="21"/></svg>
+            <span className="text-white text-sm font-medium max-w-[120px] truncate">{title || 'Select page'}</span>
+            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2"><path d="M6 9l6 6 6-6"/></svg>
           </button>
 
           {pageSwitcherOpen && (
             <div className="absolute top-full left-0 mt-1 w-72 bg-white rounded-xl shadow-2xl border border-gray-200 overflow-hidden z-[70]">
               <div className="p-2 border-b border-gray-100">
-                <p className="text-[10px] uppercase tracking-wider text-gray-400 font-semibold px-2 py-1">Pages</p>
+                <p className="text-[10px] uppercase tracking-wider text-gray-400 font-semibold px-2 py-1">Your Pages</p>
               </div>
               <div className="max-h-64 overflow-y-auto">
                 {allPages.map((p) => (
@@ -297,9 +354,7 @@ export default function GrapesjsEditor({ page }: GrapesjsEditorProps) {
                     key={p.id}
                     onClick={() => {
                       setPageSwitcherOpen(false)
-                      if (p.id !== page?.id) {
-                        router.push(`/admin/pages/${p.id}`)
-                      }
+                      if (p.id !== page?.id) router.push(`/admin/pages/${p.id}`)
                     }}
                     className={`w-full text-left px-4 py-2.5 text-sm hover:bg-gray-50 transition-colors flex items-center justify-between ${
                       p.id === page?.id ? 'bg-blue-50 text-[#1B2A6B] font-semibold' : 'text-gray-700'
@@ -312,10 +367,7 @@ export default function GrapesjsEditor({ page }: GrapesjsEditorProps) {
               </div>
               <div className="p-2 border-t border-gray-100">
                 <button
-                  onClick={() => {
-                    setPageSwitcherOpen(false)
-                    router.push('/admin/pages/new')
-                  }}
+                  onClick={() => { setPageSwitcherOpen(false); router.push('/admin/pages/new') }}
                   className="w-full text-left px-4 py-2.5 text-sm text-[#F7941D] font-semibold hover:bg-orange-50 rounded-lg transition-colors flex items-center gap-2"
                 >
                   <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
@@ -326,62 +378,138 @@ export default function GrapesjsEditor({ page }: GrapesjsEditorProps) {
           )}
         </div>
 
-        <div className="h-6 w-px bg-white/20" />
-
         <input
           type="text"
           value={title}
           onChange={(e) => setTitle(e.target.value)}
           aria-label="Page title"
           placeholder="Page title"
-          className="bg-transparent text-white/60 text-sm border-none outline-none focus:text-white focus:ring-1 focus:ring-[#5BC8E8] rounded px-2 py-1 w-40"
+          className="bg-transparent text-white/60 text-xs border-none outline-none focus:text-white focus:ring-1 focus:ring-[#5BC8E8] rounded px-2 py-1 w-28"
         />
+
+        <div className="h-6 w-px bg-white/20" />
+
+        {/* Quick action buttons */}
+        <button
+          onClick={handleUploadImage}
+          className="flex items-center gap-1.5 bg-white/10 hover:bg-white/20 rounded-lg px-3 py-1.5 text-white text-xs font-medium transition-colors"
+          title="Upload an image to the page"
+        >
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>
+          Add Image
+        </button>
+
+        <button
+          onClick={() => setImportOpen(true)}
+          className="flex items-center gap-1.5 bg-white/10 hover:bg-white/20 rounded-lg px-3 py-1.5 text-white text-xs font-medium transition-colors"
+          title="Paste HTML or code to build the page"
+        >
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
+          Import Code
+        </button>
+
+        <button
+          onClick={() => themeInputRef.current?.click()}
+          className="flex items-center gap-1.5 bg-white/10 hover:bg-white/20 rounded-lg px-3 py-1.5 text-white text-xs font-medium transition-colors"
+          title="Upload an HTML template file"
+        >
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+          Upload Theme
+        </button>
 
         <div className="flex-1" />
 
         {/* Device toggles */}
-        <div className="flex items-center gap-1 bg-white/10 rounded-lg p-0.5">
+        <div className="flex items-center gap-0.5 bg-white/10 rounded-lg p-0.5">
           {(['desktop', 'tablet', 'mobile'] as const).map((d) => (
             <button
               key={d}
               onClick={() => handleDeviceChange(d)}
-              className={`px-2.5 py-1 rounded text-xs font-medium transition-colors ${
+              title={`Preview on ${d}`}
+              className={`px-2 py-1 rounded text-[11px] font-medium transition-colors ${
                 activeDevice === d ? 'bg-white text-[#1B2A6B]' : 'text-white/70 hover:text-white'
               }`}
             >
-              {d === 'desktop' ? '\uD83D\uDDA5' : d === 'tablet' ? '\uD83D\uDCF1' : '\uD83D\uDCF2'} {d.charAt(0).toUpperCase() + d.slice(1)}
+              {d === 'desktop' ? '\uD83D\uDDA5' : d === 'tablet' ? '\uD83D\uDCF1' : '\uD83D\uDCF2'}
             </button>
           ))}
         </div>
 
-        <div className="h-6 w-px bg-white/20" />
-
         <button
           onClick={() => setSettingsOpen(!settingsOpen)}
-          className="text-white/70 hover:text-white transition-colors"
-          title="Page settings"
+          className="text-white/70 hover:text-white transition-colors p-1"
+          title="Page settings (slug, SEO)"
         >
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="3"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="3"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>
         </button>
 
-        {/* Published toggle */}
         <button
           onClick={() => setPublished(!published)}
-          className={`px-3 py-1 rounded text-xs font-semibold transition-colors ${
+          className={`px-2.5 py-1 rounded text-[11px] font-semibold transition-colors ${
             published ? 'bg-green-500 text-white' : 'bg-gray-500 text-white'
           }`}
         >
-          {published ? 'Published' : 'Draft'}
+          {published ? 'Live' : 'Draft'}
         </button>
 
         <button
           onClick={handleSave}
           disabled={saving}
-          className="bg-[#F7941D] text-white px-5 py-1.5 rounded-lg text-sm font-semibold hover:bg-[#e6850a] disabled:opacity-50 transition-colors"
+          className="bg-[#F7941D] text-white px-4 py-1.5 rounded-lg text-xs font-semibold hover:bg-[#e6850a] disabled:opacity-50 transition-colors"
         >
           {saving ? 'Saving...' : 'Save'}
         </button>
       </div>
+
+      {/* Import Code Modal */}
+      {importOpen && (
+        <div className="fixed inset-0 z-[60] flex items-center justify-center p-4" onClick={() => setImportOpen(false)}>
+          <div className="absolute inset-0 bg-black/40" />
+          <div className="relative bg-white rounded-2xl shadow-2xl max-w-2xl w-full p-6" onClick={e => e.stopPropagation()}>
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-lg font-bold text-[#1B2A6B]">Import HTML / Code</h3>
+              <button onClick={() => setImportOpen(false)} className="text-gray-400 hover:text-gray-600" aria-label="Close">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M18 6L6 18M6 6l12 12"/></svg>
+              </button>
+            </div>
+            <p className="text-sm text-gray-500 mb-3">
+              Paste any HTML code below. This will replace the current page content. You can paste a full template, a section, or code from any website builder.
+            </p>
+            <textarea
+              value={importCode}
+              onChange={(e) => setImportCode(e.target.value)}
+              placeholder={'<section>\n  <h1>My Page</h1>\n  <p>Paste your HTML here...</p>\n</section>'}
+              rows={12}
+              className="w-full px-4 py-3 border border-gray-300 rounded-xl font-mono text-sm focus:ring-2 focus:ring-[#F7941D] focus:border-transparent resize-none"
+            />
+            <div className="flex gap-3 mt-4">
+              <button
+                onClick={handleImportCode}
+                disabled={!importCode.trim()}
+                className="bg-[#F7941D] text-white px-6 py-2.5 rounded-xl font-semibold hover:bg-[#e6850a] disabled:opacity-40 transition-colors"
+              >
+                Import & Replace
+              </button>
+              <button
+                onClick={() => {
+                  if (!importCode.trim() || !editorRef.current) return
+                  editorRef.current.addComponents(importCode)
+                  setImportOpen(false)
+                  setImportCode('')
+                  showToast('Code added to page!')
+                }}
+                disabled={!importCode.trim()}
+                className="bg-[#1B2A6B] text-white px-6 py-2.5 rounded-xl font-semibold hover:bg-[#152155] disabled:opacity-40 transition-colors"
+              >
+                Add Below Existing
+              </button>
+              <button onClick={() => setImportOpen(false)} className="px-6 py-2.5 text-gray-500 font-medium hover:text-gray-700">
+                Cancel
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Settings drawer */}
       {settingsOpen && (
@@ -402,25 +530,30 @@ export default function GrapesjsEditor({ page }: GrapesjsEditorProps) {
               <span className="text-sm font-medium text-gray-700">URL Slug</span>
               <input type="text" value={slug} onChange={(e) => setSlug(e.target.value)}
                 className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-[#F7941D] focus:border-transparent" />
+              <span className="text-xs text-gray-400 mt-1 block">yoursite.com/{slug || 'page-url'}</span>
             </label>
 
             <label className="block mb-4">
-              <span className="text-sm font-medium text-gray-700">Meta Title</span>
-              <input type="text" value={metaTitle} onChange={(e) => setMetaTitle(e.target.value)}
+              <span className="text-sm font-medium text-gray-700">Meta Title (SEO)</span>
+              <input type="text" value={metaTitle} onChange={(e) => setMetaTitle(e.target.value)} placeholder={title}
                 className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-[#F7941D] focus:border-transparent" />
             </label>
 
             <label className="block mb-4">
-              <span className="text-sm font-medium text-gray-700">Meta Description</span>
-              <textarea value={metaDescription} onChange={(e) => setMetaDescription(e.target.value)} rows={3}
+              <span className="text-sm font-medium text-gray-700">Meta Description (SEO)</span>
+              <textarea value={metaDescription} onChange={(e) => setMetaDescription(e.target.value)} rows={3} placeholder="Describe this page for search engines..."
                 className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-[#F7941D] focus:border-transparent" />
             </label>
 
             <label className="block mb-4">
-              <span className="text-sm font-medium text-gray-700">OG Image URL</span>
-              <input type="text" value={metaOgImage} onChange={(e) => setMetaOgImage(e.target.value)}
+              <span className="text-sm font-medium text-gray-700">Social Share Image URL</span>
+              <input type="text" value={metaOgImage} onChange={(e) => setMetaOgImage(e.target.value)} placeholder="https://..."
                 className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-[#F7941D] focus:border-transparent" />
             </label>
+
+            <div className="mt-6 pt-4 border-t border-gray-100">
+              <p className="text-xs text-gray-400">Tip: Click the gear icon on the right sidebar of the editor to style any selected element.</p>
+            </div>
           </div>
         </div>
       )}
@@ -473,7 +606,7 @@ export default function GrapesjsEditor({ page }: GrapesjsEditorProps) {
                   ],
                 },
                 {
-                  name: 'General',
+                  name: 'Layout',
                   open: false,
                   properties: [
                     'display', 'float', 'position',
@@ -481,12 +614,12 @@ export default function GrapesjsEditor({ page }: GrapesjsEditorProps) {
                   ],
                 },
                 {
-                  name: 'Dimension',
+                  name: 'Size & Spacing',
                   open: false,
                   properties: ['width', 'height', 'max-width', 'min-height', 'margin', 'padding'],
                 },
                 {
-                  name: 'Decorations',
+                  name: 'Appearance',
                   open: false,
                   properties: [
                     'opacity', 'border-radius', 'border', 'box-shadow',
@@ -494,7 +627,7 @@ export default function GrapesjsEditor({ page }: GrapesjsEditorProps) {
                   ],
                 },
                 {
-                  name: 'Extra',
+                  name: 'Effects',
                   open: false,
                   properties: ['transition', 'perspective', 'transform'],
                 },
