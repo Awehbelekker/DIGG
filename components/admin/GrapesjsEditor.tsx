@@ -32,6 +32,25 @@ export default function GrapesjsEditor({ page }: GrapesjsEditorProps) {
   const [metaTitle, setMetaTitle] = useState(page?.meta_title || '')
   const [metaDescription, setMetaDescription] = useState(page?.meta_description || '')
   const [metaOgImage, setMetaOgImage] = useState(page?.meta_og_image || '')
+  const [siteTheme, setSiteTheme] = useState({ headingFont: 'Montserrat', bodyFont: 'Lato' })
+
+  useEffect(() => {
+    supabase
+      .from('site_settings')
+      .select('key, value')
+      .in('key', ['heading_font', 'body_font'])
+      .then(({ data }) => {
+        if (!data) return
+        const map: Record<string, string> = {}
+        for (const row of data) {
+          map[row.key] = typeof row.value === 'string' ? row.value : String(row.value ?? '')
+        }
+        setSiteTheme({
+          headingFont: map.heading_font || 'Montserrat',
+          bodyFont: map.body_font || 'Lato',
+        })
+      })
+  }, [supabase])
 
   const handleDeviceChange = useCallback((device: 'desktop' | 'tablet' | 'mobile') => {
     setActiveDevice(device)
@@ -119,6 +138,31 @@ export default function GrapesjsEditor({ page }: GrapesjsEditorProps) {
       .getPublicUrl(path)
     return publicData.publicUrl
   }, [supabase])
+
+  useEffect(() => {
+    const editor = editorRef.current
+    if (!editor) return
+    const canvasDoc = editor.Canvas.getDocument()
+    if (!canvasDoc) return
+    let styleEl = canvasDoc.getElementById('digg-theme-vars')
+    if (!styleEl) {
+      styleEl = canvasDoc.createElement('style')
+      styleEl.id = 'digg-theme-vars'
+      canvasDoc.head.appendChild(styleEl)
+    }
+    styleEl.textContent = `
+      :root {
+        --font-heading: "${siteTheme.headingFont}", system-ui, sans-serif;
+        --font-body: "${siteTheme.bodyFont}", system-ui, sans-serif;
+        --color-navy: #1B2A6B;
+        --color-orange: #F7941D;
+        --color-light-blue: #5BC8E8;
+      }
+      body { font-family: var(--font-body); color: #333; }
+      h1 { font-family: var(--font-heading); font-weight: 700; }
+      h2, h3, h4, h5, h6 { font-family: var(--font-heading); }
+    `
+  }, [siteTheme])
 
   const onEditor = useCallback((editor: Editor) => {
     editorRef.current = editor
@@ -339,7 +383,7 @@ export default function GrapesjsEditor({ page }: GrapesjsEditorProps) {
                     {
                       property: 'font-family',
                       type: 'select',
-                      defaults: 'Montserrat, sans-serif',
+                      defaults: `"${siteTheme.headingFont}", sans-serif`,
                       options: [
                         { id: 'Arial, Helvetica, sans-serif', label: 'Arial' },
                         { id: 'Georgia, serif', label: 'Georgia' },
