@@ -233,6 +233,22 @@ export default function GrapesjsEditor({ page }: GrapesjsEditorProps) {
     const canvasDoc = editor.Canvas.getDocument()
     const canvasBody = editor.Canvas.getBody()
     if (canvasDoc && canvasBody) {
+      // Block all link clicks inside the canvas from navigating the browser
+      canvasDoc.addEventListener('click', (e: Event) => {
+        const target = e.target as HTMLElement
+        const link = target.closest('a')
+        if (link) {
+          e.preventDefault()
+          e.stopPropagation()
+        }
+      }, true)
+
+      // Also block form submissions from navigating
+      canvasDoc.addEventListener('submit', (e: Event) => {
+        e.preventDefault()
+        e.stopPropagation()
+      }, true)
+
       const prevent = (e: Event) => { e.preventDefault(); e.stopPropagation() }
       canvasDoc.addEventListener('dragover', prevent)
       canvasDoc.addEventListener('dragenter', prevent)
@@ -359,6 +375,21 @@ export default function GrapesjsEditor({ page }: GrapesjsEditorProps) {
     if (blkBtn) blkBtn.set('active', true)
   }, [])
 
+  const blockCanvasLinks = useCallback((doc: Document) => {
+    doc.addEventListener('click', (e: Event) => {
+      const target = e.target as HTMLElement
+      const link = target.closest('a')
+      if (link) {
+        e.preventDefault()
+        e.stopPropagation()
+      }
+    }, true)
+    doc.addEventListener('submit', (e: Event) => {
+      e.preventDefault()
+      e.stopPropagation()
+    }, true)
+  }, [])
+
   const handlePreview = useCallback(() => {
     const editor = editorRef.current
     if (!editor) return
@@ -368,8 +399,13 @@ export default function GrapesjsEditor({ page }: GrapesjsEditorProps) {
     } else {
       editor.runCommand('preview')
       setPreviewing(true)
+      // Re-apply link blocking after preview mode activates
+      setTimeout(() => {
+        const canvasDoc = editor.Canvas.getDocument()
+        if (canvasDoc) blockCanvasLinks(canvasDoc)
+      }, 100)
     }
-  }, [previewing])
+  }, [previewing, blockCanvasLinks])
 
   const handleDuplicate = useCallback(() => {
     const editor = editorRef.current
@@ -478,7 +514,9 @@ export default function GrapesjsEditor({ page }: GrapesjsEditorProps) {
                     key={p.id}
                     onClick={() => {
                       setPageSwitcherOpen(false)
-                      if (p.id !== page?.id) router.push(`/admin/pages/${p.id}`)
+                      if (p.id !== page?.id) {
+                        window.location.href = `/admin/pages/${p.id}`
+                      }
                     }}
                     className={`w-full text-left px-4 py-2.5 text-sm hover:bg-gray-50 transition-colors flex items-center justify-between ${
                       p.id === page?.id ? 'bg-blue-50 text-[#1B2A6B] font-semibold' : 'text-gray-700'
