@@ -4,6 +4,8 @@ import Link from 'next/link'
 import AdminPageHeading from '@/components/admin/AdminPageHeading'
 import PageRowActions from '@/components/admin/PageRowActions'
 
+export const dynamic = 'force-dynamic'
+
 export default async function VisualBuilderPage() {
   const supabase = await createClient()
   const { data: pages } = await supabase

@@ -92,7 +92,10 @@ export default function GrapesjsEditor({ page }: GrapesjsEditorProps) {
       return
     }
     const editor = editorRef.current
-    if (!editor) return
+    if (!editor) {
+      showToast('Editor not ready yet — please wait a moment and try again.', 'error')
+      return
+    }
 
     setSaving(true)
     try {
@@ -116,11 +119,24 @@ export default function GrapesjsEditor({ page }: GrapesjsEditorProps) {
       }
 
       if (page) {
-        const { error } = await supabase.from('pages').update(payload).eq('id', page.id)
+        const { data, error } = await supabase
+          .from('pages')
+          .update(payload)
+          .eq('id', page.id)
+          .select('id')
         if (error) throw error
+        if (!data || data.length === 0) {
+          throw new Error('Save blocked — your session may have expired. Please log in again.')
+        }
       } else {
-        const { error } = await supabase.from('pages').insert([payload])
+        const { data, error } = await supabase
+          .from('pages')
+          .insert([payload])
+          .select('id')
         if (error) throw error
+        if (!data || data.length === 0) {
+          throw new Error('Insert blocked — your session may have expired. Please log in again.')
+        }
       }
 
       showToast('Page saved!')
