@@ -1,5 +1,5 @@
-import EditorPicker from '@/components/admin/EditorPicker'
+import GrapesjsEditorWrapper from '@/components/admin/GrapesjsEditorWrapper'
 
 export default function NewPagePage() {
-  return <EditorPicker />
+  return <GrapesjsEditorWrapper />
 }

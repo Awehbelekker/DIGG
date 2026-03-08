@@ -11,7 +11,8 @@ import gjsCustomCode from 'grapesjs-custom-code'
 import { createClient } from '@/lib/supabase/client'
 import { showToast } from '@/components/admin/Toast'
 import diggBlocksPlugin from '@/lib/grapesjs/blocks'
-import type { Page } from '@/lib/types/database'
+import { sectionsToHtml } from '@/lib/grapesjs/sections-to-html'
+import type { Page, PageSection } from '@/lib/types/database'
 
 interface GrapesjsEditorProps {
   page?: Page
@@ -104,6 +105,13 @@ export default function GrapesjsEditor({ page }: GrapesjsEditorProps) {
 
     if (page?.gjs_data && typeof page.gjs_data === 'object' && Object.keys(page.gjs_data).length > 0) {
       editor.loadProjectData(page.gjs_data as Parameters<Editor['loadProjectData']>[0])
+    } else if (page?.content) {
+      const content = page.content as { sections?: PageSection[] }
+      const sections = content?.sections ?? []
+      if (sections.length > 0) {
+        const html = sectionsToHtml(sections)
+        editor.setComponents(html)
+      }
     }
   }, [page])
 
