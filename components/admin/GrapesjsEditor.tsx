@@ -3,7 +3,7 @@
 import { useState, useCallback, useEffect, useRef } from 'react'
 import { useRouter } from 'next/navigation'
 import grapesjs, { type Editor } from 'grapesjs'
-import GjsEditor, { Canvas } from '@grapesjs/react'
+import GjsEditor from '@grapesjs/react'
 import gjsBlocksBasic from 'grapesjs-blocks-basic'
 import gjsPresetWebpage from 'grapesjs-preset-webpage'
 import gjsPluginForms from 'grapesjs-plugin-forms'
@@ -925,13 +925,7 @@ export default function GrapesjsEditor({ page }: GrapesjsEditorProps) {
             },
           }}
           onEditor={onEditor}
-        >
-          <div className="flex h-full">
-            <div className="flex-1 overflow-hidden">
-              <Canvas />
-            </div>
-          </div>
-        </GjsEditor>
+        />
       </div>
     </div>
   )
