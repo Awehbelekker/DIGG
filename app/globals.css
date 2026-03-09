@@ -133,29 +133,49 @@ h2, h3, h4, h5, h6 {
 
 /* ===== GrapesJS Editor Layout Overrides ===== */
 
-/* Keep GrapesJS inside its container */
 .gjs-editor {
   position: relative !important;
 }
 
-/* Make the GrapesJS native toolbar clearly visible */
-.gjs-pn-commands,
+/* Force the GrapesJS toolbar to be visible with a fixed height */
+.gjs-pn-commands {
+  min-height: 40px !important;
+  background: #353535 !important;
+  display: flex !important;
+  align-items: center !important;
+  padding: 0 8px !important;
+  box-sizing: border-box !important;
+}
+
 .gjs-pn-options {
-  background-color: #353535 !important;
+  min-height: 40px !important;
+  background: #353535 !important;
+  display: flex !important;
+  align-items: center !important;
+  padding: 0 8px !important;
+  box-sizing: border-box !important;
+  flex-wrap: wrap !important;
 }
 
 .gjs-pn-devices-c {
-  background-color: #353535 !important;
+  min-height: 40px !important;
+  background: #353535 !important;
+  display: flex !important;
+  align-items: center !important;
+}
+
+/* Push canvas below the 40px toolbar */
+.gjs-cv-canvas {
+  top: 40px !important;
+}
+
+.gjs-pn-options .gjs-pn-btn {
+  padding: 0 2px;
 }
 
 /* Sidebar */
 .gjs-pn-views-container {
   overflow-y: auto;
-}
-
-/* Style our injected panel buttons */
-.gjs-pn-options .gjs-pn-btn {
-  padding: 0 2px;
 }
 
 /* Tablet: compact right sidebar */
