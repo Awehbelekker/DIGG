@@ -414,11 +414,13 @@ export default function GrapesjsEditor({ page }: GrapesjsEditorProps) {
       <input ref={fileInputRef} type="file" accept="image/*" multiple className="hidden" onChange={handleFileSelected} />
       <input ref={themeInputRef} type="file" accept=".html,.htm" className="hidden" onChange={handleThemeUpload} />
 
-      {/* === Row 1: Navigation bar (36px) === */}
+      {/* Single full-viewport editor shell: nav + tools + canvas */}
       <div
-        className="bg-[#1B2A6B] flex items-center px-2 gap-1.5"
-        style={{ position: 'fixed', top: 0, left: 0, right: 0, height: 36, zIndex: 99999 }}
+        className="flex flex-col"
+        style={{ position: 'fixed', inset: 0, zIndex: 9999, background: '#1B2A6B' }}
       >
+        {/* Row 1: Navigation bar (36px) */}
+        <div className="bg-[#1B2A6B] flex items-center px-2 gap-1.5 shrink-0" style={{ height: 36 }}>
         <button onClick={() => router.push('/admin/dashboard')} className="text-white/70 hover:text-white p-1" title="Back to admin">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M19 12H5m7-7l-7 7 7 7"/></svg>
         </button>
@@ -470,11 +472,8 @@ export default function GrapesjsEditor({ page }: GrapesjsEditorProps) {
         </button>
       </div>
 
-      {/* === Row 2: Editing tools (36px) === */}
-      <div
-        className="bg-[#353535] flex items-center px-2 gap-1 border-t border-white/10"
-        style={{ position: 'fixed', top: 36, left: 0, right: 0, height: 36, zIndex: 99999 }}
-      >
+        {/* Row 2: Editing tools (36px) */}
+        <div className="bg-[#353535] flex items-center px-2 gap-1 border-t border-white/10 shrink-0" style={{ height: 36 }}>
         <button onClick={() => editorRef.current?.UndoManager.undo()} className="p-1 text-white/60 hover:text-white" title="Undo (Ctrl+Z)">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M3 10h10a5 5 0 015 5v2"/><polyline points="3 10 7 6"/><polyline points="3 10 7 14"/></svg>
         </button>
@@ -510,9 +509,8 @@ export default function GrapesjsEditor({ page }: GrapesjsEditorProps) {
         <button onClick={() => setSettingsOpen(!settingsOpen)} className="p-1 text-white/60 hover:text-white" title="Page settings">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="3"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>
         </button>
-      </div>
+        </div>
 
-      {/* Import Code Modal */}
       {importOpen && (
         <div className="fixed inset-0 flex items-center justify-center p-4" style={{ zIndex: 100000 }} onClick={() => setImportOpen(false)}>
           <div className="absolute inset-0 bg-black/40" />
@@ -587,12 +585,12 @@ export default function GrapesjsEditor({ page }: GrapesjsEditorProps) {
         </div>
       )}
 
-      {/* GrapesJS editor — below the 72px toolbar (36+36), fills the rest */}
-      <div style={{ position: 'fixed', top: 72, left: 0, right: 0, bottom: 0, zIndex: 40 }}>
-        <GjsEditor
-          grapesjs={grapesjs}
-          grapesjsCss="https://unpkg.com/grapesjs/dist/css/grapes.min.css"
-          options={{
+        {/* Row 3: GrapesJS editor — website view sits inside this panel */}
+        <div className="flex-1 min-h-0 relative" style={{ minHeight: 0 }}>
+          <GjsEditor
+            grapesjs={grapesjs}
+            grapesjsCss="https://unpkg.com/grapesjs/dist/css/grapes.min.css"
+            options={{
             height: '100%',
             storageManager: false,
             undoManager: { trackSelection: false },
@@ -693,8 +691,9 @@ export default function GrapesjsEditor({ page }: GrapesjsEditorProps) {
               assets: [],
             },
           }}
-          onEditor={onEditor}
-        />
+            onEditor={onEditor}
+          />
+        </div>
       </div>
     </>
   )
