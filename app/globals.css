@@ -137,40 +137,16 @@ h2, h3, h4, h5, h6 {
   position: relative !important;
 }
 
-/* Force the GrapesJS toolbar to be visible with a fixed height */
-.gjs-pn-commands {
-  min-height: 40px !important;
-  background: #353535 !important;
-  display: flex !important;
-  align-items: center !important;
-  padding: 0 8px !important;
-  box-sizing: border-box !important;
-}
-
-.gjs-pn-options {
-  min-height: 40px !important;
-  background: #353535 !important;
-  display: flex !important;
-  align-items: center !important;
-  padding: 0 8px !important;
-  box-sizing: border-box !important;
-  flex-wrap: wrap !important;
-}
-
+/* Hide the native GrapesJS top toolbar — we use our own React toolbar */
+.gjs-pn-commands,
+.gjs-pn-options,
 .gjs-pn-devices-c {
-  min-height: 40px !important;
-  background: #353535 !important;
-  display: flex !important;
-  align-items: center !important;
+  display: none !important;
 }
 
-/* Push canvas below the 40px toolbar */
+/* Canvas starts at the very top of its container (no toolbar offset) */
 .gjs-cv-canvas {
-  top: 40px !important;
-}
-
-.gjs-pn-options .gjs-pn-btn {
-  padding: 0 2px;
+  top: 0 !important;
 }
 
 /* Sidebar */
@@ -194,7 +170,7 @@ h2, h3, h4, h5, h6 {
   .gjs-pn-views-container {
     position: fixed !important;
     right: 0 !important;
-    top: 36px !important;
+    top: 72px !important;
     bottom: 0 !important;
     width: 280px !important;
     z-index: 55 !important;
