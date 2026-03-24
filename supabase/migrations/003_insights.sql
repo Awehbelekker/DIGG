@@ -13,15 +13,18 @@ CREATE INDEX idx_insights_slug ON insights(slug);
 CREATE INDEX idx_insights_published ON insights(published);
 CREATE INDEX idx_insights_updated ON insights(updated_at DESC);
 
+DROP TRIGGER IF EXISTS update_insights_updated_at ON insights;
 CREATE TRIGGER update_insights_updated_at BEFORE UPDATE ON insights
   FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 
 ALTER TABLE insights ENABLE ROW LEVEL SECURITY;
 
+DROP POLICY IF EXISTS "Public can view published insights" ON insights;
 CREATE POLICY "Public can view published insights"
   ON insights FOR SELECT
   USING (published = true);
 
+DROP POLICY IF EXISTS "Admins can manage insights" ON insights;
 CREATE POLICY "Admins can manage insights"
   ON insights FOR ALL
   USING (auth.role() = 'authenticated');
