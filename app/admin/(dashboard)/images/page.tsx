@@ -6,6 +6,7 @@ import type { Image } from '@/lib/types/database'
 import ImageUpload from '@/components/admin/ImageUpload'
 import AdminPageHeading from '@/components/admin/AdminPageHeading'
 import { showToast } from '@/components/admin/Toast'
+import AdminSafeLink from '@/components/admin/AdminSafeLink'
 import { useRegisterAdminNavUnsaved } from '@/components/admin/AdminUnsavedProvider'
 import { useUnsavedChangesAlert } from '@/lib/hooks/useUnsavedChangesAlert'
 
@@ -195,7 +196,7 @@ export default function AdminImagesPage() {
                 <p className="text-sm font-medium text-gray-900 truncate">{image.filename}</p>
                 <p className="text-xs text-gray-500 mt-1">{image.folder}</p>
                 <div className="mt-4 flex flex-wrap gap-2">
-                  <a href={image.url} target="_blank" rel="noopener noreferrer" className="flex-1 min-w-0 text-center text-xs bg-[#5BC8E8] text-[#1B2A6B] px-3 py-1.5 rounded-lg hover:bg-[#4ab8d8] transition-colors">View</a>
+                  <AdminSafeLink href={image.url} openInNewTab className="flex-1 min-w-0 text-center text-xs bg-[#5BC8E8] text-[#1B2A6B] px-3 py-1.5 rounded-lg hover:bg-[#4ab8d8] transition-colors">View</AdminSafeLink>
                   <button type="button" onClick={() => { navigator.clipboard.writeText(image.url); showToast('URL copied!'); }} className="flex-1 min-w-0 text-center text-xs bg-gray-100 text-gray-700 px-3 py-1.5 rounded-lg hover:bg-gray-200 transition-colors">Copy URL</button>
                   <button onClick={() => handleDelete(image.id)} className="flex-1 min-w-0 text-center text-xs bg-red-600 text-white px-3 py-1.5 rounded-lg hover:bg-red-700 transition-colors">Delete</button>
                 </div>

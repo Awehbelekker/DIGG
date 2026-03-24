@@ -48,24 +48,22 @@ export default function PageRowActions({ page }: PageRowActionsProps) {
         >
           Edit
         </AdminSafeLink>
-        <a
+        <AdminSafeLink
           href={`/preview/${page.id}`}
-          target="_blank"
-          rel="noopener noreferrer"
+          openInNewTab
           className="text-gray-600 hover:text-[#1B2A6B]"
           title="Preview (works for drafts too)"
         >
           Preview
-        </a>
-        <a
+        </AdminSafeLink>
+        <AdminSafeLink
           href={`/${page.slug}`}
-          target="_blank"
-          rel="noopener noreferrer"
+          openInNewTab
           className="text-gray-500 hover:text-[#1B2A6B] text-xs"
           title="View live (published only)"
         >
           View live
-        </a>
+        </AdminSafeLink>
         <button
           type="button"
           onClick={handleDuplicate}

@@ -112,14 +112,13 @@ export default function InsightEditor({ insight }: { insight?: Insight | null })
             <span className="text-sm text-gray-700">Published</span>
           </label>
           {insight && (
-            <a
+            <AdminSafeLink
               href={`/preview/insight/${insight.id}`}
-              target="_blank"
-              rel="noopener noreferrer"
+              openInNewTab
               className="text-sm text-amber-700 hover:text-amber-800"
             >
               Preview draft
-            </a>
+            </AdminSafeLink>
           )}
         </div>
       </div>

@@ -1,5 +1,4 @@
 import { createClient } from '@/lib/supabase/server'
-import Link from 'next/link'
 import AdminPageHeading from '@/components/admin/AdminPageHeading'
 import NewsletterExportButton from '@/components/admin/NewsletterExportButton'
 import type { NewsletterSignup } from '@/lib/types/database'

@@ -30,15 +30,14 @@ export default function InsightRowActions({ insight }: { insight: Insight }) {
         <AdminSafeLink href={`/admin/insights/${insight.id}`} className="text-[#F7941D] hover:text-[#e6850a]">
           Edit
         </AdminSafeLink>
-        <a
+        <AdminSafeLink
           href={insight.published ? `/insights/${insight.slug}` : `/preview/insight/${insight.id}`}
-          target="_blank"
-          rel="noopener noreferrer"
+          openInNewTab
           className="text-gray-600 hover:text-[#1B2A6B]"
           title={insight.published ? 'View on site' : 'Preview draft'}
         >
           {insight.published ? 'View' : 'Preview'}
-        </a>
+        </AdminSafeLink>
         <button
           type="button"
           onClick={handleDelete}
