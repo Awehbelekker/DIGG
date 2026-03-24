@@ -1,6 +1,6 @@
 import { createClient } from '@/lib/supabase/server'
-import Link from 'next/link'
 import AdminPageHeading from '@/components/admin/AdminPageHeading'
+import AdminSafeLink from '@/components/admin/AdminSafeLink'
 
 export default async function AdminDashboard() {
   const supabase = await createClient()
@@ -48,27 +48,27 @@ export default async function AdminDashboard() {
 
       {/* Quick links */}
       <div className="mb-8 flex flex-wrap gap-3">
-        <Link
+        <AdminSafeLink
           href="/admin/settings"
           className="inline-flex items-center px-4 py-2 rounded-xl bg-[#1B2A6B] text-white text-sm font-medium hover:bg-[#2a3d8a] transition-colors"
         >
           Hero & Selected Work
-        </Link>
+        </AdminSafeLink>
         {homePage && (
-          <Link
+          <AdminSafeLink
             href={`/admin/pages/${homePage.id}`}
             className="inline-flex items-center px-4 py-2 rounded-xl border border-[#1B2A6B] bg-white text-[#1B2A6B] text-sm font-medium hover:bg-[#1B2A6B] hover:text-white transition-colors"
           >
             Edit Home
-          </Link>
+          </AdminSafeLink>
         )}
         {aboutPage && (
-          <Link
+          <AdminSafeLink
             href={`/admin/pages/${aboutPage.id}`}
             className="inline-flex items-center px-4 py-2 rounded-xl border border-[#1B2A6B] bg-white text-[#1B2A6B] text-sm font-medium hover:bg-[#1B2A6B] hover:text-white transition-colors"
           >
             Edit About
-          </Link>
+          </AdminSafeLink>
         )}
         <a
           href="/"
@@ -83,14 +83,14 @@ export default async function AdminDashboard() {
       {/* Stats Grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-6 mb-8">
         {stats.map((stat) => (
-          <Link
+          <AdminSafeLink
             key={stat.label}
             href={stat.href}
             className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 hover:shadow-md hover:border-gray-200 transition-all"
           >
             <h3 className="text-lg font-semibold text-gray-600 mb-2" style={{ fontFamily: 'var(--font-heading)' }}>{stat.label}</h3>
             <p className="text-4xl font-bold text-[#F7941D]">{stat.count}</p>
-          </Link>
+          </AdminSafeLink>
         ))}
       </div>
 
@@ -108,12 +108,12 @@ export default async function AdminDashboard() {
                       <p className="text-sm text-gray-500">/{p.slug === 'home' ? '' : p.slug || '—'}</p>
                       <p className="text-xs text-gray-400 mt-1">{new Date(p.updated_at).toLocaleString()}</p>
                     </div>
-                    <Link
+                    <AdminSafeLink
                       href={`/admin/pages/${p.id}`}
                       className="shrink-0 px-3 py-1.5 rounded-lg bg-[#F7941D] text-white text-sm font-medium hover:bg-[#e6850a] transition-colors"
                     >
                       Edit
-                    </Link>
+                    </AdminSafeLink>
                   </div>
                 </div>
               ))}
@@ -121,12 +121,12 @@ export default async function AdminDashboard() {
           ) : (
             <p className="text-gray-500">No pages yet</p>
           )}
-          <Link
+          <AdminSafeLink
             href="/admin/pages"
             className="mt-4 inline-block text-[#F7941D] hover:text-[#e6850a] font-semibold"
           >
             View all pages →
-          </Link>
+          </AdminSafeLink>
         </div>
 
         {/* Recent Form Submissions */}
@@ -160,12 +160,12 @@ export default async function AdminDashboard() {
           ) : (
             <p className="text-gray-500">No submissions yet</p>
           )}
-          <Link
+          <AdminSafeLink
             href="/admin/forms"
             className="mt-4 inline-block text-[#F7941D] hover:text-[#e6850a] font-semibold"
           >
             View all submissions →
-          </Link>
+          </AdminSafeLink>
         </div>
       </div>
     </div>

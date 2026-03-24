@@ -1,6 +1,6 @@
 'use client'
 
-import Link from 'next/link'
+import AdminSafeLink from '@/components/admin/AdminSafeLink'
 
 type Filter = 'all' | 'unread' | 'read' | 'archived'
 
@@ -15,7 +15,7 @@ export default function FormFilterTabs({ current }: { current: Filter }) {
   return (
     <div className="flex gap-1 p-1 bg-gray-100 rounded-lg w-fit">
       {TABS.map(({ value, label }) => (
-        <Link
+        <AdminSafeLink
           key={value}
           href={value === 'all' ? '/admin/forms' : `/admin/forms?filter=${value}`}
           className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
@@ -25,7 +25,7 @@ export default function FormFilterTabs({ current }: { current: Filter }) {
           }`}
         >
           {label}
-        </Link>
+        </AdminSafeLink>
       ))}
     </div>
   )

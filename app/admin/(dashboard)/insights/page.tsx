@@ -1,6 +1,6 @@
 import { createClient } from '@/lib/supabase/server'
-import Link from 'next/link'
 import AdminPageHeading from '@/components/admin/AdminPageHeading'
+import AdminSafeLink from '@/components/admin/AdminSafeLink'
 import InsightRowActions from '@/components/admin/InsightRowActions'
 import type { Insight } from '@/lib/types/database'
 
@@ -15,12 +15,12 @@ export default async function AdminInsightsPage() {
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
       <div className="flex justify-between items-center mb-8">
         <AdminPageHeading subtitle="Articles and updates for your site.">Insights</AdminPageHeading>
-        <Link
+        <AdminSafeLink
           href="/admin/insights/new"
           className="bg-[#F7941D] text-white px-6 py-2 rounded font-semibold hover:bg-[#e6850a] transition-colors"
         >
           New Insight
-        </Link>
+        </AdminSafeLink>
       </div>
 
       {insights && insights.length > 0 ? (
@@ -61,12 +61,12 @@ export default async function AdminInsightsPage() {
       ) : (
         <div className="bg-white rounded-lg shadow-md p-12 text-center">
           <p className="text-gray-500 mb-4">No insights yet</p>
-          <Link
+          <AdminSafeLink
             href="/admin/insights/new"
             className="inline-block bg-[#F7941D] text-white px-6 py-2 rounded font-semibold hover:bg-[#e6850a] transition-colors"
           >
             Create your first insight
-          </Link>
+          </AdminSafeLink>
         </div>
       )}
     </div>

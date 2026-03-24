@@ -1,6 +1,6 @@
 'use client'
 
-import Link from 'next/link'
+import AdminSafeLink from '@/components/admin/AdminSafeLink'
 import { useRouter } from 'next/navigation'
 import { useState } from 'react'
 import { showToast } from '@/components/admin/Toast'
@@ -42,12 +42,12 @@ export default function FormSubmissionRow({ submission }: { submission: FormSubm
       <div className="flex justify-between items-start mb-4 flex-wrap gap-2">
         <div>
           <div className="flex items-center flex-wrap gap-2">
-            <Link
+            <AdminSafeLink
               href={`/admin/forms/${submission.id}`}
               className={`text-lg font-semibold hover:text-[#F7941D] transition-colors ${!read ? 'text-[#1B2A6B]' : 'text-gray-700'}`}
             >
               {String((submission.data as Record<string, unknown>).name || 'Unknown')}
-            </Link>
+            </AdminSafeLink>
             <span className={`px-3 py-1 rounded-full text-xs font-semibold ${
               submission.form_type === 'contact' ? 'bg-[#5BC8E8] text-[#1B2A6B]' : 'bg-[#F7941D] text-white'
             }`}>
@@ -77,12 +77,12 @@ export default function FormSubmissionRow({ submission }: { submission: FormSubm
           >
             {loading === 'archive' ? '…' : archived ? 'Unarchive' : 'Archive'}
           </button>
-          <Link
+          <AdminSafeLink
             href={`/admin/forms/${submission.id}`}
             className="px-3 py-1.5 text-sm font-medium text-[#F7941D] hover:bg-[#F7941D]/10 rounded-lg transition-colors"
           >
             View
-          </Link>
+          </AdminSafeLink>
         </div>
       </div>
       <div className="mt-4 space-y-2">

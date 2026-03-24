@@ -1,8 +1,7 @@
 import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
-import Link from 'next/link'
 import AdminPageHeading from '@/components/admin/AdminPageHeading'
-import PageRowActions from '@/components/admin/PageRowActions'
+import AdminSafeLink from '@/components/admin/AdminSafeLink'
 
 export const dynamic = 'force-dynamic'
 
@@ -29,12 +28,12 @@ export default async function VisualBuilderPage() {
       <AdminPageHeading subtitle="Start building your website with the drag-and-drop visual editor.">
         Visual Builder
       </AdminPageHeading>
-      <Link
+      <AdminSafeLink
         href="/admin/pages/new"
         className="inline-block mt-8 bg-[#F7941D] text-white px-8 py-3 rounded-xl font-semibold hover:bg-[#e6850a] transition-colors text-lg"
       >
         Create Your First Page
-      </Link>
+      </AdminSafeLink>
     </div>
   )
 }

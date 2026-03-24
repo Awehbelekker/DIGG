@@ -1,7 +1,9 @@
 'use client'
 
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
 import { inviteUserByEmail, type TeamUser } from './actions'
+import { useRegisterAdminNavUnsaved } from '@/components/admin/AdminUnsavedProvider'
+import { useUnsavedChangesAlert } from '@/lib/hooks/useUnsavedChangesAlert'
 
 export default function TeamClient({
   initialUsers,
@@ -14,6 +16,13 @@ export default function TeamClient({
   const [email, setEmail] = useState('')
   const [loading, setLoading] = useState(false)
   const [message, setMessage] = useState<{ type: 'ok' | 'err'; text: string } | null>(null)
+
+  const inviteDraftDirty = useMemo(() => email.trim().length > 0, [email])
+  useRegisterAdminNavUnsaved(inviteDraftDirty)
+  useUnsavedChangesAlert(
+    inviteDraftDirty,
+    'You have an email address in the invite field. Leave without sending?'
+  )
 
   const handleInvite = async (e: React.FormEvent) => {
     e.preventDefault()

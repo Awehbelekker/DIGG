@@ -1,7 +1,7 @@
 import { createClient } from '@/lib/supabase/server'
 import { notFound } from 'next/navigation'
-import Link from 'next/link'
 import AdminPageHeading from '@/components/admin/AdminPageHeading'
+import AdminSafeLink from '@/components/admin/AdminSafeLink'
 import FormSubmissionActions from '@/components/admin/FormSubmissionActions'
 import type { FormSubmission } from '@/lib/types/database'
 
@@ -28,12 +28,12 @@ export default async function FormSubmissionDetailPage({
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
       <div className="mb-6 flex flex-wrap items-center justify-between gap-4">
-        <Link
+        <AdminSafeLink
           href="/admin/forms"
           className="text-sm text-[#F7941D] hover:text-[#e6850a] font-medium"
         >
           ← Back to Form Submissions
-        </Link>
+        </AdminSafeLink>
         <FormSubmissionActions submission={sub} />
       </div>
       <AdminPageHeading className="mb-8" subtitle="View submission details">

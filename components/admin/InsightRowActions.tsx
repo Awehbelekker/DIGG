@@ -1,6 +1,6 @@
 'use client'
 
-import Link from 'next/link'
+import AdminSafeLink from '@/components/admin/AdminSafeLink'
 import { useRouter } from 'next/navigation'
 import { useState } from 'react'
 import { showToast } from '@/components/admin/Toast'
@@ -27,9 +27,9 @@ export default function InsightRowActions({ insight }: { insight: Insight }) {
   return (
     <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
       <div className="flex items-center justify-end gap-2">
-        <Link href={`/admin/insights/${insight.id}`} className="text-[#F7941D] hover:text-[#e6850a]">
+        <AdminSafeLink href={`/admin/insights/${insight.id}`} className="text-[#F7941D] hover:text-[#e6850a]">
           Edit
-        </Link>
+        </AdminSafeLink>
         <a
           href={insight.published ? `/insights/${insight.slug}` : `/preview/insight/${insight.id}`}
           target="_blank"

@@ -1,6 +1,6 @@
 'use client'
 
-import Link from 'next/link'
+import AdminSafeLink from '@/components/admin/AdminSafeLink'
 import { useRouter } from 'next/navigation'
 import { useState } from 'react'
 import { showToast } from '@/components/admin/Toast'
@@ -42,12 +42,12 @@ export default function PageRowActions({ page }: PageRowActionsProps) {
   return (
     <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
       <div className="flex items-center justify-end gap-2">
-        <Link
+        <AdminSafeLink
           href={`/admin/pages/${page.id}`}
           className="text-[#F7941D] hover:text-[#e6850a]"
         >
           Edit
-        </Link>
+        </AdminSafeLink>
         <a
           href={`/preview/${page.id}`}
           target="_blank"
