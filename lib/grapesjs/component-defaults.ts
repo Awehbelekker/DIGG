@@ -78,9 +78,20 @@ export function applyResizePolicy(component: Component) {
 
   const type = component.get('type')
   const tag = (component.get('tagName') || '').toLowerCase()
+  const style = component.getStyle() || {}
+  const pos = String(style.position || '').toLowerCase()
 
   if (type === 'image') {
     component.set('resizable', { ...RESIZE_IMAGE })
+    return
+  }
+
+  /** Floated links / buttons: drag (toolbar) + corner resize */
+  const isFloated =
+    (pos === 'absolute' || pos === 'fixed') &&
+    (tag === 'a' || tag === 'button' || type === 'link')
+  if (isFloated) {
+    component.set('resizable', { minDim: 36, step: 1, ratioDefault: false })
     return
   }
 

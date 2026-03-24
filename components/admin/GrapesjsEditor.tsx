@@ -16,6 +16,8 @@ import { createClient } from '@/lib/supabase/client'
 import { showToast } from '@/components/admin/Toast'
 import diggBlocksPlugin from '@/lib/grapesjs/blocks'
 import { applyResizePolicyToEntireTree, registerDiggComponentResizeBehavior } from '@/lib/grapesjs/component-defaults'
+import { registerFloatingCommands } from '@/lib/grapesjs/floating-controls'
+import { registerImageFocalOverlay } from '@/lib/grapesjs/image-focal-overlay'
 import { diggAlignmentSector } from '@/lib/grapesjs/alignment-sector'
 import { diggImageFramingSector, diggNewImageStyle } from '@/lib/grapesjs/image-framing-sector'
 import {
@@ -319,6 +321,8 @@ export default function GrapesjsEditor({ page }: GrapesjsEditorProps) {
     ignoreDirtyRef.current = true
 
     registerDiggComponentResizeBehavior(editor)
+    registerFloatingCommands(editor)
+    registerImageFocalOverlay(editor)
 
     if (page?.gjs_data && typeof page.gjs_data === 'object' && Object.keys(page.gjs_data).length > 0) {
       editor.loadProjectData(page.gjs_data as Parameters<Editor['loadProjectData']>[0])
@@ -673,6 +677,43 @@ export default function GrapesjsEditor({ page }: GrapesjsEditorProps) {
           Image
         </button>
 
+        <button
+          type="button"
+          onClick={() => {
+            const ed = editorRef.current
+            const c = ed?.getSelected()
+            if (!ed || !c) {
+              showToast('Select a link or button on the canvas first.', 'info')
+              return
+            }
+            const tag = (c.get('tagName') || '').toLowerCase()
+            if (tag !== 'a' && tag !== 'button' && c.get('type') !== 'link') {
+              showToast('Pick a button or a link — then use Float to place it freely.', 'info')
+              return
+            }
+            ed.runCommand('digg:float')
+          }}
+          className="hidden sm:flex items-center gap-1 bg-white/10 hover:bg-white/20 rounded px-2 py-1 text-white text-[11px] font-medium"
+          title="Float the selected link or button — drag with the move handle, resize corners"
+        >
+          Float
+        </button>
+        <button
+          type="button"
+          onClick={() => {
+            const ed = editorRef.current
+            if (!ed?.getSelected()) {
+              showToast('Select a floated link or button first.', 'info')
+              return
+            }
+            ed.runCommand('digg:unfloat')
+          }}
+          className="hidden sm:flex items-center gap-1 bg-white/10 hover:bg-white/20 rounded px-2 py-1 text-white text-[11px] font-medium"
+          title="Remove floating — back to normal flow"
+        >
+          Unfloat
+        </button>
+
         <button onClick={() => setImportOpen(true)} className="flex items-center gap-1 bg-white/10 hover:bg-white/20 rounded px-2 py-1 text-white text-[11px] font-medium" title="Import HTML">
           <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
           Code
@@ -727,6 +768,8 @@ export default function GrapesjsEditor({ page }: GrapesjsEditorProps) {
               <dt className="text-gray-600">Deselect</dt><dd className="text-gray-900 font-mono text-right">Escape</dd>
               <dt className="text-gray-600">Device preview</dt><dd className="text-gray-900 text-right">Desktop / tablet / mobile in the canvas toolbar</dd>
               <dt className="text-gray-600">Resize on canvas</dt><dd className="text-gray-900 text-right">Select a block — drag corner handles to resize; images keep aspect ratio</dd>
+              <dt className="text-gray-600">Image focal point</dt><dd className="text-gray-900 text-right">Select an image — drag on the orange dashed overlay to choose what shows inside the frame</dd>
+              <dt className="text-gray-600">Float button / link</dt><dd className="text-gray-900 text-right">Select a link or button → Float — then use the move handle and corners (Unfloat to reset)</dd>
               <dt className="text-gray-600">Drag blocks</dt><dd className="text-gray-900 text-right">Drag the move handle or drag the block in the tree to reorder</dd>
               <dt className="text-gray-600">Style panel sync</dt><dd className="text-gray-900 text-right">Typography, Alignment & width, and Layout update with the selection</dd>
               <dt className="text-gray-600">Mobile / tablet</dt><dd className="text-gray-900 text-right">Use device icons above the canvas; yellow bar shows layout tips for small screens</dd>
