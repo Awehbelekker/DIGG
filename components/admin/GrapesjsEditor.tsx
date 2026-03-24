@@ -16,6 +16,7 @@ import { createClient } from '@/lib/supabase/client'
 import { showToast } from '@/components/admin/Toast'
 import diggBlocksPlugin from '@/lib/grapesjs/blocks'
 import { diggImageFramingSector, diggNewImageStyle } from '@/lib/grapesjs/image-framing-sector'
+import { PAGE_STARTERS } from '@/lib/grapesjs/page-starters'
 import { sectionsToHtml } from '@/lib/grapesjs/sections-to-html'
 import { GOOGLE_FONT_OPTIONS, googleFontsUrl } from '@/lib/google-fonts'
 import type { Page, PageSection } from '@/lib/types/database'
@@ -44,6 +45,8 @@ export default function GrapesjsEditor({ page }: GrapesjsEditorProps) {
   const [allPages, setAllPages] = useState<{ id: string; title: string; slug: string }[]>([])
   const [pageSwitcherOpen, setPageSwitcherOpen] = useState(false)
   const [mobilePanelsOpen, setMobilePanelsOpen] = useState(false)
+  const [shortcutsOpen, setShortcutsOpen] = useState(false)
+  const [startersOpen, setStartersOpen] = useState(false)
   const saveRef = useRef<() => void>(() => {})
 
   useEffect(() => {
@@ -150,6 +153,57 @@ export default function GrapesjsEditor({ page }: GrapesjsEditorProps) {
     globalThis.addEventListener('keydown', handler)
     return () => globalThis.removeEventListener('keydown', handler)
   }, [handleSave])
+
+  useEffect(() => {
+    const handler = (e: KeyboardEvent) => {
+      const el = e.target as HTMLElement | null
+      if (!el) return
+      const tag = el.tagName
+      if (tag === 'INPUT' || tag === 'TEXTAREA' || el.isContentEditable) return
+      if (e.key === '?' && !e.ctrlKey && !e.metaKey && !e.altKey) {
+        e.preventDefault()
+        setShortcutsOpen(true)
+      }
+      if (e.key === 'Escape' && shortcutsOpen) setShortcutsOpen(false)
+    }
+    globalThis.addEventListener('keydown', handler)
+    return () => globalThis.removeEventListener('keydown', handler)
+  }, [shortcutsOpen])
+
+  const openPreview = useCallback(() => {
+    if (!page?.id) {
+      showToast('Save the page once to open preview (needs a page ID).', 'error')
+      return
+    }
+    window.open(`/preview/${page.id}`, '_blank', 'noopener,noreferrer')
+  }, [page?.id])
+
+  const openLiveSite = useCallback(() => {
+    if (!published) {
+      showToast('Turn the page Live and save to view it on the public site.', 'error')
+      return
+    }
+    const s = slug.trim()
+    if (!s) {
+      showToast('Set a URL slug in Settings first.', 'error')
+      setSettingsOpen(true)
+      return
+    }
+    const path = s === 'home' ? '/' : `/${s}`
+    window.open(`${window.location.origin}${path}`, '_blank', 'noopener,noreferrer')
+  }, [published, slug])
+
+  const applyPageStarter = useCallback((html: string) => {
+    const ed = editorRef.current
+    if (!ed) return
+    const wrapper = ed.getWrapper()
+    if (!wrapper) return
+    const count = wrapper.components().length
+    if (count > 0 && !globalThis.confirm('Replace everything on the page with this starter?')) return
+    ed.setComponents(html)
+    setStartersOpen(false)
+    showToast('Starter applied — customize and Save when ready.')
+  }, [])
 
   const uploadSingleFile = useCallback(async (file: File): Promise<string | null> => {
     const ext = file.name.split('.').pop() || 'jpg'
@@ -405,8 +459,25 @@ export default function GrapesjsEditor({ page }: GrapesjsEditorProps) {
   return (
     <>
       {/* Hidden file inputs */}
-      <input ref={fileInputRef} type="file" accept="image/*" multiple className="hidden" onChange={handleFileSelected} />
-      <input ref={themeInputRef} type="file" accept=".html,.htm" className="hidden" onChange={handleThemeUpload} />
+      <input
+        ref={fileInputRef}
+        type="file"
+        accept="image/*"
+        multiple
+        className="hidden"
+        onChange={handleFileSelected}
+        aria-label="Upload images to the page"
+        title="Upload images to the page"
+      />
+      <input
+        ref={themeInputRef}
+        type="file"
+        accept=".html,.htm"
+        className="hidden"
+        onChange={handleThemeUpload}
+        aria-label="Upload HTML theme file"
+        title="Upload HTML theme file"
+      />
 
       {/* Single full-viewport editor shell: nav + tools + canvas */}
       <div
@@ -453,6 +524,24 @@ export default function GrapesjsEditor({ page }: GrapesjsEditorProps) {
 
         <div className="flex-1" />
 
+        <button
+          type="button"
+          onClick={openPreview}
+          disabled={!page?.id}
+          className="hidden sm:flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-semibold text-white/90 bg-white/10 hover:bg-white/20 disabled:opacity-40 disabled:pointer-events-none"
+          title={page?.id ? 'Open saved preview in a new tab' : 'Save the page first'}
+        >
+          Preview
+        </button>
+        <button
+          type="button"
+          onClick={openLiveSite}
+          disabled={!published || !slug.trim()}
+          className="hidden md:flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-semibold text-white/90 bg-white/10 hover:bg-white/20 disabled:opacity-40 disabled:pointer-events-none"
+          title={published ? 'Open public page' : 'Publish and save to open the live URL'}
+        >
+          Site
+        </button>
         <button onClick={() => setPublished(!published)} className={`px-2 py-0.5 rounded text-[10px] font-semibold ${published ? 'bg-green-500/80 text-white' : 'bg-gray-500/80 text-white'}`}>
           {published ? 'Live' : 'Draft'}
         </button>
@@ -498,12 +587,83 @@ export default function GrapesjsEditor({ page }: GrapesjsEditorProps) {
           Theme
         </button>
 
+        <button
+          type="button"
+          onClick={() => setStartersOpen(true)}
+          className="flex items-center gap-1 bg-white/10 hover:bg-white/20 rounded px-2 py-1 text-white text-[11px] font-medium"
+          title="Insert a ready-made page layout"
+        >
+          Starters
+        </button>
+
+        <button
+          type="button"
+          onClick={() => setShortcutsOpen(true)}
+          className="p-1 text-white/60 hover:text-white"
+          title="Keyboard shortcuts (?)"
+        >
+          <span className="text-[11px] font-semibold px-1">?</span>
+        </button>
+
         <div className="flex-1" />
 
         <button onClick={() => setSettingsOpen(!settingsOpen)} className="p-1 text-white/60 hover:text-white" title="Page settings">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="3"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>
         </button>
         </div>
+
+      {shortcutsOpen && (
+        <div className="fixed inset-0 flex items-center justify-center p-4" style={{ zIndex: 100000 }} onClick={() => setShortcutsOpen(false)}>
+          <div className="absolute inset-0 bg-black/40" />
+          <div className="relative bg-white rounded-2xl shadow-2xl max-w-md w-full p-6" onClick={e => e.stopPropagation()}>
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-lg font-bold text-[#1B2A6B]">Keyboard shortcuts</h3>
+              <button type="button" onClick={() => setShortcutsOpen(false)} className="text-gray-400 hover:text-gray-600" aria-label="Close">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M18 6L6 18M6 6l12 12"/></svg>
+              </button>
+            </div>
+            <p className="text-xs text-gray-500 mb-3">Press <kbd className="px-1 py-0.5 bg-gray-100 rounded text-gray-700">?</kbd> anytime (when not typing in a field) to open this panel.</p>
+            <dl className="grid grid-cols-[1fr_auto] gap-x-4 gap-y-2 text-sm">
+              <dt className="text-gray-600">Save</dt><dd className="text-gray-900 font-mono text-right">Ctrl / ⌘ + S</dd>
+              <dt className="text-gray-600">Undo</dt><dd className="text-gray-900 font-mono text-right">Ctrl / ⌘ + Z</dd>
+              <dt className="text-gray-600">Redo</dt><dd className="text-gray-900 font-mono text-right">Ctrl / ⌘ + Shift + Z</dd>
+              <dt className="text-gray-600">Delete selection</dt><dd className="text-gray-900 font-mono text-right">Delete / Backspace</dd>
+              <dt className="text-gray-600">Deselect</dt><dd className="text-gray-900 font-mono text-right">Escape</dd>
+              <dt className="text-gray-600">Device preview</dt><dd className="text-gray-900 text-right">Top bar in canvas</dd>
+              <dt className="text-gray-600">Blocks & styles</dt><dd className="text-gray-900 text-right">Right panels</dd>
+            </dl>
+            <p className="text-xs text-gray-500 mt-4">Preview shows the <strong>last saved</strong> version. Save, then open Preview.</p>
+          </div>
+        </div>
+      )}
+
+      {startersOpen && (
+        <div className="fixed inset-0 flex items-center justify-center p-4" style={{ zIndex: 100000 }} onClick={() => setStartersOpen(false)}>
+          <div className="absolute inset-0 bg-black/40" />
+          <div className="relative bg-white rounded-2xl shadow-2xl max-w-2xl w-full p-6 max-h-[90vh] overflow-y-auto" onClick={e => e.stopPropagation()}>
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-lg font-bold text-[#1B2A6B]">Page starters</h3>
+              <button type="button" onClick={() => setStartersOpen(false)} className="text-gray-400 hover:text-gray-600" aria-label="Close">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M18 6L6 18M6 6l12 12"/></svg>
+              </button>
+            </div>
+            <p className="text-sm text-gray-500 mb-4">Replace the canvas with a ready-made layout. You can edit every block afterward.</p>
+            <div className="grid gap-3 sm:grid-cols-3">
+              {PAGE_STARTERS.map((starter) => (
+                <button
+                  key={starter.id}
+                  type="button"
+                  onClick={() => applyPageStarter(starter.html)}
+                  className="text-left p-4 rounded-xl border border-gray-200 hover:border-[#F7941D] hover:bg-orange-50/50 transition-colors"
+                >
+                  <span className="font-semibold text-[#1B2A6B] block">{starter.title}</span>
+                  <span className="text-xs text-gray-500 mt-1 block">{starter.description}</span>
+                </button>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
 
       {importOpen && (
         <div className="fixed inset-0 flex items-center justify-center p-4" style={{ zIndex: 100000 }} onClick={() => setImportOpen(false)}>

@@ -1,6 +1,7 @@
 import { createClient } from '@/lib/supabase/server'
 import { notFound, redirect } from 'next/navigation'
 import SectionRenderer from '@/components/public/SectionRenderer'
+import GjsPageRenderer from '@/components/public/GjsPageRenderer'
 import type { PageSection } from '@/lib/types/database'
 
 type Props = { params: Promise<{ id: string }> }
@@ -24,13 +25,35 @@ export default async function PreviewPage({ params }: Props) {
 
   if (error || !page) notFound()
 
+  const published = Boolean(page.published)
+  const editorType = page.editor_type as string | undefined
+
+  if (editorType === 'grapesjs') {
+    const html = ((page.content_html as string) || '').trim()
+    const css = (page.content_css as string) || ''
+    return (
+      <div className="min-h-screen">
+        <div className="bg-amber-100 border-b border-amber-300 px-4 py-2 text-center text-sm text-amber-900">
+          Preview — last saved version. This page is {published ? 'published' : 'unpublished'} on the live site.
+        </div>
+        {html ? (
+          <GjsPageRenderer html={html} css={css} />
+        ) : (
+          <section className="py-12 text-center text-gray-500 text-sm px-4">
+            No HTML saved yet. Add blocks in the visual builder and click Save.
+          </section>
+        )}
+      </div>
+    )
+  }
+
   const content = page.content as { sections?: Array<{ type: string; data: Record<string, unknown> }> } | null
   const sections = content?.sections ?? []
 
   return (
     <div className="min-h-screen">
       <div className="bg-amber-100 border-b border-amber-300 px-4 py-2 text-center text-sm text-amber-900">
-        Preview mode — only you see this. This page is {page.published ? 'published' : 'unpublished'}.
+        Preview — section-based page. This page is {published ? 'published' : 'unpublished'}.
       </div>
       {sections.map((section, index) => (
         <SectionRenderer key={`${section.type}-${index}`} section={section as PageSection} />
