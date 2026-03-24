@@ -1,5 +1,5 @@
 -- Insights (blog/articles) for SEO and authority
-CREATE TABLE insights (
+CREATE TABLE IF NOT EXISTS insights (
   id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
   slug TEXT UNIQUE NOT NULL,
   title TEXT NOT NULL,
@@ -9,9 +9,9 @@ CREATE TABLE insights (
   updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
-CREATE INDEX idx_insights_slug ON insights(slug);
-CREATE INDEX idx_insights_published ON insights(published);
-CREATE INDEX idx_insights_updated ON insights(updated_at DESC);
+CREATE INDEX IF NOT EXISTS idx_insights_slug ON insights(slug);
+CREATE INDEX IF NOT EXISTS idx_insights_published ON insights(published);
+CREATE INDEX IF NOT EXISTS idx_insights_updated ON insights(updated_at DESC);
 
 DROP TRIGGER IF EXISTS update_insights_updated_at ON insights;
 CREATE TRIGGER update_insights_updated_at BEFORE UPDATE ON insights
