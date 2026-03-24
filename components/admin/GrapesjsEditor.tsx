@@ -15,6 +15,8 @@ import gjsTabs from 'grapesjs-tabs'
 import { createClient } from '@/lib/supabase/client'
 import { showToast } from '@/components/admin/Toast'
 import diggBlocksPlugin from '@/lib/grapesjs/blocks'
+import { applyResizePolicyToEntireTree, registerDiggComponentResizeBehavior } from '@/lib/grapesjs/component-defaults'
+import { diggAlignmentSector } from '@/lib/grapesjs/alignment-sector'
 import { diggImageFramingSector, diggNewImageStyle } from '@/lib/grapesjs/image-framing-sector'
 import { PAGE_STARTERS } from '@/lib/grapesjs/page-starters'
 import { sectionsToHtml } from '@/lib/grapesjs/sections-to-html'
@@ -303,6 +305,8 @@ export default function GrapesjsEditor({ page }: GrapesjsEditorProps) {
     editorRef.current = editor
     ignoreDirtyRef.current = true
 
+    registerDiggComponentResizeBehavior(editor)
+
     if (page?.gjs_data && typeof page.gjs_data === 'object' && Object.keys(page.gjs_data).length > 0) {
       editor.loadProjectData(page.gjs_data as Parameters<Editor['loadProjectData']>[0])
     } else if (page?.content) {
@@ -313,6 +317,8 @@ export default function GrapesjsEditor({ page }: GrapesjsEditorProps) {
         editor.setComponents(html)
       }
     }
+
+    queueMicrotask(() => applyResizePolicyToEntireTree(editor))
 
     const mark = () => markDirtyRef.current()
     editor.on('component:add', mark)
@@ -352,9 +358,15 @@ export default function GrapesjsEditor({ page }: GrapesjsEditorProps) {
       })
 
     // Auto-switch sidebar to Style Manager when an element is selected
-    editor.on('component:selected', () => {
+    editor.on('component:selected', (component) => {
       const smBtn = editor.Panels.getButton('views', 'open-sm')
       if (smBtn && !smBtn.get('active')) smBtn.set('active', true)
+
+      const isImg = component.get('type') === 'image' || (component.get('tagName') || '').toLowerCase() === 'img'
+      if (isImg) {
+        const sector = editor.StyleManager.getSector('image-framing', { warn: false })
+        sector?.set('open', true)
+      }
     })
 
     editor.on('component:deselected', () => {
@@ -671,7 +683,10 @@ export default function GrapesjsEditor({ page }: GrapesjsEditorProps) {
               <dt className="text-gray-600">Redo</dt><dd className="text-gray-900 font-mono text-right">Ctrl / ⌘ + Shift + Z</dd>
               <dt className="text-gray-600">Delete selection</dt><dd className="text-gray-900 font-mono text-right">Delete / Backspace</dd>
               <dt className="text-gray-600">Deselect</dt><dd className="text-gray-900 font-mono text-right">Escape</dd>
-              <dt className="text-gray-600">Device preview</dt><dd className="text-gray-900 text-right">Top bar in canvas</dd>
+              <dt className="text-gray-600">Device preview</dt><dd className="text-gray-900 text-right">Desktop / tablet / mobile in the canvas toolbar</dd>
+              <dt className="text-gray-600">Resize on canvas</dt><dd className="text-gray-900 text-right">Select a block — drag corner handles to resize; images keep aspect ratio</dd>
+              <dt className="text-gray-600">Drag blocks</dt><dd className="text-gray-900 text-right">Drag the move handle or drag the block in the tree to reorder</dd>
+              <dt className="text-gray-600">Style panel sync</dt><dd className="text-gray-900 text-right">Typography, Alignment & width, and Layout update with the selection</dd>
               <dt className="text-gray-600">Blocks & styles</dt><dd className="text-gray-900 text-right">Right panels</dd>
             </dl>
             <p className="text-xs text-gray-500 mt-4">Preview shows the <strong>last saved</strong> version. Save, then open Preview.</p>
@@ -829,6 +844,7 @@ export default function GrapesjsEditor({ page }: GrapesjsEditorProps) {
                     'text-transform', 'text-shadow',
                   ],
                 },
+                diggAlignmentSector,
                 {
                   name: 'Layout',
                   open: false,

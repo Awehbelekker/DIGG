@@ -1,8 +1,10 @@
 /**
  * Style Manager sector for <img> framing: fit mode, focal position, aspect ratio.
+ * This is CSS reframing (how the image fills its box), not bitmap/pixel cropping.
  * Works best when the image has a defined width and aspect-ratio (or fixed height).
  */
 export const diggImageFramingSector = {
+  id: 'image-framing',
   name: 'Image framing',
   open: true,
   properties: [
