@@ -95,7 +95,18 @@ export function applyResizePolicy(component: Component) {
     return
   }
 
-  if (type === 'text' || type === 'link') {
+  /** Block text (paragraphs, headings): mouse-resize the text box */
+  if (type === 'text') {
+    const blockText = new Set(['p', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'blockquote'])
+    if (blockText.has(tag)) {
+      component.set('resizable', { minDim: 48, step: 1, ratioDefault: false })
+      return
+    }
+    component.set('resizable', false)
+    return
+  }
+
+  if (type === 'link') {
     component.set('resizable', false)
     return
   }

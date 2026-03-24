@@ -768,7 +768,7 @@ export default function GrapesjsEditor({ page }: GrapesjsEditorProps) {
               <dt className="text-gray-600">Deselect</dt><dd className="text-gray-900 font-mono text-right">Escape</dd>
               <dt className="text-gray-600">Device preview</dt><dd className="text-gray-900 text-right">Desktop / tablet / mobile in the canvas toolbar</dd>
               <dt className="text-gray-600">Resize on canvas</dt><dd className="text-gray-900 text-right">Select a block — drag corner handles to resize; images keep aspect ratio</dd>
-              <dt className="text-gray-600">Image focal point</dt><dd className="text-gray-900 text-right">Select an image — drag on the orange dashed overlay to choose what shows inside the frame</dd>
+              <dt className="text-gray-600">Image in frame</dt><dd className="text-gray-900 text-right">Select image — drag overlay for focal, wheel to zoom inside the box, corners resize the frame; headings/paragraphs use corner handles to size text box</dd>
               <dt className="text-gray-600">Float button / link</dt><dd className="text-gray-900 text-right">Select a link or button → Float — then use the move handle and corners (Unfloat to reset)</dd>
               <dt className="text-gray-600">Drag blocks</dt><dd className="text-gray-900 text-right">Drag the move handle or drag the block in the tree to reorder</dd>
               <dt className="text-gray-600">Style panel sync</dt><dd className="text-gray-900 text-right">Typography, Alignment & width, and Layout update with the selection</dd>
