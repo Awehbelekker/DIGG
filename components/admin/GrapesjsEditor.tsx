@@ -15,6 +15,7 @@ import gjsTabs from 'grapesjs-tabs'
 import { createClient } from '@/lib/supabase/client'
 import { showToast } from '@/components/admin/Toast'
 import diggBlocksPlugin from '@/lib/grapesjs/blocks'
+import { diggImageFramingSector, diggNewImageStyle } from '@/lib/grapesjs/image-framing-sector'
 import { sectionsToHtml } from '@/lib/grapesjs/sections-to-html'
 import { GOOGLE_FONT_OPTIONS, googleFontsUrl } from '@/lib/google-fonts'
 import type { Page, PageSection } from '@/lib/types/database'
@@ -314,7 +315,7 @@ export default function GrapesjsEditor({ page }: GrapesjsEditorProps) {
               editor.addComponents({
                 type: 'image',
                 attributes: { src: url },
-                style: { width: '100%', 'max-width': '800px', height: 'auto', display: 'block', margin: '1rem auto', 'border-radius': '0.75rem' },
+                style: { ...diggNewImageStyle },
               })
             }
           }
@@ -353,14 +354,7 @@ export default function GrapesjsEditor({ page }: GrapesjsEditorProps) {
         editorRef.current.addComponents({
           type: 'image',
           attributes: { src: url },
-          style: {
-            width: '100%',
-            'max-width': '800px',
-            height: 'auto',
-            display: 'block',
-            margin: '1rem auto',
-            'border-radius': '0.75rem',
-          },
+          style: { ...diggNewImageStyle },
         })
       }
     }
@@ -646,6 +640,7 @@ export default function GrapesjsEditor({ page }: GrapesjsEditorProps) {
                   open: false,
                   properties: ['width', 'height', 'max-width', 'min-height', 'margin', 'padding'],
                 },
+                diggImageFramingSector,
                 {
                   name: 'Appearance',
                   open: false,
