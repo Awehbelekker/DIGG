@@ -1,11 +1,13 @@
 'use client'
 
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import { showToast } from '@/components/admin/Toast'
 import type { Insight } from '@/lib/types/database'
 import Link from 'next/link'
+import { useRegisterAdminNavUnsaved } from '@/components/admin/AdminUnsavedProvider'
+import { useUnsavedChangesAlert } from '@/lib/hooks/useUnsavedChangesAlert'
 
 export default function InsightEditor({ insight }: { insight?: Insight | null }) {
   const router = useRouter()
@@ -17,6 +19,24 @@ export default function InsightEditor({ insight }: { insight?: Insight | null })
     body: insight?.body ?? '',
     published: insight?.published ?? false,
   })
+
+  const savedSnapshot = useMemo(
+    () => ({
+      slug: insight?.slug ?? '',
+      title: insight?.title ?? '',
+      body: insight?.body ?? '',
+      published: insight?.published ?? false,
+    }),
+    [insight]
+  )
+
+  const dirty = useMemo(
+    () => JSON.stringify(formData) !== JSON.stringify(savedSnapshot),
+    [formData, savedSnapshot]
+  )
+
+  useRegisterAdminNavUnsaved(dirty)
+  const { confirmLeave } = useUnsavedChangesAlert(dirty)
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -106,6 +126,11 @@ export default function InsightEditor({ insight }: { insight?: Insight | null })
       <div className="mt-6 flex gap-3">
         <Link
           href="/admin/insights"
+          onClick={(e) => {
+            if (!dirty) return
+            e.preventDefault()
+            confirmLeave(() => router.push('/admin/insights'))
+          }}
           className="px-6 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50"
         >
           Cancel

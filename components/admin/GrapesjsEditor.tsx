@@ -20,6 +20,7 @@ import { PAGE_STARTERS } from '@/lib/grapesjs/page-starters'
 import { sectionsToHtml } from '@/lib/grapesjs/sections-to-html'
 import { GOOGLE_FONT_OPTIONS, googleFontsUrl } from '@/lib/google-fonts'
 import type { Page, PageSection } from '@/lib/types/database'
+import { useUnsavedChangesAlert } from '@/lib/hooks/useUnsavedChangesAlert'
 
 interface GrapesjsEditorProps {
   page?: Page
@@ -49,13 +50,8 @@ export default function GrapesjsEditor({ page }: GrapesjsEditorProps) {
   const [startersOpen, setStartersOpen] = useState(false)
   const [dirty, setDirty] = useState(false)
   const saveRef = useRef<() => void>(() => {})
-  const dirtyRef = useRef(false)
   const ignoreDirtyRef = useRef(true)
   const markDirtyRef = useRef<() => void>(() => {})
-
-  useEffect(() => {
-    dirtyRef.current = dirty
-  }, [dirty])
 
   useEffect(() => {
     markDirtyRef.current = () => {
@@ -63,6 +59,11 @@ export default function GrapesjsEditor({ page }: GrapesjsEditorProps) {
       setDirty(true)
     }
   })
+
+  const { confirmLeave } = useUnsavedChangesAlert(
+    dirty,
+    'You have unsaved changes on this page. Leave without saving?'
+  )
 
   useEffect(() => {
     supabase
@@ -161,26 +162,6 @@ export default function GrapesjsEditor({ page }: GrapesjsEditorProps) {
 
   const touchPageFieldsDirty = useCallback(() => {
     setDirty(true)
-  }, [])
-
-  const confirmLeave = useCallback((action: () => void) => {
-    if (!dirtyRef.current) {
-      action()
-      return
-    }
-    if (globalThis.confirm('You have unsaved changes on this page. Leave without saving?')) {
-      action()
-    }
-  }, [])
-
-  useEffect(() => {
-    const onBeforeUnload = (e: BeforeUnloadEvent) => {
-      if (!dirtyRef.current) return
-      e.preventDefault()
-      e.returnValue = ''
-    }
-    window.addEventListener('beforeunload', onBeforeUnload)
-    return () => window.removeEventListener('beforeunload', onBeforeUnload)
   }, [])
 
   useEffect(() => {

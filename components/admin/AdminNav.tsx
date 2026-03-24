@@ -3,15 +3,30 @@
 import Link from 'next/link'
 import { usePathname, useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
-import { useState } from 'react'
+import { useCallback, useState } from 'react'
+import { useAdminNavUnsavedFlag } from '@/components/admin/AdminUnsavedProvider'
+
+const LEAVE_MSG = 'You have unsaved changes. Leave without saving?'
 
 export default function AdminNav() {
   const pathname = usePathname()
   const router = useRouter()
   const [loading, setLoading] = useState(false)
   const supabase = createClient()
+  const navUnsaved = useAdminNavUnsavedFlag()
+
+  const tryNavigate = useCallback(
+    (href: string) => {
+      if (href === pathname) return
+      if (!navUnsaved || globalThis.confirm(LEAVE_MSG)) {
+        router.push(href)
+      }
+    },
+    [navUnsaved, pathname, router]
+  )
 
   const handleLogout = async () => {
+    if (navUnsaved && !globalThis.confirm(LEAVE_MSG)) return
     setLoading(true)
     await supabase.auth.signOut()
     router.push('/admin/login')
@@ -38,6 +53,11 @@ export default function AdminNav() {
               <Link
                 key={item.href}
                 href={item.href}
+                onClick={(e) => {
+                  if (!navUnsaved || item.href === pathname) return
+                  e.preventDefault()
+                  tryNavigate(item.href)
+                }}
                 className={`px-4 py-2 rounded-xl text-sm font-medium transition-colors ${
                   pathname === item.href
                     ? 'bg-[#F7941D] text-white'

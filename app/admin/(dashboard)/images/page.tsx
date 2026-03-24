@@ -1,11 +1,13 @@
 'use client'
 
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback, useMemo } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import type { Image } from '@/lib/types/database'
 import ImageUpload from '@/components/admin/ImageUpload'
 import AdminPageHeading from '@/components/admin/AdminPageHeading'
 import { showToast } from '@/components/admin/Toast'
+import { useRegisterAdminNavUnsaved } from '@/components/admin/AdminUnsavedProvider'
+import { useUnsavedChangesAlert } from '@/lib/hooks/useUnsavedChangesAlert'
 
 const FOLDERS = ['hero', 'logo', 'team', 'portfolio'] as const
 type Folder = (typeof FOLDERS)[number]
@@ -19,6 +21,16 @@ export default function AdminImagesPage() {
   const [bulkFolder, setBulkFolder] = useState<Folder>('portfolio')
   const [bulkAlt, setBulkAlt] = useState('')
   const supabase = createClient()
+
+  const bulkFormDirty = useMemo(
+    () => selectedIds.size > 0 && (bulkAction === 'folder' || bulkAction === 'alt' || bulkAlt.trim() !== ''),
+    [selectedIds, bulkAction, bulkAlt]
+  )
+  useRegisterAdminNavUnsaved(bulkFormDirty)
+  useUnsavedChangesAlert(
+    bulkFormDirty,
+    'You have a bulk action in progress or alt text not applied. Leave without finishing?'
+  )
 
   const loadImages = useCallback(async () => {
     setLoading(true)
@@ -96,7 +108,16 @@ export default function AdminImagesPage() {
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-      <AdminPageHeading className="mb-8" subtitle="Upload and manage hero, logo, team, and portfolio images.">Image Management</AdminPageHeading>
+      <AdminPageHeading className="mb-8" subtitle="Upload and manage hero, logo, team, and portfolio images.">
+        <span className="inline-flex items-center gap-2 flex-wrap">
+          Image Management
+          {bulkFormDirty && (
+            <span className="text-sm font-semibold text-amber-700 bg-amber-50 border border-amber-200 px-2 py-0.5 rounded-lg">
+              Unfinished bulk action
+            </span>
+          )}
+        </span>
+      </AdminPageHeading>
 
       <div className="mb-6 flex flex-wrap gap-2">
         {folders.map((folder) => (

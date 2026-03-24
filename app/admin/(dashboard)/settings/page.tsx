@@ -1,12 +1,14 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useMemo } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import AdminPageHeading from '@/components/admin/AdminPageHeading'
 import SettingsUrlValidation from '@/components/admin/SettingsUrlValidation'
 import { GOOGLE_FONT_OPTIONS, DEFAULT_HEADING_FONT, DEFAULT_BODY_FONT } from '@/lib/google-fonts'
 import { showToast } from '@/components/admin/Toast'
 import DropUpload from '@/components/admin/DropUpload'
+import { useRegisterAdminNavUnsaved } from '@/components/admin/AdminUnsavedProvider'
+import { useUnsavedChangesAlert } from '@/lib/hooks/useUnsavedChangesAlert'
 
 type SelectedWorkItem = { title: string; place: string; imageUrl?: string; link?: string }
 
@@ -44,9 +46,17 @@ function strVal(v: unknown): string {
 
 export default function AdminSettingsPage() {
   const [settings, setSettings] = useState<Record<string, unknown>>({})
+  const [savedSettings, setSavedSettings] = useState<Record<string, unknown>>({})
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
   const supabase = createClient()
+
+  const dirty = useMemo(
+    () => JSON.stringify(settings) !== JSON.stringify(savedSettings),
+    [settings, savedSettings]
+  )
+  useRegisterAdminNavUnsaved(!loading && dirty)
+  useUnsavedChangesAlert(!loading && dirty)
 
   useEffect(() => {
     loadSettings()
@@ -74,6 +84,7 @@ export default function AdminSettingsPage() {
         settingsMap[setting.key] = val
       })
       setSettings(settingsMap)
+      setSavedSettings(JSON.parse(JSON.stringify(settingsMap)) as Record<string, unknown>)
     }
     setLoading(false)
   }
@@ -91,7 +102,8 @@ export default function AdminSettingsPage() {
 
       if (error) throw error
 
-      setSettings({ ...settings, [key]: value })
+      setSettings((prev) => ({ ...prev, [key]: value }))
+      setSavedSettings((prev) => ({ ...prev, [key]: value }))
       showToast('Settings saved!')
     } catch (err) {
       showToast('Error saving settings: ' + (err instanceof Error ? err.message : String(err)), 'error')
@@ -162,7 +174,16 @@ export default function AdminSettingsPage() {
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-      <AdminPageHeading className="mb-8" subtitle="Contact details, hero image, sharing, Selected Work, and Homepage Products.">Site Settings</AdminPageHeading>
+      <AdminPageHeading className="mb-8" subtitle="Contact details, hero image, sharing, Selected Work, and Homepage Products.">
+        <span className="inline-flex items-center gap-2 flex-wrap">
+          Site Settings
+          {dirty && (
+            <span className="text-sm font-semibold text-amber-700 bg-amber-50 border border-amber-200 px-2 py-0.5 rounded-lg">
+              Unsaved changes
+            </span>
+          )}
+        </span>
+      </AdminPageHeading>
 
       <div className="space-y-8">
         <SettingsUrlValidation settings={settings} />
