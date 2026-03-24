@@ -17,6 +17,7 @@ import { showToast } from '@/components/admin/Toast'
 import diggBlocksPlugin from '@/lib/grapesjs/blocks'
 import { applyResizePolicyToEntireTree, registerDiggComponentResizeBehavior } from '@/lib/grapesjs/component-defaults'
 import { registerFloatingCommands } from '@/lib/grapesjs/floating-controls'
+import { registerMobileResponsiveCommands } from '@/lib/grapesjs/mobile-responsive-commands'
 import { registerImageFocalOverlay } from '@/lib/grapesjs/image-focal-overlay'
 import { diggAlignmentSector } from '@/lib/grapesjs/alignment-sector'
 import { diggImageFramingSector, diggNewImageStyle } from '@/lib/grapesjs/image-framing-sector'
@@ -326,7 +327,13 @@ export default function GrapesjsEditor({ page }: GrapesjsEditorProps) {
 
     registerDiggComponentResizeBehavior(editor)
     registerFloatingCommands(editor)
+    registerMobileResponsiveCommands(editor)
     registerImageFocalOverlay(editor)
+
+    editor.on('command:run', (opts: { id?: string }) => {
+      const id = opts?.id ?? ''
+      if (id.startsWith('digg:mobile-')) markDirtyRef.current()
+    })
 
     if (page?.gjs_data && typeof page.gjs_data === 'object' && Object.keys(page.gjs_data).length > 0) {
       editor.loadProjectData(page.gjs_data as Parameters<Editor['loadProjectData']>[0])
@@ -831,6 +838,33 @@ export default function GrapesjsEditor({ page }: GrapesjsEditorProps) {
           My blocks
         </button>
 
+        <div className="w-px h-5 bg-white/20 hidden lg:block" />
+
+        <button
+          type="button"
+          onClick={() => editorRef.current?.runCommand('digg:mobile-stack')}
+          className="hidden lg:flex items-center gap-1 bg-emerald-900/40 hover:bg-emerald-800/50 rounded px-2 py-1 text-emerald-100 text-[11px] font-medium"
+          title="Mobile (≤767px): stack flex children in a column"
+        >
+          M stack
+        </button>
+        <button
+          type="button"
+          onClick={() => editorRef.current?.runCommand('digg:mobile-full')}
+          className="hidden lg:flex items-center gap-1 bg-emerald-900/40 hover:bg-emerald-800/50 rounded px-2 py-1 text-emerald-100 text-[11px] font-medium"
+          title="Mobile (≤767px): full width in the frame"
+        >
+          M full
+        </button>
+        <button
+          type="button"
+          onClick={() => editorRef.current?.runCommand('digg:mobile-text')}
+          className="hidden lg:flex items-center gap-1 bg-emerald-900/40 hover:bg-emerald-800/50 rounded px-2 py-1 text-emerald-100 text-[11px] font-medium"
+          title="Mobile (≤767px): smaller, readable text"
+        >
+          M text
+        </button>
+
         <button
           type="button"
           onClick={() => setShortcutsOpen(true)}
@@ -862,6 +896,7 @@ export default function GrapesjsEditor({ page }: GrapesjsEditorProps) {
               <dt className="text-gray-600">Save</dt><dd className="text-gray-900 font-mono text-right">Ctrl / ⌘ + S</dd>
               <dt className="text-gray-600">Undo / Redo</dt><dd className="text-gray-900 text-right">Toolbar or Ctrl+Z / Ctrl+Shift+Z — full canvas layout</dd>
               <dt className="text-gray-600">My blocks</dt><dd className="text-gray-900 text-right">Save a selected section and reuse it on any page</dd>
+              <dt className="text-gray-600">M stack / full / text</dt><dd className="text-gray-900 text-right">Adds mobile-only CSS (≤767px) for the selection — check with device preview</dd>
               <dt className="text-gray-600">Delete selection</dt><dd className="text-gray-900 font-mono text-right">Delete / Backspace</dd>
               <dt className="text-gray-600">Deselect</dt><dd className="text-gray-900 font-mono text-right">Escape</dd>
               <dt className="text-gray-600">Device preview</dt><dd className="text-gray-900 text-right">Desktop / tablet / mobile in the canvas toolbar</dd>
