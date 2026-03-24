@@ -28,7 +28,7 @@ import {
 import { PAGE_STARTERS } from '@/lib/grapesjs/page-starters'
 import { sectionsToHtml } from '@/lib/grapesjs/sections-to-html'
 import { GOOGLE_FONT_OPTIONS, googleFontsUrl } from '@/lib/google-fonts'
-import type { Page, PageSection } from '@/lib/types/database'
+import type { BuilderSnippet, Page, PageSection } from '@/lib/types/database'
 import { useUnsavedChangesAlert } from '@/lib/hooks/useUnsavedChangesAlert'
 
 interface GrapesjsEditorProps {
@@ -57,6 +57,10 @@ export default function GrapesjsEditor({ page }: GrapesjsEditorProps) {
   const [mobilePanelsOpen, setMobilePanelsOpen] = useState(false)
   const [shortcutsOpen, setShortcutsOpen] = useState(false)
   const [startersOpen, setStartersOpen] = useState(false)
+  const [snippetsOpen, setSnippetsOpen] = useState(false)
+  const [snippetSaveTitle, setSnippetSaveTitle] = useState('')
+  const [snippets, setSnippets] = useState<BuilderSnippet[]>([])
+  const [snippetsLoading, setSnippetsLoading] = useState(false)
   const [dirty, setDirty] = useState(false)
   const [previewDeviceName, setPreviewDeviceName] = useState('desktop')
   const [selectionMobileHints, setSelectionMobileHints] = useState<string[]>([])
@@ -520,6 +524,89 @@ export default function GrapesjsEditor({ page }: GrapesjsEditorProps) {
     showToast('Canvas cleared')
   }, [])
 
+  const loadSnippets = useCallback(async () => {
+    setSnippetsLoading(true)
+    try {
+      const { data, error } = await supabase
+        .from('builder_snippets')
+        .select('id, title, component, created_at')
+        .order('created_at', { ascending: false })
+      if (error) throw error
+      setSnippets((data as BuilderSnippet[]) ?? [])
+    } catch {
+      showToast(
+        'Could not load saved blocks. Run the latest Supabase migration (011_builder_snippets) if this is a new feature.',
+        'error'
+      )
+      setSnippets([])
+    } finally {
+      setSnippetsLoading(false)
+    }
+  }, [supabase])
+
+  useEffect(() => {
+    if (snippetsOpen) void loadSnippets()
+  }, [snippetsOpen, loadSnippets])
+
+  const saveSelectionAsSnippet = useCallback(async () => {
+    const editor = editorRef.current
+    const sel = editor?.getSelected()
+    if (!editor || !sel) {
+      showToast('Select a section or block on the canvas first.', 'info')
+      return
+    }
+    if (sel.is('wrapper')) {
+      showToast('Select a section or block — not the whole page.', 'info')
+      return
+    }
+    const name = snippetSaveTitle.trim()
+    if (!name) {
+      showToast('Enter a name for this saved block.', 'info')
+      return
+    }
+    const componentJson = sel.toJSON() as Record<string, unknown>
+    const { error } = await supabase.from('builder_snippets').insert({
+      title: name,
+      component: componentJson,
+    })
+    if (error) {
+      showToast(error.message || 'Could not save block.', 'error')
+      return
+    }
+    showToast(`Saved “${name}” to My blocks.`)
+    setSnippetSaveTitle('')
+    void loadSnippets()
+  }, [snippetSaveTitle, supabase, loadSnippets])
+
+  const insertSnippet = useCallback((row: BuilderSnippet) => {
+    const editor = editorRef.current
+    if (!editor) return
+    try {
+      const def = JSON.parse(JSON.stringify(row.component)) as Record<string, unknown>
+      editor.addComponents(def)
+      queueMicrotask(() => applyResizePolicyToEntireTree(editor))
+      setDirty(true)
+      showToast(`Inserted “${row.title}”.`)
+      setSnippetsOpen(false)
+    } catch {
+      showToast('Could not insert this block.', 'error')
+    }
+  }, [])
+
+  const deleteSnippet = useCallback(
+    async (id: string, title: string) => {
+      if (!globalThis.confirm(`Delete saved block “${title}”?`)) return
+      const { error } = await supabase.from('builder_snippets').delete().eq('id', id)
+      if (error) {
+        showToast(error.message || 'Delete failed.', 'error')
+        return
+      }
+      showToast('Block removed.')
+      void loadSnippets()
+    },
+    [supabase, loadSnippets]
+  )
+
   const handleFlexibleWidthQuickFix = useCallback(() => {
     const editor = editorRef.current
     const selected = editor?.getSelected()
@@ -657,11 +744,13 @@ export default function GrapesjsEditor({ page }: GrapesjsEditorProps) {
 
         {/* Row 2: Editing tools (36px) */}
         <div className="bg-[#353535] flex items-center px-2 gap-1 border-t border-white/10 shrink-0" style={{ height: 36 }}>
-        <button onClick={() => editorRef.current?.UndoManager.undo()} className="p-1 text-white/60 hover:text-white" title="Undo (Ctrl+Z)">
+        <button onClick={() => editorRef.current?.UndoManager.undo()} className="flex items-center gap-1 px-1 py-1 text-white/60 hover:text-white rounded" title="Undo last change on the canvas (Ctrl+Z)">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M3 10h10a5 5 0 015 5v2"/><polyline points="3 10 7 6"/><polyline points="3 10 7 14"/></svg>
+          <span className="hidden lg:inline text-[10px] font-medium">Undo</span>
         </button>
-        <button onClick={() => editorRef.current?.UndoManager.redo()} className="p-1 text-white/60 hover:text-white" title="Redo">
+        <button onClick={() => editorRef.current?.UndoManager.redo()} className="flex items-center gap-1 px-1 py-1 text-white/60 hover:text-white rounded" title="Redo (Ctrl+Shift+Z)">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M21 10H11a5 5 0 00-5 5v2"/><polyline points="21 10 17 6"/><polyline points="21 10 17 14"/></svg>
+          <span className="hidden lg:inline text-[10px] font-medium">Redo</span>
         </button>
 
         <div className="w-px h-5 bg-white/20" />
@@ -735,6 +824,15 @@ export default function GrapesjsEditor({ page }: GrapesjsEditorProps) {
 
         <button
           type="button"
+          onClick={() => setSnippetsOpen(true)}
+          className="flex items-center gap-1 bg-white/10 hover:bg-white/20 rounded px-2 py-1 text-white text-[11px] font-medium"
+          title="Your saved blocks — insert on any page"
+        >
+          My blocks
+        </button>
+
+        <button
+          type="button"
           onClick={() => setShortcutsOpen(true)}
           className="p-1 text-white/60 hover:text-white"
           title="Keyboard shortcuts (?)"
@@ -762,8 +860,8 @@ export default function GrapesjsEditor({ page }: GrapesjsEditorProps) {
             <p className="text-xs text-gray-500 mb-3">Press <kbd className="px-1 py-0.5 bg-gray-100 rounded text-gray-700">?</kbd> anytime (when not typing in a field) to open this panel.</p>
             <dl className="grid grid-cols-[1fr_auto] gap-x-4 gap-y-2 text-sm">
               <dt className="text-gray-600">Save</dt><dd className="text-gray-900 font-mono text-right">Ctrl / ⌘ + S</dd>
-              <dt className="text-gray-600">Undo</dt><dd className="text-gray-900 font-mono text-right">Ctrl / ⌘ + Z</dd>
-              <dt className="text-gray-600">Redo</dt><dd className="text-gray-900 font-mono text-right">Ctrl / ⌘ + Shift + Z</dd>
+              <dt className="text-gray-600">Undo / Redo</dt><dd className="text-gray-900 text-right">Toolbar or Ctrl+Z / Ctrl+Shift+Z — full canvas layout</dd>
+              <dt className="text-gray-600">My blocks</dt><dd className="text-gray-900 text-right">Save a selected section and reuse it on any page</dd>
               <dt className="text-gray-600">Delete selection</dt><dd className="text-gray-900 font-mono text-right">Delete / Backspace</dd>
               <dt className="text-gray-600">Deselect</dt><dd className="text-gray-900 font-mono text-right">Escape</dd>
               <dt className="text-gray-600">Device preview</dt><dd className="text-gray-900 text-right">Desktop / tablet / mobile in the canvas toolbar</dd>
@@ -804,6 +902,73 @@ export default function GrapesjsEditor({ page }: GrapesjsEditorProps) {
                   <span className="text-xs text-gray-500 mt-1 block">{starter.description}</span>
                 </button>
               ))}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {snippetsOpen && (
+        <div className="fixed inset-0 flex items-center justify-center p-4" style={{ zIndex: 100000 }} onClick={() => setSnippetsOpen(false)}>
+          <div className="absolute inset-0 bg-black/40" />
+          <div className="relative bg-white rounded-2xl shadow-2xl max-w-lg w-full p-6 max-h-[90vh] overflow-y-auto" onClick={e => e.stopPropagation()}>
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-lg font-bold text-[#1B2A6B]">My blocks</h3>
+              <button type="button" onClick={() => setSnippetsOpen(false)} className="text-gray-400 hover:text-gray-600" aria-label="Close">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M18 6L6 18M6 6l12 12"/></svg>
+              </button>
+            </div>
+            <p className="text-sm text-gray-500 mb-4">
+              Save blocks you reuse on other pages. Select a section on the canvas, name it, and save — then insert here anytime.
+            </p>
+
+            <div className="flex flex-col sm:flex-row gap-2 mb-3">
+              <input
+                type="text"
+                value={snippetSaveTitle}
+                onChange={(e) => setSnippetSaveTitle(e.target.value)}
+                placeholder="Name for saved block"
+                className="flex-1 px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-[#F7941D] focus:border-transparent"
+              />
+              <button
+                type="button"
+                onClick={() => void saveSelectionAsSnippet()}
+                className="px-4 py-2 rounded-lg bg-[#F7941D] text-white text-sm font-semibold hover:bg-[#e6850a] shrink-0"
+              >
+                Save selection
+              </button>
+            </div>
+
+            <div className="border-t border-gray-100 pt-4 mt-2">
+              <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">Saved</p>
+              {snippetsLoading ? (
+                <p className="text-sm text-gray-400">Loading…</p>
+              ) : snippets.length === 0 ? (
+                <p className="text-sm text-gray-400">No saved blocks yet.</p>
+              ) : (
+                <ul className="space-y-2">
+                  {snippets.map((s) => (
+                    <li key={s.id} className="flex items-center justify-between gap-2 rounded-lg border border-gray-100 px-3 py-2 hover:bg-gray-50">
+                      <span className="text-sm font-medium text-gray-800 truncate">{s.title}</span>
+                      <span className="flex items-center gap-2 shrink-0">
+                        <button
+                          type="button"
+                          onClick={() => insertSnippet(s)}
+                          className="text-xs font-semibold text-[#1B2A6B] hover:underline"
+                        >
+                          Insert
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => void deleteSnippet(s.id, s.title)}
+                          className="text-xs text-red-600 hover:underline"
+                        >
+                          Delete
+                        </button>
+                      </span>
+                    </li>
+                  ))}
+                </ul>
+              )}
             </div>
           </div>
         </div>

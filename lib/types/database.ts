@@ -84,3 +84,11 @@ export interface NewsletterSignup {
   source: string | null
   created_at: string
 }
+
+/** Saved GrapesJS component JSON for “My blocks” / reusable sections */
+export interface BuilderSnippet {
+  id: string
+  title: string
+  component: Record<string, unknown>
+  created_at: string
+}

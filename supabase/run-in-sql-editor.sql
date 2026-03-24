@@ -89,3 +89,17 @@ CREATE POLICY "Auth delete hero-images" ON storage.objects FOR DELETE USING (buc
 CREATE POLICY "Auth delete logos" ON storage.objects FOR DELETE USING (bucket_id = 'logos' AND auth.role() = 'authenticated');
 CREATE POLICY "Auth delete team-photos" ON storage.objects FOR DELETE USING (bucket_id = 'team-photos' AND auth.role() = 'authenticated');
 CREATE POLICY "Auth delete portfolio" ON storage.objects FOR DELETE USING (bucket_id = 'portfolio' AND auth.role() = 'authenticated');
+
+-- Builder: reusable saved blocks (GrapesJS “My blocks”)
+CREATE TABLE IF NOT EXISTS builder_snippets (
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  title TEXT NOT NULL,
+  component JSONB NOT NULL,
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);
+CREATE INDEX IF NOT EXISTS idx_builder_snippets_created ON builder_snippets(created_at DESC);
+ALTER TABLE builder_snippets ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "Admins can manage builder snippets" ON builder_snippets;
+CREATE POLICY "Admins can manage builder snippets"
+  ON builder_snippets FOR ALL
+  USING (auth.role() = 'authenticated');
