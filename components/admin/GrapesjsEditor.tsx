@@ -47,7 +47,22 @@ export default function GrapesjsEditor({ page }: GrapesjsEditorProps) {
   const [mobilePanelsOpen, setMobilePanelsOpen] = useState(false)
   const [shortcutsOpen, setShortcutsOpen] = useState(false)
   const [startersOpen, setStartersOpen] = useState(false)
+  const [dirty, setDirty] = useState(false)
   const saveRef = useRef<() => void>(() => {})
+  const dirtyRef = useRef(false)
+  const ignoreDirtyRef = useRef(true)
+  const markDirtyRef = useRef<() => void>(() => {})
+
+  useEffect(() => {
+    dirtyRef.current = dirty
+  }, [dirty])
+
+  useEffect(() => {
+    markDirtyRef.current = () => {
+      if (ignoreDirtyRef.current) return
+      setDirty(true)
+    }
+  })
 
   useEffect(() => {
     supabase
@@ -132,6 +147,7 @@ export default function GrapesjsEditor({ page }: GrapesjsEditorProps) {
       }
 
       showToast('Page saved!')
+      setDirty(false)
       if (!page) {
         router.push('/admin/pages')
         router.refresh()
@@ -142,6 +158,30 @@ export default function GrapesjsEditor({ page }: GrapesjsEditorProps) {
       setSaving(false)
     }
   }, [slug, title, metaTitle, metaDescription, metaOgImage, published, page, supabase, router])
+
+  const touchPageFieldsDirty = useCallback(() => {
+    setDirty(true)
+  }, [])
+
+  const confirmLeave = useCallback((action: () => void) => {
+    if (!dirtyRef.current) {
+      action()
+      return
+    }
+    if (globalThis.confirm('You have unsaved changes on this page. Leave without saving?')) {
+      action()
+    }
+  }, [])
+
+  useEffect(() => {
+    const onBeforeUnload = (e: BeforeUnloadEvent) => {
+      if (!dirtyRef.current) return
+      e.preventDefault()
+      e.returnValue = ''
+    }
+    window.addEventListener('beforeunload', onBeforeUnload)
+    return () => window.removeEventListener('beforeunload', onBeforeUnload)
+  }, [])
 
   useEffect(() => {
     const handler = (e: KeyboardEvent) => {
@@ -280,6 +320,7 @@ export default function GrapesjsEditor({ page }: GrapesjsEditorProps) {
 
   const onEditor = useCallback((editor: Editor) => {
     editorRef.current = editor
+    ignoreDirtyRef.current = true
 
     if (page?.gjs_data && typeof page.gjs_data === 'object' && Object.keys(page.gjs_data).length > 0) {
       editor.loadProjectData(page.gjs_data as Parameters<Editor['loadProjectData']>[0])
@@ -291,6 +332,17 @@ export default function GrapesjsEditor({ page }: GrapesjsEditorProps) {
         editor.setComponents(html)
       }
     }
+
+    const mark = () => markDirtyRef.current()
+    editor.on('component:add', mark)
+    editor.on('component:remove', mark)
+    editor.on('component:update', mark)
+    editor.on('component:styleUpdate', mark)
+
+    // End initial load guard after project + canvas settle (avoids false “dirty” from hydration)
+    window.setTimeout(() => {
+      ignoreDirtyRef.current = false
+    }, 1000)
 
     // ---- Custom commands for panel buttons ----
     editor.Commands.add('digg:save', { run: () => saveRef.current() })
@@ -374,7 +426,7 @@ export default function GrapesjsEditor({ page }: GrapesjsEditorProps) {
             }
           }
         }
-        showToast('Images uploaded!', 'info')
+        showToast('Images uploaded — click Save so this page and image placements sync everywhere.', 'info')
       })
     }
   }, [page, uploadSingleFile, supabase])
@@ -412,7 +464,7 @@ export default function GrapesjsEditor({ page }: GrapesjsEditorProps) {
         })
       }
     }
-    showToast('Image added to page!')
+    showToast('Image added — click Save to keep layout and links on every device.')
     if (fileInputRef.current) fileInputRef.current.value = ''
   }, [uploadSingleFile])
 
@@ -486,7 +538,7 @@ export default function GrapesjsEditor({ page }: GrapesjsEditorProps) {
       >
         {/* Row 1: Navigation bar (36px) */}
         <div className="bg-[#1B2A6B] flex items-center px-2 gap-1.5 shrink-0" style={{ height: 36 }}>
-        <button onClick={() => router.push('/admin/dashboard')} className="text-white/70 hover:text-white p-1" title="Back to admin">
+        <button type="button" onClick={() => confirmLeave(() => router.push('/admin/dashboard'))} className="text-white/70 hover:text-white p-1" title="Back to admin">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M19 12H5m7-7l-7 7 7 7"/></svg>
         </button>
 
@@ -502,7 +554,10 @@ export default function GrapesjsEditor({ page }: GrapesjsEditorProps) {
               </div>
               <div className="max-h-64 overflow-y-auto">
                 {allPages.map((p) => (
-                  <button key={p.id} onClick={() => { setPageSwitcherOpen(false); if (p.id !== page?.id) window.location.href = `/admin/pages/${p.id}` }}
+                  <button key={p.id} type="button" onClick={() => {
+                    if (p.id === page?.id) { setPageSwitcherOpen(false); return }
+                    confirmLeave(() => { setPageSwitcherOpen(false); window.location.href = `/admin/pages/${p.id}` })
+                  }}
                     className={`w-full text-left px-4 py-2.5 text-sm hover:bg-gray-50 transition-colors flex items-center justify-between ${p.id === page?.id ? 'bg-blue-50 text-[#1B2A6B] font-semibold' : 'text-gray-700'}`}>
                     <span className="truncate">{p.title}</span>
                     <span className="text-[10px] text-gray-400 ml-2 shrink-0">/{p.slug === 'home' ? '' : p.slug}</span>
@@ -510,7 +565,7 @@ export default function GrapesjsEditor({ page }: GrapesjsEditorProps) {
                 ))}
               </div>
               <div className="p-2 border-t border-gray-100">
-                <button onClick={() => { setPageSwitcherOpen(false); router.push('/admin/pages/new') }} className="w-full text-left px-4 py-2.5 text-sm text-[#F7941D] font-semibold hover:bg-orange-50 rounded-lg transition-colors flex items-center gap-2">
+                <button type="button" onClick={() => confirmLeave(() => { setPageSwitcherOpen(false); router.push('/admin/pages/new') })} className="w-full text-left px-4 py-2.5 text-sm text-[#F7941D] font-semibold hover:bg-orange-50 rounded-lg transition-colors flex items-center gap-2">
                   <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
                   New Page
                 </button>
@@ -519,10 +574,16 @@ export default function GrapesjsEditor({ page }: GrapesjsEditorProps) {
           )}
         </div>
 
-        <input type="text" value={title} onChange={(e) => setTitle(e.target.value)} aria-label="Page title" placeholder="Page title"
+        <input type="text" value={title} onChange={(e) => { setTitle(e.target.value); touchPageFieldsDirty() }} aria-label="Page title" placeholder="Page title"
           className="bg-transparent text-white/50 text-[10px] border-none outline-none focus:text-white rounded px-1 py-0.5 w-20 hidden sm:block" />
 
         <div className="flex-1" />
+
+        {dirty && (
+          <span className="text-[10px] font-semibold text-amber-200 whitespace-nowrap hidden sm:inline" title="Save to sync across devices">
+            Unsaved
+          </span>
+        )}
 
         <button
           type="button"
@@ -542,7 +603,7 @@ export default function GrapesjsEditor({ page }: GrapesjsEditorProps) {
         >
           Site
         </button>
-        <button onClick={() => setPublished(!published)} className={`px-2 py-0.5 rounded text-[10px] font-semibold ${published ? 'bg-green-500/80 text-white' : 'bg-gray-500/80 text-white'}`}>
+        <button type="button" onClick={() => { setPublished(p => !p); touchPageFieldsDirty() }} className={`px-2 py-0.5 rounded text-[10px] font-semibold ${published ? 'bg-green-500/80 text-white' : 'bg-gray-500/80 text-white'}`}>
           {published ? 'Live' : 'Draft'}
         </button>
         <button onClick={handleSave} disabled={saving} className="bg-[#F7941D] text-white px-3 py-0.5 rounded text-[11px] font-semibold hover:bg-[#e6850a] disabled:opacity-50">
@@ -633,6 +694,7 @@ export default function GrapesjsEditor({ page }: GrapesjsEditorProps) {
               <dt className="text-gray-600">Blocks & styles</dt><dd className="text-gray-900 text-right">Right panels</dd>
             </dl>
             <p className="text-xs text-gray-500 mt-4">Preview shows the <strong>last saved</strong> version. Save, then open Preview.</p>
+            <p className="text-xs text-gray-500 mt-2">Closing the tab or leaving the builder prompts you if there are unsaved changes. Images upload to the library immediately, but the page layout is saved when you click Save.</p>
           </div>
         </div>
       )}
@@ -707,20 +769,20 @@ export default function GrapesjsEditor({ page }: GrapesjsEditorProps) {
             </div>
             <label className="block mb-4">
               <span className="text-sm font-medium text-gray-700">URL Slug</span>
-              <input type="text" value={slug} onChange={(e) => setSlug(e.target.value)} className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-[#F7941D] focus:border-transparent" />
+              <input type="text" value={slug} onChange={(e) => { setSlug(e.target.value); touchPageFieldsDirty() }} className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-[#F7941D] focus:border-transparent" />
               <span className="text-xs text-gray-400 mt-1 block">yoursite.com/{slug || 'page-url'}</span>
             </label>
             <label className="block mb-4">
               <span className="text-sm font-medium text-gray-700">Meta Title (SEO)</span>
-              <input type="text" value={metaTitle} onChange={(e) => setMetaTitle(e.target.value)} placeholder={title} className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-[#F7941D] focus:border-transparent" />
+              <input type="text" value={metaTitle} onChange={(e) => { setMetaTitle(e.target.value); touchPageFieldsDirty() }} placeholder={title} className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-[#F7941D] focus:border-transparent" />
             </label>
             <label className="block mb-4">
               <span className="text-sm font-medium text-gray-700">Meta Description (SEO)</span>
-              <textarea value={metaDescription} onChange={(e) => setMetaDescription(e.target.value)} rows={3} placeholder="Describe this page for search engines..." className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-[#F7941D] focus:border-transparent" />
+              <textarea value={metaDescription} onChange={(e) => { setMetaDescription(e.target.value); touchPageFieldsDirty() }} rows={3} placeholder="Describe this page for search engines..." className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-[#F7941D] focus:border-transparent" />
             </label>
             <label className="block mb-4">
               <span className="text-sm font-medium text-gray-700">Social Share Image URL</span>
-              <input type="text" value={metaOgImage} onChange={(e) => setMetaOgImage(e.target.value)} placeholder="https://..." className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-[#F7941D] focus:border-transparent" />
+              <input type="text" value={metaOgImage} onChange={(e) => { setMetaOgImage(e.target.value); touchPageFieldsDirty() }} placeholder="https://..." className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-[#F7941D] focus:border-transparent" />
             </label>
             <div className="mt-6 pt-4 border-t border-gray-100">
               <button onClick={handleClearCanvas} className="w-full text-left px-4 py-3 text-sm text-red-600 hover:bg-red-50 rounded-lg transition-colors font-medium">Clear All Page Content</button>
