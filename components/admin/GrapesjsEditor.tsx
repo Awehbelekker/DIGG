@@ -18,6 +18,11 @@ import diggBlocksPlugin from '@/lib/grapesjs/blocks'
 import { applyResizePolicyToEntireTree, registerDiggComponentResizeBehavior } from '@/lib/grapesjs/component-defaults'
 import { diggAlignmentSector } from '@/lib/grapesjs/alignment-sector'
 import { diggImageFramingSector, diggNewImageStyle } from '@/lib/grapesjs/image-framing-sector'
+import {
+  applyFlexibleWidthToComponent,
+  getMobileLayoutHintsForComponent,
+  getPreviewDeviceCategory,
+} from '@/lib/grapesjs/mobile-hints'
 import { PAGE_STARTERS } from '@/lib/grapesjs/page-starters'
 import { sectionsToHtml } from '@/lib/grapesjs/sections-to-html'
 import { GOOGLE_FONT_OPTIONS, googleFontsUrl } from '@/lib/google-fonts'
@@ -51,9 +56,17 @@ export default function GrapesjsEditor({ page }: GrapesjsEditorProps) {
   const [shortcutsOpen, setShortcutsOpen] = useState(false)
   const [startersOpen, setStartersOpen] = useState(false)
   const [dirty, setDirty] = useState(false)
+  const [previewDeviceName, setPreviewDeviceName] = useState('desktop')
+  const [selectionMobileHints, setSelectionMobileHints] = useState<string[]>([])
   const saveRef = useRef<() => void>(() => {})
   const ignoreDirtyRef = useRef(true)
   const markDirtyRef = useRef<() => void>(() => {})
+  const setPreviewDeviceNameRef = useRef(setPreviewDeviceName)
+  const setSelectionMobileHintsRef = useRef(setSelectionMobileHints)
+  useEffect(() => {
+    setPreviewDeviceNameRef.current = setPreviewDeviceName
+    setSelectionMobileHintsRef.current = setSelectionMobileHints
+  })
 
   useEffect(() => {
     markDirtyRef.current = () => {
@@ -320,11 +333,25 @@ export default function GrapesjsEditor({ page }: GrapesjsEditorProps) {
 
     queueMicrotask(() => applyResizePolicyToEntireTree(editor))
 
+    const refreshMobileHints = () => {
+      const dev = editor.DeviceManager.getSelected()
+      const name = String(dev?.get('name') || 'desktop')
+      setPreviewDeviceNameRef.current(name)
+      const sel = editor.getSelected()
+      setSelectionMobileHintsRef.current(sel ? getMobileLayoutHintsForComponent(sel) : [])
+    }
+
+    editor.on('device:select', refreshMobileHints)
+    queueMicrotask(refreshMobileHints)
+
     const mark = () => markDirtyRef.current()
     editor.on('component:add', mark)
     editor.on('component:remove', mark)
     editor.on('component:update', mark)
-    editor.on('component:styleUpdate', mark)
+    editor.on('component:styleUpdate', () => {
+      mark()
+      refreshMobileHints()
+    })
 
     // End initial load guard after project + canvas settle (avoids false “dirty” from hydration)
     window.setTimeout(() => {
@@ -367,9 +394,11 @@ export default function GrapesjsEditor({ page }: GrapesjsEditorProps) {
         const sector = editor.StyleManager.getSector('image-framing', { warn: false })
         sector?.set('open', true)
       }
+      refreshMobileHints()
     })
 
     editor.on('component:deselected', () => {
+      refreshMobileHints()
       if (!editor.getSelected()) {
         const blkBtn = editor.Panels.getButton('views', 'open-blocks')
         if (blkBtn && !blkBtn.get('active')) blkBtn.set('active', true)
@@ -487,6 +516,17 @@ export default function GrapesjsEditor({ page }: GrapesjsEditorProps) {
     showToast('Canvas cleared')
   }, [])
 
+  const handleFlexibleWidthQuickFix = useCallback(() => {
+    const editor = editorRef.current
+    const selected = editor?.getSelected()
+    if (!editor || !selected) {
+      showToast('Select a block on the canvas first.', 'info')
+      return
+    }
+    applyFlexibleWidthToComponent(selected)
+    showToast('Applied max-width: 100% and box-sizing: border-box on the selection.')
+  }, [])
+
   useEffect(() => {
     if (!pageSwitcherOpen) return
     const close = () => setPageSwitcherOpen(false)
@@ -500,6 +540,8 @@ export default function GrapesjsEditor({ page }: GrapesjsEditorProps) {
     if (views) views.classList.toggle('mobile-panels-open', mobilePanelsOpen)
     if (container) container.classList.toggle('mobile-panels-open', mobilePanelsOpen)
   }, [mobilePanelsOpen])
+
+  const previewDeviceCategory = getPreviewDeviceCategory(previewDeviceName)
 
   return (
     <>
@@ -687,6 +729,7 @@ export default function GrapesjsEditor({ page }: GrapesjsEditorProps) {
               <dt className="text-gray-600">Resize on canvas</dt><dd className="text-gray-900 text-right">Select a block — drag corner handles to resize; images keep aspect ratio</dd>
               <dt className="text-gray-600">Drag blocks</dt><dd className="text-gray-900 text-right">Drag the move handle or drag the block in the tree to reorder</dd>
               <dt className="text-gray-600">Style panel sync</dt><dd className="text-gray-900 text-right">Typography, Alignment & width, and Layout update with the selection</dd>
+              <dt className="text-gray-600">Mobile / tablet</dt><dd className="text-gray-900 text-right">Use device icons above the canvas; yellow bar shows layout tips for small screens</dd>
               <dt className="text-gray-600">Blocks & styles</dt><dd className="text-gray-900 text-right">Right panels</dd>
             </dl>
             <p className="text-xs text-gray-500 mt-4">Preview shows the <strong>last saved</strong> version. Save, then open Preview.</p>
@@ -794,6 +837,41 @@ export default function GrapesjsEditor({ page }: GrapesjsEditorProps) {
               </div>
             </div>
           </div>
+        </div>
+      )}
+
+      {(previewDeviceCategory !== 'desktop' || selectionMobileHints.length > 0) && (
+        <div
+          className="shrink-0 border-b border-amber-500/35 bg-gradient-to-r from-amber-950/90 to-[#0f172a] px-2 sm:px-3 py-2 flex flex-col sm:flex-row sm:flex-wrap sm:items-center gap-2 text-[10px] sm:text-[11px] text-amber-50/95"
+          role="status"
+          aria-live="polite"
+        >
+          <div className="flex flex-wrap items-center gap-2 min-w-0">
+            {previewDeviceCategory !== 'desktop' && (
+              <span className="font-semibold text-amber-200 shrink-0">
+                {previewDeviceCategory === 'mobile' ? 'Mobile' : 'Tablet'} preview
+              </span>
+            )}
+            {previewDeviceCategory !== 'desktop' && (
+              <span className="text-amber-100/80 hidden sm:inline">
+                Check stacking, spacing, and tap-sized buttons — this is a live narrow-canvas preview, not automatic fixes for every phone.
+              </span>
+            )}
+            <button
+              type="button"
+              onClick={handleFlexibleWidthQuickFix}
+              className="shrink-0 px-2 py-1 rounded-lg bg-amber-500/20 hover:bg-amber-500/35 text-amber-100 font-semibold border border-amber-400/30"
+            >
+              Flex width on selection
+            </button>
+          </div>
+          {selectionMobileHints.length > 0 && (
+            <ul className="list-disc list-inside text-amber-100/90 space-y-0.5 sm:ml-2 min-w-0 flex-1">
+              {selectionMobileHints.map((hint) => (
+                <li key={hint}>{hint}</li>
+              ))}
+            </ul>
+          )}
         </div>
       )}
 
