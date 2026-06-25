@@ -81,11 +81,18 @@ export async function switchPageToGrapesjs(pageId: string) {
 
 export async function switchPageToSections(pageId: string) {
   const supabase = await createClient()
-  const { data: page, error: fetchError } = await supabase.from('pages').select('slug').eq('id', pageId).single()
+  const { data: page, error: fetchError } = await supabase
+    .from('pages')
+    .select('slug, content')
+    .eq('id', pageId)
+    .single()
   if (fetchError || !page) throw new Error('Page not found')
 
   const slug = page.slug as string
-  const sections = isBuiltinPageSlug(slug) ? defaultSectionsForSlug(slug) ?? [] : []
+  const content = page.content as { sections?: PageSection[] } | null
+  const saved = content?.sections?.length ? content.sections : null
+  const sections =
+    saved ?? (isBuiltinPageSlug(slug) ? defaultSectionsForSlug(slug) ?? [] : [])
 
   const { error } = await supabase
     .from('pages')

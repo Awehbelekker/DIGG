@@ -61,6 +61,7 @@ export default function Footer({
   const pillars = siteSettings.pillars?.trim() || 'Develop · Invest · Grow · Give'
   const companyLine = siteSettings.company_line?.trim() || 'Aweh Be Lekker (Pty) Ltd · Reg 2024/537986/07'
   const showNewsletter = siteSettings.footer_newsletter_enabled === true
+  const pillarWords = parsePillarWords(pillars)
 
   const pageLinks =
     links.length > 0
@@ -96,9 +97,11 @@ export default function Footer({
     <footer className="bg-[var(--color-ink)] text-[var(--color-greige)] pt-10 sm:pt-12 pb-[max(2.25rem,env(safe-area-inset-bottom))]">
       <div className="max-w-[1080px] mx-auto px-4 sm:px-6 lg:px-7">
         {/* Row 1 — brand + pillars */}
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 sm:gap-8 pb-8 sm:pb-10 border-b border-white/10">
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between sm:gap-8 pb-8 sm:pb-10 border-b border-white/10">
           {logoBlock}
-          <FooterPillarsInline pillars={pillars} />
+          <div className="sm:ml-auto sm:pl-6 lg:pl-10">
+            <FooterPillarsInline pillars={pillars} />
+          </div>
         </div>
 
         {/* Row 2 — link columns */}
@@ -130,8 +133,18 @@ export default function Footer({
           </div>
         </div>
 
-        <div className="mt-8 sm:mt-10 pt-5 sm:pt-6 border-t border-white/10 text-xs text-[#7d8694]">
+        <div className="mt-8 sm:mt-10 pt-5 sm:pt-6 border-t border-white/10 flex flex-col sm:flex-row sm:flex-wrap sm:justify-between sm:items-center gap-2 sm:gap-3 text-xs text-[#7d8694]">
           <span>© {new Date().getFullYear()} {siteName}. All rights reserved.</span>
+          {pillarWords.length > 0 && (
+            <span className="hidden sm:inline-flex sm:items-center sm:gap-1.5 uppercase tracking-[0.12em]">
+              {pillarWords.map((word, i) => (
+                <span key={word + i}>
+                  {word}
+                  {i < pillarWords.length - 1 && <span className="text-[var(--color-coral)] mx-0.5">·</span>}
+                </span>
+              ))}
+            </span>
+          )}
         </div>
         {showNewsletter && null}
         <Link href="/admin/login" className="inline-block mt-4 text-[10px] text-white/20 hover:text-white/40">

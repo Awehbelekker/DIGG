@@ -152,11 +152,12 @@ export const DEFAULT_SECTION_DATA: Record<SectionType, Record<string, unknown>> 
     kick: 'What we do',
     title: 'Four services. Plain language.',
     side: 'No jargon.',
+    cardLayout: 'top',
     items: [
-      { title: 'Service one', description: 'Description.', icon: '📐' },
-      { title: 'Service two', description: 'Description.', icon: '📊' },
-      { title: 'Service three', description: 'Description.', icon: '🏗️' },
-      { title: 'Service four', description: 'Description.', icon: '🔑' },
+      { title: 'Service one', description: 'Description.', icon: '📐', mediaMode: 'auto' },
+      { title: 'Service two', description: 'Description.', icon: '📊', mediaMode: 'auto' },
+      { title: 'Service three', description: 'Description.', icon: '🏗️', mediaMode: 'auto' },
+      { title: 'Service four', description: 'Description.', icon: '🔑', mediaMode: 'auto' },
     ],
   },
   work_cards: {

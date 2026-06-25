@@ -18,7 +18,14 @@ import type { MarqueeFeedMode, MarqueeItemKind } from '@/lib/marquee'
 import type { WorkCardEditorItem } from '@/lib/insight-work-card'
 
 type GridItem = { title: string; description: string; imageUrl?: string }
-type ServiceItem = { title: string; description: string; icon?: string; imageUrl?: string }
+type ServiceItem = {
+  title: string
+  description: string
+  icon?: string
+  imageUrl?: string
+  mediaMode?: 'auto' | 'emoji' | 'image'
+  iconPosition?: 'top' | 'left' | 'right'
+}
 type ProductItem = WorkCardEditorItem
 type StatItem = { label: string; value: string }
 
@@ -601,9 +608,15 @@ export default function SectionPageEditor({ page }: { page: Page }) {
     }
     if (type === 'services') {
       const items = (data.items as ServiceItem[]) ?? []
+      const cardLayout = (data.cardLayout as string) || 'top'
       const set = (key: string, value: string) => onChange({ ...data, [key]: value })
+      const setLayout = (value: string) => onChange({ ...data, cardLayout: value })
+
       return (
         <div className="space-y-4">
+          <p className="text-xs text-gray-500">
+            Each card can use an emoji icon or uploaded image. Set default placement for all cards, or override per service.
+          </p>
           <label className="block">
             <span className="text-sm font-medium text-gray-700">Eyebrow</span>
             <input type="text" value={String(data.kick ?? '')} onChange={(e) => set('kick', e.target.value)} className="mt-1 w-full px-3 py-2 border rounded-lg text-sm" />
@@ -615,6 +628,14 @@ export default function SectionPageEditor({ page }: { page: Page }) {
           <label className="block">
             <span className="text-sm font-medium text-gray-700">Side text (optional)</span>
             <textarea value={String(data.side ?? '')} onChange={(e) => set('side', e.target.value)} rows={2} className="mt-1 w-full px-3 py-2 border rounded-lg text-sm" placeholder="Short line shown beside the heading on desktop" />
+          </label>
+          <label className="block">
+            <span className="text-sm font-medium text-gray-700">Default icon / image placement</span>
+            <select value={cardLayout} onChange={(e) => setLayout(e.target.value)} className="mt-1 w-full px-3 py-2 border rounded-lg text-sm">
+              <option value="top">Above title (stacked)</option>
+              <option value="left">Left of text</option>
+              <option value="right">Right of text</option>
+            </select>
           </label>
           {items.map((item, i) => (
             <div key={i} className="p-3 bg-gray-50 rounded-lg border border-gray-100 space-y-2">
@@ -641,28 +662,68 @@ export default function SectionPageEditor({ page }: { page: Page }) {
                 }}
                 className="w-full px-3 py-2 border rounded-lg text-sm"
               />
-              <input
-                type="text"
-                value={item.icon ?? ''}
-                placeholder="Emoji icon (if no image)"
-                onChange={(e) => {
-                  const next = [...items]
-                  next[i] = { ...item, icon: e.target.value }
-                  onChange({ ...data, items: next })
-                }}
-                className="w-full px-3 py-2 border rounded-lg text-sm"
-              />
-              <DropUpload
-                compact
-                value={item.imageUrl ?? ''}
-                onChange={(url) => {
-                  const next = [...items]
-                  next[i] = { ...item, imageUrl: url }
-                  onChange({ ...data, items: next })
-                }}
-                folder="services"
-                label="Icon image (overrides emoji)"
-              />
+              <div className="grid sm:grid-cols-2 gap-2">
+                <label className="block">
+                  <span className="text-xs font-medium text-gray-600">Show</span>
+                  <select
+                    value={item.mediaMode ?? 'auto'}
+                    onChange={(e) => {
+                      const next = [...items]
+                      next[i] = { ...item, mediaMode: e.target.value as ServiceItem['mediaMode'] }
+                      onChange({ ...data, items: next })
+                    }}
+                    className="mt-1 w-full px-3 py-2 border rounded-lg text-sm"
+                  >
+                    <option value="auto">Auto (image if uploaded, else emoji)</option>
+                    <option value="emoji">Emoji icon only</option>
+                    <option value="image">Image only</option>
+                  </select>
+                </label>
+                <label className="block">
+                  <span className="text-xs font-medium text-gray-600">Placement override</span>
+                  <select
+                    value={item.iconPosition ?? ''}
+                    onChange={(e) => {
+                      const next = [...items]
+                      const val = e.target.value as ServiceItem['iconPosition'] | ''
+                      next[i] = { ...item, iconPosition: val || undefined }
+                      onChange({ ...data, items: next })
+                    }}
+                    className="mt-1 w-full px-3 py-2 border rounded-lg text-sm"
+                  >
+                    <option value="">Use section default</option>
+                    <option value="top">Above title</option>
+                    <option value="left">Left of text</option>
+                    <option value="right">Right of text</option>
+                  </select>
+                </label>
+              </div>
+              {(item.mediaMode ?? 'auto') !== 'image' && (
+                <input
+                  type="text"
+                  value={item.icon ?? ''}
+                  placeholder="Emoji icon (if no image)"
+                  onChange={(e) => {
+                    const next = [...items]
+                    next[i] = { ...item, icon: e.target.value }
+                    onChange({ ...data, items: next })
+                  }}
+                  className="w-full px-3 py-2 border rounded-lg text-sm"
+                />
+              )}
+              {(item.mediaMode ?? 'auto') !== 'emoji' && (
+                <DropUpload
+                  compact
+                  value={item.imageUrl ?? ''}
+                  onChange={(url) => {
+                    const next = [...items]
+                    next[i] = { ...item, imageUrl: url }
+                    onChange({ ...data, items: next })
+                  }}
+                  folder="services"
+                  label="Icon image"
+                />
+              )}
             </div>
           ))}
         </div>

@@ -60,7 +60,8 @@ export default function SectionRenderer({ section, siteSettings }: SectionRender
         kick={(data.kick as string) || undefined}
         title={(data.title as string) || 'What we do'}
         side={(data.side as string) || undefined}
-        items={(data.items as { title: string; description: string; icon?: string; imageUrl?: string }[]) ?? []}
+        cardLayout={(data.cardLayout as 'top' | 'left' | 'right') || 'top'}
+        items={(data.items as import('./ServicesGrid').ServiceGridItem[]) ?? []}
       />
     )
   }

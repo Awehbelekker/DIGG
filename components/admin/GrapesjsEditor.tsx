@@ -192,7 +192,7 @@ export default function GrapesjsEditor({ page }: GrapesjsEditorProps) {
   const handleSwitchToSections = useCallback(async () => {
     if (!page?.id) return
     const msg =
-      'Switch back to the section editor? The visual layout will be replaced with the default mockup sections (or code defaults for this page). Your GrapesJS layout is not kept.'
+      'Switch back to the section editor? Your saved section content will be restored. If none was saved, code defaults are used.'
     if (!globalThis.confirm(msg)) return
     if (dirty) {
       showToast('Save or discard unsaved changes before switching editors.', 'error')

@@ -4,6 +4,7 @@ import { HOME_PAGE_SECTIONS } from '@/lib/home-content'
 import { ABOUT_PAGE_SECTIONS } from '@/lib/about-content'
 import { CONTACT_PAGE_SECTIONS } from '@/lib/contact-content'
 import { isBuiltinPageSlug, type BuiltinPageSlug } from '@/lib/builtin-pages'
+import { mergeSectionsWithCodeDefaults } from '@/lib/merge-section-defaults'
 
 function codeDefaults(slug: BuiltinPageSlug): PageSection[] {
   switch (slug) {
@@ -121,6 +122,10 @@ export function resolvePageSections(
       : codeDefaults(builtinSlug)
   } else {
     sections = hasDb ? (JSON.parse(JSON.stringify(dbSections)) as PageSection[]) : []
+  }
+
+  if (isBuiltinPageSlug(slug)) {
+    sections = mergeSectionsWithCodeDefaults(sections)
   }
 
   return applySiteSettingsToSections(slug, sections, settings)
