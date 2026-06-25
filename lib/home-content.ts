@@ -112,7 +112,7 @@ export const HOME_PAGE_SECTIONS: PageSection[] = [
         { label: 'Years in practice', value: '12+' },
         { label: 'Largest single project', value: '300,000m²' },
         { label: 'Residential units delivered', value: '1,000+' },
-        { label: 'SACAP registered', value: 'PAT44740093' },
+        { label: 'PAT44740093', value: 'SACAP' },
       ],
     },
   },
