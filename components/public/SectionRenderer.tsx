@@ -12,7 +12,7 @@ import TwoColumn from './TwoColumn'
 import LogoBar from './LogoBar'
 import FAQ from './FAQ'
 import ContactDirectDetails from './ContactDirectDetails'
-import PillarsMarquee from './PillarsMarquee'
+import MarqueeSection from './MarqueeSection'
 import ServicesGrid from './ServicesGrid'
 import WorkCardGrid from './WorkCardGrid'
 import CtaSection from './CtaSection'
@@ -51,8 +51,7 @@ export default function SectionRenderer({ section, siteSettings }: SectionRender
   }
 
   if (type === 'marquee') {
-    const items = (data.items as { word: string }[]) ?? []
-    return <PillarsMarquee items={items} />
+    return <MarqueeSection data={data} />
   }
 
   if (type === 'services') {

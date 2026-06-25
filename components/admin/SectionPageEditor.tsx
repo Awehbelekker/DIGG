@@ -14,6 +14,7 @@ import { createClient } from '@/lib/supabase/client'
 import { showToast } from '@/components/admin/Toast'
 import { savePageSections, resetPageToDefaults, switchPageToGrapesjs } from '@/app/admin/(dashboard)/pages/actions'
 import { useUnsavedChangesAlert } from '@/lib/hooks/useUnsavedChangesAlert'
+import type { MarqueeFeedMode, MarqueeItemKind } from '@/lib/marquee'
 import type { WorkCardEditorItem } from '@/lib/insight-work-card'
 
 type GridItem = { title: string; description: string; imageUrl?: string }
@@ -347,23 +348,146 @@ export default function SectionPageEditor({ page }: { page: Page }) {
     if (type === 'text') return <TextFields data={data} onChange={onChange} />
     if (type === 'cta') return <CtaFields data={data} onChange={onChange} />
     if (type === 'marquee') {
-      const items = (data.items as { word: string }[]) ?? []
+      type RawItem = { kind?: MarqueeItemKind; text?: string; word?: string }
+      const items = (data.items as RawItem[]) ?? []
+      const speed = (data.speed as string) || 'normal'
+      const direction = (data.direction as string) || 'left'
+      const pauseOnHover = Boolean(data.pauseOnHover)
+      const feedMode = (data.feedMode as MarqueeFeedMode) || 'off'
+      const feedLimit = Number(data.feedLimit) || 8
+
+      const normalized = items.map((item) => ({
+        kind: (item.kind === 'phrase' ? 'phrase' : 'word') as MarqueeItemKind,
+        text: item.text ?? item.word ?? '',
+      }))
+
+      const setItems = (next: { kind: MarqueeItemKind; text: string }[]) =>
+        onChange({ ...data, items: next })
+      const setMeta = (patch: Record<string, unknown>) => onChange({ ...data, ...patch })
+
       return (
-        <div className="space-y-2">
-          {items.map((item, i) => (
+        <div className="space-y-4">
+          <p className="text-xs text-gray-500">
+            Pillar words scroll in bold with a coral dot. Motivation phrases appear lighter and italic between them.
+            Enable Work feed to auto-insert project titles or excerpts after each pillar word.
+          </p>
+          <div className="space-y-2">
+            {normalized.map((item, i) => (
+              <div key={i} className="flex flex-wrap gap-2">
+                <select
+                  value={item.kind}
+                  onChange={(e) => {
+                    const next = [...normalized]
+                    next[i] = { ...item, kind: e.target.value as MarqueeItemKind }
+                    setItems(next)
+                  }}
+                  className="px-3 py-2 border rounded-lg text-sm w-36 shrink-0"
+                >
+                  <option value="word">Pillar word</option>
+                  <option value="phrase">Motivation</option>
+                </select>
+                <input
+                  type="text"
+                  value={item.text}
+                  placeholder={item.kind === 'word' ? 'Develop' : 'Build for the long term'}
+                  onChange={(e) => {
+                    const next = [...normalized]
+                    next[i] = { ...item, text: e.target.value }
+                    setItems(next)
+                  }}
+                  className="flex-1 min-w-[160px] px-3 py-2 border rounded-lg text-sm"
+                />
+                <button
+                  type="button"
+                  onClick={() => setItems(normalized.filter((_, idx) => idx !== i))}
+                  className="px-3 py-2 rounded-lg text-red-600 hover:bg-red-50 text-sm shrink-0"
+                >
+                  Remove
+                </button>
+              </div>
+            ))}
+          </div>
+          <div className="flex flex-wrap gap-3">
+            <button
+              type="button"
+              onClick={() => setItems([...normalized, { kind: 'word', text: '' }])}
+              className="text-sm font-semibold text-[#B56244] hover:underline"
+            >
+              + Add pillar word
+            </button>
+            <button
+              type="button"
+              onClick={() => setItems([...normalized, { kind: 'phrase', text: '' }])}
+              className="text-sm font-semibold text-[#152232] hover:underline"
+            >
+              + Add motivation phrase
+            </button>
+          </div>
+          <div className="pt-3 border-t border-gray-100 space-y-3">
+            <h4 className="text-sm font-semibold text-gray-700">Work feed (auto phrases)</h4>
+            <label className="block">
+              <span className="text-sm font-medium text-gray-700">Insert from Work feed</span>
+              <select
+                value={feedMode}
+                onChange={(e) => setMeta({ feedMode: e.target.value })}
+                className="mt-1 w-full px-3 py-2 border rounded-lg text-sm"
+              >
+                <option value="off">Off — manual items only</option>
+                <option value="titles">After each pillar word — project titles</option>
+                <option value="excerpts">After each pillar word — excerpts (trimmed)</option>
+              </select>
+            </label>
+            {feedMode !== 'off' && (
+              <label className="block">
+                <span className="text-sm font-medium text-gray-700">How many Work items to pull</span>
+                <input
+                  type="number"
+                  min={1}
+                  max={20}
+                  value={feedLimit}
+                  onChange={(e) => setMeta({ feedLimit: Number(e.target.value) || 8 })}
+                  className="mt-1 w-full px-3 py-2 border rounded-lg text-sm"
+                />
+                <span className="text-xs text-gray-500 mt-1 block">
+                  Uses latest published Work items ({publishedInsights.length} available).
+                </span>
+              </label>
+            )}
+          </div>
+          <div className="grid sm:grid-cols-2 gap-3 pt-3 border-t border-gray-100">
+            <label className="block">
+              <span className="text-sm font-medium text-gray-700">Scroll speed</span>
+              <select
+                value={speed}
+                onChange={(e) => setMeta({ speed: e.target.value })}
+                className="mt-1 w-full px-3 py-2 border rounded-lg text-sm"
+              >
+                <option value="slow">Slow</option>
+                <option value="normal">Normal</option>
+                <option value="fast">Fast</option>
+              </select>
+            </label>
+            <label className="block">
+              <span className="text-sm font-medium text-gray-700">Direction</span>
+              <select
+                value={direction}
+                onChange={(e) => setMeta({ direction: e.target.value })}
+                className="mt-1 w-full px-3 py-2 border rounded-lg text-sm"
+              >
+                <option value="left">Scroll left</option>
+                <option value="right">Scroll right</option>
+              </select>
+            </label>
+          </div>
+          <label className="flex items-center gap-2 text-sm">
             <input
-              key={i}
-              type="text"
-              value={item.word}
-              placeholder={`Word ${i + 1}`}
-              onChange={(e) => {
-                const next = [...items]
-                next[i] = { word: e.target.value }
-                onChange({ ...data, items: next })
-              }}
-              className="w-full px-3 py-2 border rounded-lg text-sm"
+              type="checkbox"
+              checked={pauseOnHover}
+              onChange={(e) => setMeta({ pauseOnHover: e.target.checked })}
             />
-          ))}
+            Pause animation when hovered
+          </label>
+          <p className="text-xs text-gray-500">Save first, then use Preview draft to check the full scroll.</p>
         </div>
       )
     }

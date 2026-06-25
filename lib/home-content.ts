@@ -21,11 +21,16 @@ export const HOME_PAGE_SECTIONS: PageSection[] = [
     type: 'marquee',
     data: {
       items: [
-        { word: 'Develop' },
-        { word: 'Invest' },
-        { word: 'Grow' },
-        { word: 'Give' },
+        { kind: 'word', text: 'Develop' },
+        { kind: 'word', text: 'Invest' },
+        { kind: 'word', text: 'Grow' },
+        { kind: 'word', text: 'Give' },
       ],
+      speed: 'normal',
+      direction: 'left',
+      pauseOnHover: false,
+      feedMode: 'titles',
+      feedLimit: 8,
     },
   },
   {

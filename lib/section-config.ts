@@ -135,11 +135,18 @@ export const DEFAULT_SECTION_DATA: Record<SectionType, Record<string, unknown>> 
   contact_details: {},
   marquee: {
     items: [
-      { word: 'Develop' },
-      { word: 'Invest' },
-      { word: 'Grow' },
-      { word: 'Give' },
+      { kind: 'word', text: 'Develop' },
+      { kind: 'word', text: 'Invest' },
+      { kind: 'word', text: 'Grow' },
+      { kind: 'word', text: 'Give' },
+      { kind: 'phrase', text: 'Build for the long term' },
+      { kind: 'phrase', text: 'Design like an investor' },
     ],
+    speed: 'normal',
+    direction: 'left',
+    pauseOnHover: false,
+    feedMode: 'titles',
+    feedLimit: 8,
   },
   services: {
     kick: 'What we do',
