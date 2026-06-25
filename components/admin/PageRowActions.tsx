@@ -44,14 +44,14 @@ export default function PageRowActions({ page }: PageRowActionsProps) {
       <div className="flex items-center justify-end gap-2">
         <AdminSafeLink
           href={`/admin/pages/${page.id}`}
-          className="text-[#F7941D] hover:text-[#e6850a]"
+          className="text-[#B56244] hover:text-[#9A4F35]"
         >
           Edit
         </AdminSafeLink>
         <AdminSafeLink
           href={`/preview/${page.id}`}
           openInNewTab
-          className="text-gray-600 hover:text-[#1B2A6B]"
+          className="text-gray-600 hover:text-[#152232]"
           title="Preview (works for drafts too)"
         >
           Preview
@@ -59,7 +59,7 @@ export default function PageRowActions({ page }: PageRowActionsProps) {
         <AdminSafeLink
           href={`/${page.slug}`}
           openInNewTab
-          className="text-gray-500 hover:text-[#1B2A6B] text-xs"
+          className="text-gray-500 hover:text-[#152232] text-xs"
           title="View live (published only)"
         >
           View live
@@ -68,7 +68,7 @@ export default function PageRowActions({ page }: PageRowActionsProps) {
           type="button"
           onClick={handleDuplicate}
           disabled={!!loading}
-          className="text-gray-600 hover:text-[#1B2A6B] disabled:opacity-50"
+          className="text-gray-600 hover:text-[#152232] disabled:opacity-50"
         >
           {loading === 'duplicate' ? '…' : 'Duplicate'}
         </button>

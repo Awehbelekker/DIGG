@@ -13,20 +13,20 @@ export async function GET() {
     return NextResponse.redirect(faviconUrl, 302)
   }
 
-  // Default: 32x32 DIGG-style icon (brand blue #1B2A6B, accent #F7941D)
+  // Default: 32x32 DIGG-style icon (brand blue #152232, accent #B56244)
   return new ImageResponse(
     (
       <div
         style={{
           width: 32,
           height: 32,
-          background: '#1B2A6B',
+          background: '#B56244',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
           fontSize: 18,
           fontWeight: 700,
-          color: '#F7941D',
+          color: '#E8624D',
           fontFamily: 'system-ui, sans-serif',
         }}
       >

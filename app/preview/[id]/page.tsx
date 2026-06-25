@@ -61,7 +61,7 @@ export default async function PreviewPage({ params }: Props) {
       {sections.length === 0 && (
         <section className="py-20 text-center text-gray-500">
           <div className="max-w-7xl mx-auto px-4">
-            <h1 className="text-3xl font-bold text-[#1B2A6B] mb-4" style={{ fontFamily: 'var(--font-heading)' }}>
+            <h1 className="text-3xl font-bold text-[#152232] mb-4" style={{ fontFamily: 'var(--font-heading)' }}>
               {page.title as string}
             </h1>
             <p>This page has no content yet. Add sections in the admin page editor.</p>

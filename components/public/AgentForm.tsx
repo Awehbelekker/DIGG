@@ -60,12 +60,12 @@ export default function AgentForm() {
     )
   }
 
-  const inputClass = "w-full px-4 py-3 text-base border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#F7941D] focus:border-transparent focus:outline-none transition-shadow"
+  const inputClass = "w-full px-4 py-3 text-base border border-gray-300 rounded-xl focus:ring-2 focus:ring-[var(--color-terracotta)] focus:border-transparent focus:outline-none transition-shadow"
 
   return (
     <form onSubmit={handleSubmit} className="max-w-2xl mx-auto bg-white p-6 sm:p-8 lg:p-10 rounded-2xl shadow-sm border border-gray-100">
       <div className="mb-6">
-        <label htmlFor="agent-name" className="block text-sm font-medium text-[#1B2A6B] mb-2">
+        <label htmlFor="agent-name" className="block text-sm font-medium text-[var(--color-ink)] mb-2">
           Your Name *
         </label>
         <input
@@ -79,7 +79,7 @@ export default function AgentForm() {
       </div>
 
       <div className="mb-6">
-        <label htmlFor="agent-agency" className="block text-sm font-medium text-[#1B2A6B] mb-2">
+        <label htmlFor="agent-agency" className="block text-sm font-medium text-[var(--color-ink)] mb-2">
           Agency *
         </label>
         <input
@@ -93,7 +93,7 @@ export default function AgentForm() {
       </div>
 
       <div className="mb-6">
-        <label htmlFor="agent-phone" className="block text-sm font-medium text-[#1B2A6B] mb-2">
+        <label htmlFor="agent-phone" className="block text-sm font-medium text-[var(--color-ink)] mb-2">
           Phone Number *
         </label>
         <input
@@ -107,7 +107,7 @@ export default function AgentForm() {
       </div>
 
       <div className="mb-6">
-        <label htmlFor="agent-email" className="block text-sm font-medium text-[#1B2A6B] mb-2">
+        <label htmlFor="agent-email" className="block text-sm font-medium text-[var(--color-ink)] mb-2">
           Email Address *
         </label>
         <input
@@ -132,7 +132,7 @@ export default function AgentForm() {
       </div>
 
       <div className="mb-8">
-        <label htmlFor="agent-referral" className="block text-sm font-medium text-[#1B2A6B] mb-2">
+        <label htmlFor="agent-referral" className="block text-sm font-medium text-[var(--color-ink)] mb-2">
           Tell us about your first referral
         </label>
         <textarea
@@ -153,7 +153,7 @@ export default function AgentForm() {
       <button
         type="submit"
         disabled={loading}
-        className="w-full bg-[#F7941D] text-white px-8 py-3.5 rounded-xl font-semibold hover:bg-[#e6850a] hover:shadow-md transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed focus:outline-none focus-visible:ring-2 focus-visible:ring-[#F7941D] focus-visible:ring-offset-2"
+        className="w-full bg-[var(--color-terracotta)] text-white px-8 py-3.5 rounded-xl font-semibold hover:bg-[var(--color-terra-deep)] hover:shadow-md transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-terracotta)] focus-visible:ring-offset-2"
       >
         {loading ? 'Submitting...' : 'Submit Registration'}
       </button>

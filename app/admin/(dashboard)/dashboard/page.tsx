@@ -50,14 +50,14 @@ export default async function AdminDashboard() {
       <div className="mb-8 flex flex-wrap gap-3">
         <AdminSafeLink
           href="/admin/settings"
-          className="inline-flex items-center px-4 py-2 rounded-xl bg-[#1B2A6B] text-white text-sm font-medium hover:bg-[#2a3d8a] transition-colors"
+          className="inline-flex items-center px-4 py-2 rounded-xl bg-[#152232] text-white text-sm font-medium hover:bg-[#172A45] transition-colors"
         >
           Hero & Selected Work
         </AdminSafeLink>
         {homePage && (
           <AdminSafeLink
             href={`/admin/pages/${homePage.id}`}
-            className="inline-flex items-center px-4 py-2 rounded-xl border border-[#1B2A6B] bg-white text-[#1B2A6B] text-sm font-medium hover:bg-[#1B2A6B] hover:text-white transition-colors"
+            className="inline-flex items-center px-4 py-2 rounded-xl border border-[#152232] bg-white text-[#152232] text-sm font-medium hover:bg-[#152232] hover:text-white transition-colors"
           >
             Edit Home
           </AdminSafeLink>
@@ -65,7 +65,7 @@ export default async function AdminDashboard() {
         {aboutPage && (
           <AdminSafeLink
             href={`/admin/pages/${aboutPage.id}`}
-            className="inline-flex items-center px-4 py-2 rounded-xl border border-[#1B2A6B] bg-white text-[#1B2A6B] text-sm font-medium hover:bg-[#1B2A6B] hover:text-white transition-colors"
+            className="inline-flex items-center px-4 py-2 rounded-xl border border-[#152232] bg-white text-[#152232] text-sm font-medium hover:bg-[#152232] hover:text-white transition-colors"
           >
             Edit About
           </AdminSafeLink>
@@ -88,7 +88,7 @@ export default async function AdminDashboard() {
             className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 hover:shadow-md hover:border-gray-200 transition-all"
           >
             <h3 className="text-lg font-semibold text-gray-600 mb-2" style={{ fontFamily: 'var(--font-heading)' }}>{stat.label}</h3>
-            <p className="text-4xl font-bold text-[#F7941D]">{stat.count}</p>
+            <p className="text-4xl font-bold text-[#B56244]">{stat.count}</p>
           </AdminSafeLink>
         ))}
       </div>
@@ -103,13 +103,13 @@ export default async function AdminDashboard() {
                 <div key={p.id} className="border-b border-gray-200 pb-4 last:border-0">
                   <div className="flex justify-between items-start gap-2">
                     <div className="min-w-0">
-                      <p className="font-semibold text-[#1B2A6B] truncate">{p.title || 'Untitled'}</p>
+                      <p className="font-semibold text-[#152232] truncate">{p.title || 'Untitled'}</p>
                       <p className="text-sm text-gray-500">/{p.slug === 'home' ? '' : p.slug || '—'}</p>
                       <p className="text-xs text-gray-400 mt-1">{new Date(p.updated_at).toLocaleString()}</p>
                     </div>
                     <AdminSafeLink
                       href={`/admin/pages/${p.id}`}
-                      className="shrink-0 px-3 py-1.5 rounded-lg bg-[#F7941D] text-white text-sm font-medium hover:bg-[#e6850a] transition-colors"
+                      className="shrink-0 px-3 py-1.5 rounded-lg bg-[#B56244] text-white text-sm font-medium hover:bg-[#9A4F35] transition-colors"
                     >
                       Edit
                     </AdminSafeLink>
@@ -122,7 +122,7 @@ export default async function AdminDashboard() {
           )}
           <AdminSafeLink
             href="/admin/pages"
-            className="mt-4 inline-block text-[#F7941D] hover:text-[#e6850a] font-semibold"
+            className="mt-4 inline-block text-[#B56244] hover:text-[#9A4F35] font-semibold"
           >
             View all pages →
           </AdminSafeLink>
@@ -137,7 +137,7 @@ export default async function AdminDashboard() {
                 <div key={submission.id} className="border-b border-gray-200 pb-4 last:border-0">
                   <div className="flex justify-between items-start">
                     <div>
-                      <p className="font-semibold text-[#1B2A6B]">
+                      <p className="font-semibold text-[#152232]">
                         {typeof (submission.data as Record<string, unknown>)?.name === 'string'
                           ? (submission.data as Record<string, unknown>).name as string
                           : 'Unknown'}
@@ -149,7 +149,7 @@ export default async function AdminDashboard() {
                         {new Date(submission.created_at).toLocaleString()}
                       </p>
                     </div>
-                    <span className="px-3 py-1 bg-[#5BC8E8] text-[#1B2A6B] rounded-full text-xs font-semibold">
+                    <span className="px-3 py-1 bg-[#8A9A7B] text-[#152232] rounded-full text-xs font-semibold">
                       {submission.form_type}
                     </span>
                   </div>
@@ -161,7 +161,7 @@ export default async function AdminDashboard() {
           )}
           <AdminSafeLink
             href="/admin/forms"
-            className="mt-4 inline-block text-[#F7941D] hover:text-[#e6850a] font-semibold"
+            className="mt-4 inline-block text-[#B56244] hover:text-[#9A4F35] font-semibold"
           >
             View all submissions →
           </AdminSafeLink>

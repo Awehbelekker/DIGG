@@ -11,13 +11,13 @@ function sectionToHtml(section: PageSection): string {
   if (type === 'hero') {
     const bg = (data.backgroundImageUrl as string) || ''
     return `
-      <section style="position:relative;min-height:80vh;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,#1B2A6B 0%,#2a3d8f 100%);overflow:hidden;color:white;text-align:center;">
+      <section style="position:relative;min-height:80vh;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,#152232 0%,#172A45 100%);overflow:hidden;color:white;text-align:center;">
         ${bg ? `<div style="position:absolute;inset:0;background:url('${esc(bg)}') center/cover no-repeat;opacity:0.3;"></div>` : ''}
         <div style="position:relative;z-index:1;max-width:800px;padding:2rem;">
           <h1 style="font-size:3.5rem;font-weight:700;margin-bottom:1rem;letter-spacing:-0.02em;line-height:1.1;">${esc(data.title)}</h1>
           <p style="font-size:1.25rem;opacity:0.9;margin-bottom:2rem;max-width:600px;margin-left:auto;margin-right:auto;">${esc(data.subtitle)}</p>
           <div style="display:flex;gap:1rem;justify-content:center;flex-wrap:wrap;">
-            <a href="${esc(data.primaryCTAhref || '#')}" style="display:inline-block;background:#F7941D;color:white;padding:0.875rem 2rem;border-radius:0.75rem;font-weight:600;text-decoration:none;">${esc(data.primaryCTAtext || 'Learn More')}</a>
+            <a href="${esc(data.primaryCTAhref || '#')}" style="display:inline-block;background:#B56244;color:white;padding:0.875rem 2rem;border-radius:0.75rem;font-weight:600;text-decoration:none;">${esc(data.primaryCTAtext || 'Learn More')}</a>
             <a href="${esc(data.secondaryCTAhref || '/contact')}" style="display:inline-block;border:2px solid rgba(255,255,255,0.5);color:white;padding:0.875rem 2rem;border-radius:0.75rem;font-weight:600;text-decoration:none;">${esc(data.secondaryCTAtext || 'Contact')}</a>
           </div>
         </div>
@@ -29,7 +29,7 @@ function sectionToHtml(section: PageSection): string {
     return `
       <section style="padding:4rem 1rem;background:white;">
         <div style="max-width:48rem;margin:0 auto;text-align:${align};">
-          ${(data.heading as string) ? `<h2 style="font-size:2rem;font-weight:700;color:#1B2A6B;margin-bottom:1rem;">${esc(data.heading)}</h2>` : ''}
+          ${(data.heading as string) ? `<h2 style="font-size:2rem;font-weight:700;color:#152232;margin-bottom:1rem;">${esc(data.heading)}</h2>` : ''}
           <p style="color:#555;line-height:1.7;white-space:pre-wrap;">${esc(data.body)}</p>
         </div>
       </section>`
@@ -56,7 +56,7 @@ function sectionToHtml(section: PageSection): string {
       <section style="padding:4rem 1rem;background:white;">
         <div style="max-width:72rem;margin:0 auto;display:grid;grid-template-columns:1fr 1fr;gap:3rem;align-items:center;">
           <div ${data.reversed ? 'style="order:2"' : ''}>
-            <h2 style="font-size:2rem;font-weight:700;color:#1B2A6B;margin-bottom:1rem;">${esc(data.heading)}</h2>
+            <h2 style="font-size:2rem;font-weight:700;color:#152232;margin-bottom:1rem;">${esc(data.heading)}</h2>
             <p style="color:#555;line-height:1.7;">${esc(data.body)}</p>
           </div>
           <div style="border-radius:1rem;overflow:hidden;${data.reversed ? 'order:1' : ''}">
@@ -69,14 +69,14 @@ function sectionToHtml(section: PageSection): string {
   if (type === 'grid') {
     const items = (data.items as { title: string; description: string; imageUrl?: string }[]) ?? []
     return `
-      <section style="padding:4rem 1rem;background:#FAFAFA;">
+      <section style="padding:4rem 1rem;background:#F4F0E8;">
         <div style="max-width:72rem;margin:0 auto;">
-          ${(data.title as string) ? `<h2 style="font-size:2rem;font-weight:700;color:#1B2A6B;text-align:center;margin-bottom:2.5rem;">${esc(data.title)}</h2>` : ''}
+          ${(data.title as string) ? `<h2 style="font-size:2rem;font-weight:700;color:#152232;text-align:center;margin-bottom:2.5rem;">${esc(data.title)}</h2>` : ''}
           <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:2rem;">
             ${items.map(item => `
               <div style="background:white;padding:1.5rem;border-radius:1rem;box-shadow:0 1px 3px rgba(0,0,0,0.08);text-align:center;">
                 ${item.imageUrl ? `<img src="${esc(item.imageUrl)}" alt="${esc(item.title)}" style="width:100%;aspect-ratio:16/9;object-fit:cover;border-radius:0.75rem;margin-bottom:1rem;" />` : ''}
-                <h3 style="font-size:1.25rem;font-weight:700;color:#1B2A6B;margin-bottom:0.5rem;">${esc(item.title)}</h3>
+                <h3 style="font-size:1.25rem;font-weight:700;color:#152232;margin-bottom:0.5rem;">${esc(item.title)}</h3>
                 <p style="color:#666;font-size:0.9rem;">${esc(item.description)}</p>
               </div>
             `).join('')}
@@ -90,7 +90,7 @@ function sectionToHtml(section: PageSection): string {
     return `
       <section style="padding:4rem 1rem;background:white;">
         <div style="max-width:72rem;margin:0 auto;">
-          ${(data.title as string) ? `<h2 style="font-size:2rem;font-weight:700;color:#1B2A6B;text-align:center;margin-bottom:2rem;">${esc(data.title)}</h2>` : ''}
+          ${(data.title as string) ? `<h2 style="font-size:2rem;font-weight:700;color:#152232;text-align:center;margin-bottom:2rem;">${esc(data.title)}</h2>` : ''}
           <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:1rem;">
             ${images.map(img => `<div style="border-radius:0.75rem;overflow:hidden;aspect-ratio:1;"><img src="${esc(img.url)}" alt="${esc(img.alt || '')}" style="width:100%;height:100%;object-fit:cover;" /></div>`).join('')}
           </div>
@@ -101,11 +101,11 @@ function sectionToHtml(section: PageSection): string {
   if (type === 'stats') {
     const items = (data.items as { label: string; value: string }[]) ?? []
     return `
-      <section style="padding:3rem 1rem;background:linear-gradient(135deg,#1B2A6B,#2a3d8f);color:white;">
+      <section style="padding:3rem 1rem;background:linear-gradient(135deg,#152232,#172A45);color:white;">
         <div style="max-width:72rem;margin:0 auto;display:grid;grid-template-columns:repeat(${items.length},1fr);gap:2rem;text-align:center;">
           ${items.map((item, i) => `
             <div>
-              <div style="font-size:3rem;font-weight:700;color:${i % 2 === 0 ? '#5BC8E8' : '#F7941D'};">${esc(item.value)}</div>
+              <div style="font-size:3rem;font-weight:700;color:${i % 2 === 0 ? '#8A9A7B' : '#B56244'};">${esc(item.value)}</div>
               <div style="font-size:0.9rem;opacity:0.8;text-transform:uppercase;letter-spacing:0.05em;">${esc(item.label)}</div>
             </div>
           `).join('')}
@@ -118,15 +118,15 @@ function sectionToHtml(section: PageSection): string {
     return `
       <section style="padding:4rem 1rem;background:white;">
         <div style="max-width:72rem;margin:0 auto;">
-          ${(data.title as string) ? `<h2 style="font-size:2rem;font-weight:700;color:#1B2A6B;text-align:center;margin-bottom:0.5rem;">${esc(data.title)}</h2>` : ''}
+          ${(data.title as string) ? `<h2 style="font-size:2rem;font-weight:700;color:#152232;text-align:center;margin-bottom:0.5rem;">${esc(data.title)}</h2>` : ''}
           ${(data.subtitle as string) ? `<p style="text-align:center;font-size:1.1rem;color:#666;margin-bottom:2.5rem;">${esc(data.subtitle)}</p>` : ''}
           <div style="display:grid;grid-template-columns:repeat(${Math.min(items.length, 4)},1fr);gap:1.5rem;">
             ${items.map(item => `
-              <a href="${esc(item.link || '#')}" style="display:block;background:#FAFAFA;border-radius:1rem;border:1px solid #eee;overflow:hidden;text-decoration:none;color:inherit;transition:box-shadow 0.2s;">
+              <a href="${esc(item.link || '#')}" style="display:block;background:#F4F0E8;border-radius:1rem;border:1px solid #eee;overflow:hidden;text-decoration:none;color:inherit;transition:box-shadow 0.2s;">
                 ${item.imageUrl ? `<div style="aspect-ratio:4/3;overflow:hidden;"><img src="${esc(item.imageUrl)}" alt="${esc(item.title)}" style="width:100%;height:100%;object-fit:cover;" /></div>` : ''}
                 <div style="padding:1.5rem;">
-                  ${item.comingSoon ? `<span style="background:#5BC8E8;color:#1B2A6B;padding:0.25rem 0.75rem;border-radius:9999px;font-size:0.75rem;font-weight:600;">Coming Soon</span>` : ''}
-                  <h3 style="font-size:1.25rem;font-weight:700;color:#1B2A6B;margin-bottom:0.5rem;">${esc(item.title)}</h3>
+                  ${item.comingSoon ? `<span style="background:#8A9A7B;color:#152232;padding:0.25rem 0.75rem;border-radius:9999px;font-size:0.75rem;font-weight:600;">Coming Soon</span>` : ''}
+                  <h3 style="font-size:1.25rem;font-weight:700;color:#152232;margin-bottom:0.5rem;">${esc(item.title)}</h3>
                   <p style="color:#666;font-size:0.9rem;">${esc(item.description)}</p>
                 </div>
               </a>
@@ -138,11 +138,11 @@ function sectionToHtml(section: PageSection): string {
 
   if (type === 'testimonial') {
     return `
-      <section style="padding:4rem 1rem;background:#FAFAFA;">
+      <section style="padding:4rem 1rem;background:#F4F0E8;">
         <div style="max-width:42rem;margin:0 auto;text-align:center;">
-          <div style="font-size:3rem;color:#5BC8E8;margin-bottom:1rem;">&ldquo;</div>
+          <div style="font-size:3rem;color:#8A9A7B;margin-bottom:1rem;">&ldquo;</div>
           <blockquote style="font-size:1.25rem;color:#333;font-style:italic;line-height:1.8;margin:0 0 1.5rem 0;">${esc(data.quote)}</blockquote>
-          <div style="font-weight:700;color:#1B2A6B;">${esc(data.author)}</div>
+          <div style="font-weight:700;color:#152232;">${esc(data.author)}</div>
           <div style="font-size:0.875rem;color:#666;">${esc(data.role)}${(data.company as string) ? `, ${esc(data.company)}` : ''}</div>
         </div>
       </section>`
@@ -154,9 +154,9 @@ function sectionToHtml(section: PageSection): string {
     const ytMatch = url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/)([^&\s]+)/)
     if (ytMatch) embedUrl = `https://www.youtube.com/embed/${ytMatch[1]}`
     return `
-      <section style="padding:4rem 1rem;background:#FAFAFA;">
+      <section style="padding:4rem 1rem;background:#F4F0E8;">
         <div style="max-width:56rem;margin:0 auto;">
-          ${(data.heading as string) ? `<h2 style="font-size:2rem;font-weight:700;color:#1B2A6B;text-align:center;margin-bottom:2rem;">${esc(data.heading)}</h2>` : ''}
+          ${(data.heading as string) ? `<h2 style="font-size:2rem;font-weight:700;color:#152232;text-align:center;margin-bottom:2rem;">${esc(data.heading)}</h2>` : ''}
           <div style="position:relative;padding-bottom:56.25%;height:0;border-radius:1rem;overflow:hidden;box-shadow:0 4px 20px rgba(0,0,0,0.1);">
             <iframe src="${esc(embedUrl)}" style="position:absolute;top:0;left:0;width:100%;height:100%;border:none;" allowfullscreen></iframe>
           </div>
@@ -183,11 +183,11 @@ function sectionToHtml(section: PageSection): string {
     return `
       <section style="padding:4rem 1rem;background:white;">
         <div style="max-width:48rem;margin:0 auto;">
-          ${(data.title as string) ? `<h2 style="font-size:2rem;font-weight:700;color:#1B2A6B;text-align:center;margin-bottom:2.5rem;">${esc(data.title)}</h2>` : ''}
+          ${(data.title as string) ? `<h2 style="font-size:2rem;font-weight:700;color:#152232;text-align:center;margin-bottom:2.5rem;">${esc(data.title)}</h2>` : ''}
           <div style="border-top:1px solid #e5e7eb;">
             ${items.map(item => `
               <div style="padding:1.25rem 0;border-bottom:1px solid #e5e7eb;">
-                <h3 style="font-size:1.1rem;font-weight:600;color:#1B2A6B;margin-bottom:0.5rem;">${esc(item.question)}</h3>
+                <h3 style="font-size:1.1rem;font-weight:600;color:#152232;margin-bottom:0.5rem;">${esc(item.question)}</h3>
                 <p style="color:#666;line-height:1.6;">${esc(item.answer)}</p>
               </div>
             `).join('')}
@@ -198,11 +198,11 @@ function sectionToHtml(section: PageSection): string {
 
   if (type === 'cta') {
     return `
-      <section style="padding:4rem 1rem;background:#1B2A6B;color:white;text-align:center;">
+      <section style="padding:4rem 1rem;background:#152232;color:white;text-align:center;">
         <div style="max-width:42rem;margin:0 auto;">
           ${(data.title as string) ? `<h2 style="font-size:2rem;font-weight:700;margin-bottom:1rem;color:white;">${esc(data.title)}</h2>` : ''}
           ${(data.description as string) ? `<p style="font-size:1.1rem;opacity:0.9;margin-bottom:2rem;">${esc(data.description)}</p>` : ''}
-          <a href="${esc(data.buttonLink || '/contact')}" style="display:inline-block;background:#F7941D;color:white;padding:0.875rem 2.5rem;border-radius:0.75rem;font-weight:600;text-decoration:none;">${esc(data.buttonText || 'Contact Us')}</a>
+          <a href="${esc(data.buttonLink || '/contact')}" style="display:inline-block;background:#B56244;color:white;padding:0.875rem 2.5rem;border-radius:0.75rem;font-weight:600;text-decoration:none;">${esc(data.buttonText || 'Contact Us')}</a>
         </div>
       </section>`
   }
@@ -217,16 +217,16 @@ function sectionToHtml(section: PageSection): string {
   if (type === 'form') {
     const formType = (data.formType as string) || 'contact'
     return `
-      <section style="padding:4rem 1rem;background:#FAFAFA;">
+      <section style="padding:4rem 1rem;background:#F4F0E8;">
         <div style="max-width:36rem;margin:0 auto;">
-          <h2 style="font-size:2rem;font-weight:700;color:#1B2A6B;text-align:center;margin-bottom:2rem;">${formType === 'agent' ? 'Agent Registration' : 'Get in Touch'}</h2>
+          <h2 style="font-size:2rem;font-weight:700;color:#152232;text-align:center;margin-bottom:2rem;">${formType === 'agent' ? 'Agent Registration' : 'Get in Touch'}</h2>
           <form style="display:flex;flex-direction:column;gap:1rem;">
             <input type="text" placeholder="Your name" style="padding:0.75rem 1rem;border:1px solid #d1d5db;border-radius:0.75rem;font-size:1rem;" />
             <input type="email" placeholder="Email address" style="padding:0.75rem 1rem;border:1px solid #d1d5db;border-radius:0.75rem;font-size:1rem;" />
             ${formType === 'agent' ? '<input type="text" placeholder="Company name" style="padding:0.75rem 1rem;border:1px solid #d1d5db;border-radius:0.75rem;font-size:1rem;" />' : ''}
             <input type="tel" placeholder="Phone (optional)" style="padding:0.75rem 1rem;border:1px solid #d1d5db;border-radius:0.75rem;font-size:1rem;" />
             <textarea placeholder="Your message" rows="5" style="padding:0.75rem 1rem;border:1px solid #d1d5db;border-radius:0.75rem;font-size:1rem;resize:vertical;"></textarea>
-            <button type="submit" style="background:#F7941D;color:white;padding:0.875rem;border-radius:0.75rem;font-weight:600;font-size:1rem;border:none;cursor:pointer;">Send Message</button>
+            <button type="submit" style="background:#B56244;color:white;padding:0.875rem;border-radius:0.75rem;font-weight:600;font-size:1rem;border:none;cursor:pointer;">Send Message</button>
           </form>
         </div>
       </section>`

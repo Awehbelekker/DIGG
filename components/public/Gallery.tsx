@@ -15,7 +15,7 @@ export default function Gallery({ title, images }: GalleryProps) {
     <section className="bg-white py-16 lg:py-20">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {title && (
-          <h2 className="text-3xl font-bold text-[#1B2A6B] mb-10 text-center" style={{ fontFamily: 'var(--font-heading)' }}>
+          <h2 className="text-3xl font-bold text-[var(--color-ink)] mb-10 text-center" style={{ fontFamily: 'var(--font-heading)' }}>
             {title}
           </h2>
         )}

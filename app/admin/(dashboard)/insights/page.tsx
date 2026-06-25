@@ -17,7 +17,7 @@ export default async function AdminInsightsPage() {
         <AdminPageHeading subtitle="Articles and updates for your site.">Insights</AdminPageHeading>
         <AdminSafeLink
           href="/admin/insights/new"
-          className="bg-[#F7941D] text-white px-6 py-2 rounded font-semibold hover:bg-[#e6850a] transition-colors"
+          className="bg-[#B56244] text-white px-6 py-2 rounded font-semibold hover:bg-[#9A4F35] transition-colors"
         >
           New Insight
         </AdminSafeLink>
@@ -63,7 +63,7 @@ export default async function AdminInsightsPage() {
           <p className="text-gray-500 mb-4">No insights yet</p>
           <AdminSafeLink
             href="/admin/insights/new"
-            className="inline-block bg-[#F7941D] text-white px-6 py-2 rounded font-semibold hover:bg-[#e6850a] transition-colors"
+            className="inline-block bg-[#B56244] text-white px-6 py-2 rounded font-semibold hover:bg-[#9A4F35] transition-colors"
           >
             Create your first insight
           </AdminSafeLink>

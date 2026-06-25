@@ -1,6 +1,9 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
+  async redirects() {
+    return [{ source: '/work', destination: '/insights', permanent: true }]
+  },
   async rewrites() {
     return [
       // Serve favicon for common alternate icon requests to avoid 404s

@@ -49,6 +49,7 @@ function MenuIcon({ open }: { open: boolean }) {
 
 const DEFAULT_LINKS: NavLink[] = [
   { href: '/', label: 'Home' },
+  { href: '/insights', label: 'Work' },
   { href: '/about', label: 'About' },
   { href: '/contact', label: 'Contact' },
 ]
@@ -66,7 +67,7 @@ export default function Navbar({ logoUrl = '', logoSize = 'medium', logoPosition
   const logoEl = (
     <Link
       href="/"
-      className="flex items-center focus:outline-none focus-visible:ring-2 focus-visible:ring-[#F7941D] focus-visible:ring-offset-2 shrink-0"
+      className="flex items-center focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-terracotta)] focus-visible:ring-offset-2 shrink-0"
       aria-label="DIGG Home"
     >
       {isExternalLogo ? (
@@ -90,7 +91,7 @@ export default function Navbar({ logoUrl = '', logoSize = 'medium', logoPosition
   )
 
   return (
-    <nav className="sticky top-0 z-50 bg-[#1B2A6B]/80 backdrop-blur-md border-b border-white/10 shadow-sm">
+    <nav className="sticky top-0 z-50 bg-[var(--color-ink)]/80 backdrop-blur-md border-b border-white/10 shadow-sm">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className={`flex items-center h-16 sm:h-20 lg:h-24 ${logoPosition === 'center' ? 'justify-between' : ''}`}>
           {logoPosition === 'left' && logoEl}
@@ -102,7 +103,7 @@ export default function Navbar({ logoUrl = '', logoSize = 'medium', logoPosition
               <li key={href}>
                 <Link
                   href={href}
-                  className="block py-2 px-3 lg:px-4 rounded-lg text-white hover:text-[#F7941D] hover:bg-white/10 font-medium text-sm lg:text-base transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-[#F7941D] focus-visible:ring-offset-2"
+                  className="block py-2 px-3 lg:px-4 rounded-lg text-white hover:text-[var(--color-terracotta)] hover:bg-white/10 font-medium text-sm lg:text-base transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-terracotta)] focus-visible:ring-offset-2"
                 >
                   {label}
                 </Link>
@@ -112,7 +113,7 @@ export default function Navbar({ logoUrl = '', logoSize = 'medium', logoPosition
               <li>
                 <a
                   href={phoneLink}
-                  className="block py-2 px-3 lg:px-4 rounded-lg text-white hover:text-[#F7941D] hover:bg-white/10 font-medium text-sm lg:text-base transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-[#F7941D] focus-visible:ring-offset-2 whitespace-nowrap"
+                  className="block py-2 px-3 lg:px-4 rounded-lg text-white hover:text-[var(--color-terracotta)] hover:bg-white/10 font-medium text-sm lg:text-base transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-terracotta)] focus-visible:ring-offset-2 whitespace-nowrap"
                 >
                   Call
                 </a>
@@ -124,7 +125,7 @@ export default function Navbar({ logoUrl = '', logoSize = 'medium', logoPosition
           {/* Mobile menu button */}
           <button
             type="button"
-            className="md:hidden p-3 -mr-2 min-h-[44px] min-w-[44px] flex items-center justify-center text-white rounded-xl hover:bg-white/10 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#F7941D] focus-visible:ring-offset-2 transition-colors"
+            className="md:hidden p-3 -mr-2 min-h-[44px] min-w-[44px] flex items-center justify-center text-white rounded-xl hover:bg-white/10 focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-terracotta)] focus-visible:ring-offset-2 transition-colors"
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
             aria-label={mobileMenuOpen ? 'Close menu' : 'Open menu'}
             aria-expanded={mobileMenuOpen ? 'true' : 'false'}
@@ -142,7 +143,7 @@ export default function Navbar({ logoUrl = '', logoSize = 'medium', logoPosition
           {showPhone && phoneLink && (
             <a
               href={phoneLink}
-              className="flex items-center min-h-[48px] py-3 px-4 mx-2 mt-2 rounded-xl bg-[#F7941D] text-white font-semibold hover:bg-[#e6850a] transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-inset"
+              className="flex items-center min-h-[48px] py-3 px-4 mx-2 mt-2 rounded-xl bg-[var(--color-terracotta)] text-white font-semibold hover:bg-[var(--color-terra-deep)] transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-inset"
               onClick={() => setMobileMenuOpen(false)}
             >
               Call {phoneNumber.trim()}
@@ -153,7 +154,7 @@ export default function Navbar({ logoUrl = '', logoSize = 'medium', logoPosition
               <li key={href}>
                 <Link
                   href={href}
-                  className="flex items-center min-h-[44px] py-3 px-4 rounded-lg text-white hover:text-[#F7941D] hover:bg-white/10 font-medium transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-[#F7941D] focus-visible:ring-inset"
+                  className="flex items-center min-h-[44px] py-3 px-4 rounded-lg text-white hover:text-[var(--color-terracotta)] hover:bg-white/10 font-medium transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-terracotta)] focus-visible:ring-inset"
                   onClick={() => setMobileMenuOpen(false)}
                 >
                   {label}

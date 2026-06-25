@@ -20,11 +20,11 @@ export const SECTION_TYPES: { type: SectionType; label: string }[] = [
 
 export const DEFAULT_SECTION_DATA: Record<SectionType, Record<string, unknown>> = {
   hero: {
-    title: 'Your Property Should Be Working Harder.',
-    subtitle: 'Great design should generate real returns. We help property owners unlock the potential inside their buildings and land.',
-    primaryCTAtext: 'See What We Do',
-    primaryCTAhref: '#products',
-    secondaryCTAtext: 'Talk to Our Team',
+    title: 'Design is an investment decision.',
+    subtitle: "DIGG is a property development and architecture practice in Cape Town. We bring an investor's mindset to every project — clarity, value, and follow-through.",
+    primaryCTAtext: 'See our work',
+    primaryCTAhref: '/insights',
+    secondaryCTAtext: '',
     secondaryCTAhref: '/contact',
     backgroundImageUrl: 'https://images.unsplash.com/photo-1486325212027-8081e485255e?w=1600&q=80',
   },
@@ -102,13 +102,13 @@ export const DEFAULT_SECTION_DATA: Record<SectionType, Record<string, unknown>> 
   faq: {
     title: 'Frequently asked questions',
     items: [
-      { question: 'What services do you offer?', answer: 'We offer a range of architecture and property development services.' },
+      { question: 'What services do you offer?', answer: 'Development advisory, architectural design, investment property solutions, and principal agent work — across Cape Town and surrounds.' },
       { question: 'How do I get started?', answer: 'Contact us through the form on our contact page and we\'ll schedule a consultation.' },
     ],
   },
   cta: {
-    title: 'Ready to get started?',
-    description: 'Talk to our team about your project.',
+    title: "Let's talk about your project.",
+    description: 'When you are ready — a short message is enough.',
     buttonText: 'Contact us',
     buttonLink: '/contact',
   },
@@ -131,3 +131,5 @@ export function createEmptySection(type: SectionType): PageSection {
 export function getRecommendedStartingSections(): PageSection[] {
   return []
 }
+
+export { HOME_PAGE_SECTIONS } from './home-content'

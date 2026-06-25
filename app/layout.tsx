@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Montserrat, Lato } from "next/font/google";
+import { Poppins, Inter } from "next/font/google";
 import "./globals.css";
 import Navbar from "@/components/public/Navbar";
 import Footer from "@/components/public/Footer";
@@ -7,20 +7,22 @@ import WhatsAppButton from "@/components/public/WhatsAppButton";
 import FontLoader from "@/components/FontLoader";
 import Analytics from "@/components/Analytics";
 import SuppressPlayAbortError from "@/components/SuppressPlayAbortError";
-import { getSiteSettings } from "@/lib/site-settings";
+import { getSiteSettings, getBrandColorsFromSettings } from "@/lib/site-settings";
+import { brandColorsToCssProperties } from "@/lib/brand-colors";
+import BrandPreviewBanner from "@/components/BrandPreviewBanner";
 import { googleFontsUrl, DEFAULT_HEADING_FONT, DEFAULT_BODY_FONT } from "@/lib/google-fonts";
 import { getNavLinks } from "@/lib/get-nav-links";
 
-const montserrat = Montserrat({
+const poppins = Poppins({
   subsets: ["latin"],
-  weight: ["400", "700"],
+  weight: ["600", "700", "800"],
   variable: "--font-heading",
   display: "swap",
 });
 
-const lato = Lato({
+const inter = Inter({
   subsets: ["latin"],
-  weight: ["400", "700"],
+  weight: ["400", "500", "600"],
   variable: "--font-body",
   display: "swap",
 });
@@ -29,7 +31,7 @@ export const viewport = {
   width: 'device-width',
   initialScale: 1,
   maximumScale: 5,
-  themeColor: '#1B2A6B',
+  themeColor: '#152232', // overridden at runtime via brand settings when deployed
 };
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -37,8 +39,8 @@ export async function generateMetadata(): Promise<Metadata> {
   const favicon = settings.favicon_url && String(settings.favicon_url).trim();
   const ogImage = settings.og_image_url && String(settings.og_image_url).trim();
   return {
-    title: "DIGG Architecture Cape Town | Property That Pays",
-    description: "Cape Town architecture team specialising in income-generating design — Airbnb units, secondary dwellings, rezoning and property investment.",
+    title: "DIGG | Property Development & Architecture | Cape Town",
+    description: "A Cape Town property development and architecture practice. Development advisory, architectural design, investment property solutions, and principal agent services.",
     icons: {
       icon: favicon || '/favicon.ico',
       apple: '/favicon.ico',
@@ -73,10 +75,16 @@ export default async function RootLayout({
   const navbarLogoPosition = (settings.navbar_logo_position as 'left' | 'center') || 'left';
   const footerLogoPosition = (settings.footer_logo_position as 'left' | 'center') || 'left';
   const phone = (settings.phone && String(settings.phone).trim()) || '';
+  const brandCss = brandColorsToCssProperties(getBrandColorsFromSettings(settings));
+  const htmlStyle = {
+    ...brandCss,
+    ...(fontStyle ?? {}),
+  } as React.CSSProperties & Record<string, string>;
 
   return (
-    <html lang="en" className={`${montserrat.variable} ${lato.variable}`} style={fontStyle as React.CSSProperties & Record<string, string>}>
-      <body className="antialiased" style={{ fontFamily: 'var(--font-body)' }}>
+    <html lang="en" className={`${poppins.variable} ${inter.variable}`} style={htmlStyle}>
+      <body className="antialiased bg-[var(--color-bone)] text-[var(--color-ink)]" style={{ fontFamily: 'var(--font-body)' }}>
+        <BrandPreviewBanner />
         {fontFamilies.length > 0 && (
           <FontLoader href={googleFontsUrl(fontFamilies)} />
         )}

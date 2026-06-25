@@ -1,35 +1,40 @@
 @import "tailwindcss";
 
-/* Lazy Fox – add your font files to public/fonts/ (see public/fonts/README.txt) */
-@font-face {
-  font-family: 'Lazy Fox';
-  src: url('/fonts/LazyFox.woff2') format('woff2'),
-       url('/fonts/LazyFox.woff') format('woff');
-  font-weight: normal;
-  font-style: normal;
-  font-display: swap;
-}
-
 :root {
-  --color-orange: #F7941D;
-  --color-navy: #1B2A6B;
-  --color-light-blue: #5BC8E8;
-  --color-white: #FEFEFE;
-  --color-off-white: #FAFAFA;
-  --color-text: #333333;
-  --color-text-light: #666666;
-  /* --font-heading (Montserrat) and --font-body (Lato) set by layout */
+  --color-bone: #F4F0E8;
+  --color-greige: #C9C0B2;
+  --color-ink: #152232;
+  --color-navy: #172A45;
+  --color-terracotta: #B56244;
+  --color-terra-deep: #9A4F35;
+  --color-sage: #8A9A7B;
+  --color-coral: #E8624D;
+  --color-white: #ffffff;
+  --color-muted: #6B6B6B;
+  /* Legacy aliases used in components */
+  --color-orange: var(--color-terracotta);
+  --color-navy-legacy: var(--color-ink);
+  --color-light-blue: var(--color-sage);
+  --color-off-white: var(--color-bone);
+  --color-text: var(--color-ink);
+  --color-text-light: var(--color-muted);
   --font-sans: var(--font-body);
 }
 
 @theme inline {
-  --color-orange: #F7941D;
-  --color-navy: #1B2A6B;
-  --color-light-blue: #5BC8E8;
-  --color-white: #FEFEFE;
-  --color-off-white: #FAFAFA;
-  --color-text: #333333;
-  --color-text-light: #666666;
+  --color-bone: #F4F0E8;
+  --color-greige: #C9C0B2;
+  --color-ink: #152232;
+  --color-navy: #172A45;
+  --color-terracotta: #B56244;
+  --color-terra-deep: #9A4F35;
+  --color-sage: #8A9A7B;
+  --color-coral: #E8624D;
+  --color-orange: #B56244;
+  --color-light-blue: #8A9A7B;
+  --color-off-white: #F4F0E8;
+  --color-text: #152232;
+  --color-text-light: #6B6B6B;
   --font-sans: var(--font-body);
 }
 
@@ -62,7 +67,7 @@ body {
   overflow-x: hidden;
 }
 
-/* Headings: Montserrat Bold (main) and Montserrat Normal (subheadings) */
+/* Headings: Poppins (display) */
 h1 {
   font-family: var(--font-heading);
   font-weight: 700;
@@ -70,15 +75,15 @@ h1 {
 }
 h2, h3, h4, h5, h6 {
   font-family: var(--font-heading);
-  font-weight: 400;
+  font-weight: 600;
   letter-spacing: -0.02em;
 }
 
-/* Body text: Lato */
+/* Body text: Inter */
 
 /* Focus ring for accessibility (keyboard/screen readers) */
 :focus-visible {
-  outline: 2px solid var(--color-orange);
+  outline: 2px solid var(--color-coral);
   outline-offset: 2px;
 }
 
@@ -108,10 +113,10 @@ h2, h3, h4, h5, h6 {
   transition: box-shadow 0.15s ease, background-color 0.15s ease;
 }
 .inline-editable:hover {
-  box-shadow: 0 0 0 2px rgba(91, 200, 232, 0.5);
+  box-shadow: 0 0 0 2px rgba(138, 154, 123, 0.5);
 }
 .inline-editable--active {
-  box-shadow: 0 0 0 2px #F7941D !important;
+  box-shadow: 0 0 0 2px #B56244 !important;
   background-color: rgba(255,255,255,0.08);
 }
 .inline-editable--empty::after {

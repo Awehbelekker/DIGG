@@ -28,7 +28,7 @@ export default async function PreviewInsightPage({ params }: Props) {
         Preview — only you see this. This insight is {insight.published ? 'published' : 'unpublished'}.
       </div>
       <article className="max-w-3xl mx-auto px-4 py-12">
-        <h1 className="text-3xl font-bold text-[#1B2A6B] mb-4" style={{ fontFamily: 'var(--font-heading)' }}>
+        <h1 className="text-3xl font-bold text-[#152232] mb-4" style={{ fontFamily: 'var(--font-heading)' }}>
           {insight.title as string}
         </h1>
         <div className="text-gray-700 whitespace-pre-wrap font-[var(--font-body)]">

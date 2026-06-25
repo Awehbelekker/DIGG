@@ -16,7 +16,7 @@ export default function TwoColumn({ heading, body, imageUrl, imageAlt, reversed 
         <div className={`grid grid-cols-1 lg:grid-cols-2 gap-12 items-center ${reversed ? 'lg:[direction:rtl]' : ''}`}>
           <div className={reversed ? 'lg:[direction:ltr]' : ''}>
             {heading && (
-              <h2 className="text-3xl font-bold text-[#1B2A6B] mb-6" style={{ fontFamily: 'var(--font-heading)' }}>
+              <h2 className="text-3xl font-bold text-[var(--color-ink)] mb-6" style={{ fontFamily: 'var(--font-heading)' }}>
                 {heading}
               </h2>
             )}

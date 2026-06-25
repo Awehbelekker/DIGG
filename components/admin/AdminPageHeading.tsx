@@ -19,7 +19,7 @@ export default function AdminPageHeading({
   return (
     <header className={className}>
       <Tag
-        className={`font-bold text-[#1B2A6B] tracking-tight ${sizeClass}`}
+        className={`font-bold text-[#152232] tracking-tight ${sizeClass}`}
         style={{ fontFamily: 'var(--font-heading)' }}
       >
         {children}

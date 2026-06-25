@@ -80,7 +80,7 @@ export default function DropUpload({
       <div className="space-y-2">
         <div
           className={`relative flex items-center gap-3 border-2 border-dashed rounded-xl p-3 transition-colors cursor-pointer ${
-            dragging ? 'border-[#F7941D] bg-orange-50' : 'border-gray-200 hover:border-gray-300'
+            dragging ? 'border-[#B56244] bg-orange-50' : 'border-gray-200 hover:border-gray-300'
           }`}
           onDragOver={(e) => { e.preventDefault(); setDragging(true) }}
           onDragLeave={() => setDragging(false)}
@@ -118,7 +118,7 @@ export default function DropUpload({
           value={value}
           onChange={(e) => onChange(e.target.value)}
           placeholder="or paste URL"
-          className="w-full px-3 py-1.5 border border-gray-200 rounded-lg text-xs text-gray-500 focus:ring-1 focus:ring-[#F7941D] focus:border-transparent"
+          className="w-full px-3 py-1.5 border border-gray-200 rounded-lg text-xs text-gray-500 focus:ring-1 focus:ring-[#B56244] focus:border-transparent"
         />
       </div>
     )
@@ -128,7 +128,7 @@ export default function DropUpload({
     <div className="space-y-2">
       <div
         className={`relative border-2 border-dashed rounded-xl transition-colors cursor-pointer overflow-hidden ${
-          dragging ? 'border-[#F7941D] bg-orange-50' : 'border-gray-200 hover:border-gray-300'
+          dragging ? 'border-[#B56244] bg-orange-50' : 'border-gray-200 hover:border-gray-300'
         }`}
         onDragOver={(e) => { e.preventDefault(); setDragging(true) }}
         onDragLeave={() => setDragging(false)}
@@ -170,7 +170,7 @@ export default function DropUpload({
         value={value}
         onChange={(e) => onChange(e.target.value)}
         placeholder="or paste image URL"
-        className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm text-gray-500 focus:ring-2 focus:ring-[#F7941D] focus:border-transparent"
+        className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm text-gray-500 focus:ring-2 focus:ring-[#B56244] focus:border-transparent"
       />
     </div>
   )

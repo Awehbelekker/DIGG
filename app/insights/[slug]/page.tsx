@@ -15,7 +15,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     .eq('published', true)
     .single()
   if (!data) return { title: 'Not found' }
-  return { title: `${data.title as string} | DIGG Insights` }
+  return { title: `${data.title as string} | DIGG Work` }
 }
 
 export default async function InsightPage({ params }: Props) {
@@ -31,18 +31,22 @@ export default async function InsightPage({ params }: Props) {
   if (error || !insight) notFound()
 
   return (
-    <div className="min-h-screen">
-      <article className="max-w-3xl mx-auto px-4 py-16">
-        <Link href="/insights" className="text-sm text-[#F7941D] hover:underline mb-6 inline-block">
-          ← Insights
+    <div className="min-h-screen bg-[var(--color-bone)]">
+      <article className="max-w-3xl mx-auto px-4 py-16 sm:py-20">
+        <Link href="/insights" className="text-sm text-[var(--color-terracotta)] hover:text-[var(--color-terra-deep)] font-medium mb-6 inline-block">
+          ← Work
         </Link>
-        <h1 className="text-3xl font-bold text-[#1B2A6B] mb-4" style={{ fontFamily: 'var(--font-heading)' }}>
+        <h1 className="text-3xl sm:text-4xl font-bold text-[var(--color-ink)] mb-4" style={{ fontFamily: 'var(--font-heading)' }}>
           {insight.title as string}
         </h1>
-        <time className="text-gray-500 text-sm block mb-8" dateTime={insight.updated_at as string}>
-          {new Date(insight.updated_at as string).toLocaleDateString()}
+        <time className="text-[var(--color-muted)] text-sm block mb-8" dateTime={insight.updated_at as string}>
+          {new Date(insight.updated_at as string).toLocaleDateString('en-ZA', {
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric',
+          })}
         </time>
-        <div className="text-gray-700 whitespace-pre-wrap font-[var(--font-body)] leading-relaxed">
+        <div className="text-[var(--color-ink)]/90 whitespace-pre-wrap leading-relaxed prose-digg">
           {(insight.body as string) || ''}
         </div>
       </article>

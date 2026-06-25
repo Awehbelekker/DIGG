@@ -13,7 +13,7 @@ export default function FAQ({ title, items }: FAQProps) {
     <RevealSection className="bg-white py-16 lg:py-20">
       <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
         {title && (
-          <h2 className="text-3xl font-bold text-[#1B2A6B] mb-10 text-center" style={{ fontFamily: 'var(--font-heading)' }}>
+          <h2 className="text-3xl font-bold text-[var(--color-ink)] mb-10 text-center" style={{ fontFamily: 'var(--font-heading)' }}>
             {title}
           </h2>
         )}
@@ -27,7 +27,7 @@ export default function FAQ({ title, items }: FAQProps) {
                   onClick={() => setOpenIndex(isOpen ? null : i)}
                   className="w-full flex items-center justify-between px-6 py-4 text-left hover:bg-gray-50 transition-colors"
                 >
-                  <span className="font-semibold text-[#1B2A6B] pr-4">{item.question}</span>
+                  <span className="font-semibold text-[var(--color-ink)] pr-4">{item.question}</span>
                   <svg
                     className={`w-5 h-5 text-gray-400 flex-shrink-0 transition-transform duration-200 ${isOpen ? 'rotate-180' : ''}`}
                     fill="none"

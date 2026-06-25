@@ -103,7 +103,7 @@ export default function ImageUpload({ onUpload }: ImageUploadProps) {
 
   return (
     <div className="bg-white rounded-lg shadow-md p-6">
-      <h2 className="text-xl font-bold text-[#1B2A6B] mb-4">Upload Image</h2>
+      <h2 className="text-xl font-bold text-[#152232] mb-4">Upload Image</h2>
       <div className="flex gap-6">
         {/* Left: thumbnail preview */}
         <div className="flex-shrink-0 w-40 h-40 rounded-xl border-2 border-dashed border-gray-200 bg-gray-50 flex items-center justify-center overflow-hidden relative">
@@ -136,7 +136,7 @@ export default function ImageUpload({ onUpload }: ImageUploadProps) {
             <select
               value={folder}
               onChange={(e) => setFolder(e.target.value as 'hero' | 'logo' | 'team' | 'portfolio')}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-[#F7941D] focus:border-transparent"
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-[#B56244] focus:border-transparent"
             >
               <option value="hero">Hero Images</option>
               <option value="logo">Logos</option>
@@ -152,7 +152,7 @@ export default function ImageUpload({ onUpload }: ImageUploadProps) {
               value={altText}
               onChange={(e) => setAltText(e.target.value)}
               placeholder="Describe the image"
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-[#F7941D] focus:border-transparent"
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-[#B56244] focus:border-transparent"
             />
           </div>
 
@@ -164,7 +164,7 @@ export default function ImageUpload({ onUpload }: ImageUploadProps) {
               accept="image/*"
               onChange={handleFileSelect}
               disabled={uploading}
-              className="w-full text-sm file:mr-3 file:py-2 file:px-4 file:rounded-lg file:border-0 file:bg-[#1B2A6B] file:text-white file:font-medium file:cursor-pointer hover:file:bg-[#142050] disabled:opacity-50"
+              className="w-full text-sm file:mr-3 file:py-2 file:px-4 file:rounded-lg file:border-0 file:bg-[#152232] file:text-white file:font-medium file:cursor-pointer hover:file:bg-[#142050] disabled:opacity-50"
             />
             <p className="mt-1 text-xs text-gray-400">Max 10 MB &middot; JPG, PNG, WebP</p>
           </div>
@@ -173,7 +173,7 @@ export default function ImageUpload({ onUpload }: ImageUploadProps) {
             type="button"
             onClick={handleUpload}
             disabled={uploading || !previewUrl}
-            className="w-full px-4 py-2.5 bg-[#F7941D] text-white rounded-lg font-semibold text-sm hover:bg-[#e6850a] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            className="w-full px-4 py-2.5 bg-[#B56244] text-white rounded-lg font-semibold text-sm hover:bg-[#9A4F35] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {uploading ? 'Uploading...' : 'Upload Image'}
           </button>

@@ -1,12 +1,13 @@
 /**
- * Writes a minimal 16x16 ICO (DIGG blue #1B2A6B) to public/favicon.ico.
+ * Writes a minimal 16x16 ICO (DIGG blue #152232) to public/favicon.ico.
  * Run once: node scripts/generate-favicon.js
  */
 const fs = require('fs');
 const path = require('path');
 
-// DIGG brand blue
-const B = 0x6B, G = 0x2A, R = 0x1B; // little-endian order in BMP
+// DIGG brand: terracotta field, coral signature dot
+const TERRA_R = 0x44, TERRA_G = 0x62, TERRA_B = 0xB5;
+const CORAL_R = 0x4D, CORAL_G = 0x62, CORAL_B = 0xE8;
 const W = 16, H = 16;
 const bmpHeaderLen = 40;
 const imgSize = W * H * 4;
@@ -34,10 +35,18 @@ bmp.writeUInt16LE(32, o); o += 2;
 bmp.writeUInt32LE(0, o); o += 4;
 bmp.writeUInt32LE(imgSize, o); o += 4;
 for (let i = 0; i < 4; i++) bmp.writeUInt32LE(0, o); o += 16;
-// Pixel data (bottom-up, BGRA)
+// Pixel data (bottom-up, BGRA) — terracotta background
 for (let y = H - 1; y >= 0; y--) {
   for (let x = 0; x < W; x++) {
-    bmp[o++] = B; bmp[o++] = G; bmp[o++] = R; bmp[o++] = 255;
+    bmp[o++] = TERRA_B; bmp[o++] = TERRA_G; bmp[o++] = TERRA_R; bmp[o++] = 255;
+  }
+}
+// Coral signature dot (bottom-right area)
+for (let y = 3; y <= 6; y++) {
+  for (let x = 10; x <= 13; x++) {
+    const row = (H - 1 - y) * W + x;
+    const px = bmpHeaderLen + row * 4;
+    bmp[px] = CORAL_B; bmp[px + 1] = CORAL_G; bmp[px + 2] = CORAL_R; bmp[px + 3] = 255;
   }
 }
 // AND mask (all 0 = no transparency)

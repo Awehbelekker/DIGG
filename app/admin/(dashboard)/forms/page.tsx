@@ -44,7 +44,7 @@ export default async function AdminFormsPage({
         <div className="bg-white rounded-lg shadow-md p-12 text-center mt-4">
           <p className="text-gray-500">No form submissions in this view</p>
           {filter !== 'all' && (
-            <AdminSafeLink href="/admin/forms" className="mt-2 inline-block text-[#F7941D] hover:underline text-sm">
+            <AdminSafeLink href="/admin/forms" className="mt-2 inline-block text-[#B56244] hover:underline text-sm">
               View all
             </AdminSafeLink>
           )}

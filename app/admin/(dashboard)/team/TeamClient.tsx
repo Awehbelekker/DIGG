@@ -64,14 +64,14 @@ export default function TeamClient({
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               placeholder="colleague@example.com"
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#F7941D] focus:border-transparent"
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#B56244] focus:border-transparent"
               required
             />
           </label>
           <button
             type="submit"
             disabled={loading}
-            className="px-4 py-2 bg-[#F7941D] text-white rounded-lg font-medium hover:bg-[#e6850a] disabled:opacity-50"
+            className="px-4 py-2 bg-[#B56244] text-white rounded-lg font-medium hover:bg-[#9A4F35] disabled:opacity-50"
           >
             {loading ? 'Sending…' : 'Send invite'}
           </button>

@@ -8,8 +8,7 @@ export default function ContactForm() {
     name: '',
     phone: '',
     email: '',
-    type: '',
-    message: ''
+    message: '',
   })
   const [loading, setLoading] = useState(false)
   const [submitted, setSubmitted] = useState(false)
@@ -32,21 +31,19 @@ export default function ContactForm() {
 
     try {
       const supabase = createClient()
-      
-      const { error } = await supabase
-        .from('form_submissions')
-        .insert({
-          form_type: 'contact',
-          data: formData
-        })
+
+      const { error } = await supabase.from('form_submissions').insert({
+        form_type: 'contact',
+        data: formData,
+      })
 
       if (error) throw error
 
       setSubmitted(true)
-      setFormData({ name: '', phone: '', email: '', type: '', message: '' })
+      setFormData({ name: '', phone: '', email: '', message: '' })
     } catch (error) {
       console.error('Error submitting form:', error)
-      setSubmitError('There was an error submitting your form. Please try again or contact us directly.')
+      setSubmitError('Something went wrong. Email us at judy@digg-ct.co.za or call 082 707 7080.')
     } finally {
       setLoading(false)
     }
@@ -54,20 +51,24 @@ export default function ContactForm() {
 
   if (submitted) {
     return (
-      <div className="max-w-2xl mx-auto bg-green-50 border border-green-200 rounded-2xl p-8 text-center">
-        <p className="text-green-800 font-semibold text-lg">Thank you for your message! We'll get back to you soon.</p>
+      <div className="max-w-2xl mx-auto bg-[var(--color-bone)] border border-[var(--color-greige)] rounded-2xl p-8 text-center">
+        <p className="text-[var(--color-ink)] font-semibold text-lg">Message sent. We&apos;ll come back to you within a day or two.</p>
       </div>
     )
   }
 
-  const inputClass = "w-full px-4 py-3 text-base border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#F7941D] focus:border-transparent focus:outline-none transition-shadow"
+  const inputClass =
+    'w-full px-4 py-3 text-base border border-[var(--color-greige)] rounded-xl bg-white focus:ring-2 focus:ring-[var(--color-coral)] focus:border-transparent focus:outline-none transition-shadow'
 
   return (
-    <form onSubmit={handleSubmit} className="max-w-2xl mx-auto bg-white p-6 sm:p-8 lg:p-10 rounded-2xl shadow-sm border border-gray-100">
-      <h2 className="text-2xl font-bold text-[#1B2A6B] text-center mb-8 tracking-tight">Get in Touch</h2>
-      
+    <form onSubmit={handleSubmit} className="max-w-2xl mx-auto bg-white p-6 sm:p-8 lg:p-10 rounded-2xl shadow-sm border border-[var(--color-greige)]/60">
+      <h2 className="text-2xl font-bold text-[var(--color-ink)] text-center mb-2 tracking-tight">Let&apos;s talk about your project</h2>
+      <p className="text-center text-[var(--color-muted)] text-sm mb-8">
+        A short note is enough. We&apos;ll come back to you within a day or two.
+      </p>
+
       <div className="mb-6">
-        <label htmlFor="name" className="block text-sm font-medium text-[#1B2A6B] mb-2">
+        <label htmlFor="name" className="block text-sm font-medium text-[var(--color-ink)] mb-2">
           Your name *
         </label>
         <input
@@ -81,22 +82,8 @@ export default function ContactForm() {
       </div>
 
       <div className="mb-6">
-        <label htmlFor="phone" className="block text-sm font-medium text-[#1B2A6B] mb-2">
-          Your phone number *
-        </label>
-        <input
-          type="tel"
-          id="phone"
-          required
-          value={formData.phone}
-          onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-          className={inputClass}
-        />
-      </div>
-
-      <div className="mb-6">
-        <label htmlFor="email" className="block text-sm font-medium text-[#1B2A6B] mb-2">
-          Your email address *
+        <label htmlFor="email" className="block text-sm font-medium text-[var(--color-ink)] mb-2">
+          Your email *
         </label>
         <input
           type="email"
@@ -120,33 +107,29 @@ export default function ContactForm() {
       </div>
 
       <div className="mb-6">
-        <label htmlFor="type" className="block text-sm font-medium text-[#1B2A6B] mb-2">
-          I am a... *
+        <label htmlFor="phone" className="block text-sm font-medium text-[var(--color-ink)] mb-2">
+          Phone <span className="text-[var(--color-muted)] font-normal">(optional)</span>
         </label>
-        <select
-          id="type"
-          required
-          value={formData.type}
-          onChange={(e) => setFormData({ ...formData, type: e.target.value })}
+        <input
+          type="tel"
+          id="phone"
+          value={formData.phone}
+          onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
           className={inputClass}
-        >
-          <option value="">Please select</option>
-          <option value="property-owner">Property owner</option>
-          <option value="estate-agent">Estate agent</option>
-          <option value="investor-developer">Investor or developer</option>
-          <option value="other">Other</option>
-        </select>
+        />
       </div>
 
       <div className="mb-8">
-        <label htmlFor="message" className="block text-sm font-medium text-[#1B2A6B] mb-2">
-          Tell us about your property or project
+        <label htmlFor="message" className="block text-sm font-medium text-[var(--color-ink)] mb-2">
+          About your project *
         </label>
         <textarea
           id="message"
           rows={5}
+          required
           value={formData.message}
           onChange={(e) => setFormData({ ...formData, message: e.target.value })}
+          placeholder="A few lines on what you're working on is plenty."
           className={inputClass}
         />
       </div>
@@ -160,9 +143,9 @@ export default function ContactForm() {
       <button
         type="submit"
         disabled={loading}
-        className="w-full bg-[#F7941D] text-white px-8 py-3.5 rounded-xl font-semibold hover:bg-[#e6850a] hover:shadow-md transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed focus:outline-none focus-visible:ring-2 focus-visible:ring-[#F7941D] focus-visible:ring-offset-2"
+        className="w-full bg-[var(--color-terracotta)] text-white px-8 py-3.5 rounded-xl font-semibold hover:bg-[var(--color-terra-deep)] hover:shadow-md transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-coral)] focus-visible:ring-offset-2"
       >
-        {loading ? 'Sending...' : 'Start the Conversation'}
+        {loading ? 'Sending…' : 'Send message'}
       </button>
     </form>
   )

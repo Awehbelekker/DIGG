@@ -1,4 +1,5 @@
 import { createClient } from '@/lib/supabase/server'
+import { parseBrandColors, type BrandColors } from '@/lib/brand-colors'
 
 export type SiteSettings = {
   contact_email?: string
@@ -13,6 +14,7 @@ export type SiteSettings = {
   navbar_logo_position?: 'left' | 'center'
   footer_logo_position?: 'left' | 'center'
   logo_size?: 'small' | 'medium' | 'large'
+  brand_colors?: BrandColors
   selected_work?: Array<{ title: string; place: string; imageUrl?: string; link?: string }>
   homepage_products?: Array<{ title: string; description: string; imageUrl?: string; link?: string; comingSoon?: boolean }>
   // Homepage editable copy (Admin → Settings → Homepage content)
@@ -53,4 +55,8 @@ export async function getSiteSettings(): Promise<SiteSettings> {
   })
 
   return settings as SiteSettings
+}
+
+export function getBrandColorsFromSettings(settings: SiteSettings): BrandColors {
+  return parseBrandColors(settings.brand_colors)
 }

@@ -30,7 +30,7 @@ export default async function FormSubmissionDetailPage({
       <div className="mb-6 flex flex-wrap items-center justify-between gap-4">
         <AdminSafeLink
           href="/admin/forms"
-          className="text-sm text-[#F7941D] hover:text-[#e6850a] font-medium"
+          className="text-sm text-[#B56244] hover:text-[#9A4F35] font-medium"
         >
           ← Back to Form Submissions
         </AdminSafeLink>
@@ -43,7 +43,7 @@ export default async function FormSubmissionDetailPage({
       <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
         <div className="p-6 border-b border-gray-100 flex flex-wrap items-center justify-between gap-4">
           <div>
-            <h2 className="text-xl font-semibold text-[#1B2A6B]" style={{ fontFamily: 'var(--font-heading)' }}>
+            <h2 className="text-xl font-semibold text-[#152232]" style={{ fontFamily: 'var(--font-heading)' }}>
               {String(data.name || 'Unknown')}
             </h2>
             <p className="text-sm text-gray-500 mt-1">
@@ -53,8 +53,8 @@ export default async function FormSubmissionDetailPage({
           <span
             className={`px-4 py-2 rounded-full text-sm font-semibold ${
               formType === 'contact'
-                ? 'bg-[#5BC8E8] text-[#1B2A6B]'
-                : 'bg-[#F7941D] text-white'
+                ? 'bg-[#8A9A7B] text-[#152232]'
+                : 'bg-[#B56244] text-white'
             }`}
           >
             {formType === 'contact' ? 'Contact' : 'Agent'}

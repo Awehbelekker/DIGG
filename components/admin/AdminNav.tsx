@@ -45,7 +45,7 @@ export default function AdminNav() {
   ]
 
   return (
-    <nav className="bg-[#1B2A6B] text-white border-b border-white/10">
+    <nav className="bg-[#152232] text-white border-b border-white/10">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-14">
           <div className="flex flex-wrap items-center gap-1">
@@ -60,7 +60,7 @@ export default function AdminNav() {
                 }}
                 className={`px-4 py-2 rounded-xl text-sm font-medium transition-colors ${
                   pathname === item.href
-                    ? 'bg-[#F7941D] text-white'
+                    ? 'bg-[#B56244] text-white'
                     : 'text-gray-300 hover:bg-white/10 hover:text-white'
                 }`}
               >

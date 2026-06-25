@@ -71,7 +71,7 @@ export default function SettingsUrlValidation({ settings }: { settings: Record<s
 
   return (
     <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 space-y-4">
-      <h2 className="text-lg font-semibold text-[#1B2A6B]">Image URL validation</h2>
+      <h2 className="text-lg font-semibold text-[#152232]">Image URL validation</h2>
       <p className="text-sm text-gray-500">
         Check that hero, Selected Work, and Homepage Product image URLs load. Failed URLs may be broken or blocked (e.g. CORS).
       </p>

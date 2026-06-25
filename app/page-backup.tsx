@@ -14,21 +14,21 @@ export default function HomePage() {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             <div className="text-center p-8">
               <div className="text-5xl mb-4">🏢</div>
-              <h3 className="text-xl font-bold text-[#1B2A6B] mb-4">Untapped Value</h3>
+              <h3 className="text-xl font-bold text-[#152232] mb-4">Untapped Value</h3>
               <p className="text-gray-600">
                 Most Cape Town properties have income potential that hasn't been activated yet.
               </p>
             </div>
             <div className="text-center p-8">
               <div className="text-5xl mb-4">💡</div>
-              <h3 className="text-xl font-bold text-[#1B2A6B] mb-4">Intelligent Design</h3>
+              <h3 className="text-xl font-bold text-[#152232] mb-4">Intelligent Design</h3>
               <p className="text-gray-600">
                 We design for outcomes, not just aesthetics. Every decision is weighed against your financial return.
               </p>
             </div>
             <div className="text-center p-8">
               <div className="text-5xl mb-4">🤝</div>
-              <h3 className="text-xl font-bold text-[#1B2A6B] mb-4">Full-Service Partnership</h3>
+              <h3 className="text-xl font-bold text-[#152232] mb-4">Full-Service Partnership</h3>
               <p className="text-gray-600">
                 From first sketch to council approval — our team walks the whole journey with you.
               </p>
@@ -40,9 +40,9 @@ export default function HomePage() {
       <StatsBar />
 
       {/* Products Section */}
-      <section id="products" className="bg-[#FAFAFA] py-16">
+      <section id="products" className="bg-[#F4F0E8] py-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <h2 className="text-3xl md:text-4xl font-bold text-[#1B2A6B] text-center mb-4">
+          <h2 className="text-3xl md:text-4xl font-bold text-[#152232] text-center mb-4">
             Built Products. Proven Solutions.
           </h2>
           <p className="text-center max-w-3xl mx-auto mb-12 text-lg text-gray-600">
@@ -58,15 +58,15 @@ export default function HomePage() {
             ].map((product, index) => (
               <div key={index} className="bg-white p-6 rounded-lg shadow-md hover:shadow-lg transition-shadow relative">
                 {product.comingSoon && (
-                  <span className="absolute top-4 right-4 bg-[#5BC8E8] text-[#1B2A6B] px-3 py-1 rounded-full text-xs font-semibold">
+                  <span className="absolute top-4 right-4 bg-[#8A9A7B] text-[#152232] px-3 py-1 rounded-full text-xs font-semibold">
                     Coming Soon
                   </span>
                 )}
-                <h3 className="text-xl font-bold text-[#1B2A6B] mb-3">{product.title}</h3>
+                <h3 className="text-xl font-bold text-[#152232] mb-3">{product.title}</h3>
                 <p className="text-gray-600 mb-4">{product.description}</p>
                 <Link
                   href="/contact"
-                  className="inline-block bg-[#F7941D] text-white px-6 py-2 rounded font-semibold hover:bg-[#e6850a] transition-colors"
+                  className="inline-block bg-[#B56244] text-white px-6 py-2 rounded font-semibold hover:bg-[#9A4F35] transition-colors"
                 >
                   {product.comingSoon ? "Get Notified →" : "Learn More →"}
                 </Link>
@@ -77,7 +77,7 @@ export default function HomePage() {
       </section>
 
       {/* Estate Agent Strip */}
-      <section className="bg-[#1B2A6B] text-white py-16 my-16">
+      <section className="bg-[#152232] text-white py-16 my-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <h2 className="text-3xl md:text-4xl font-bold mb-6">Are You an Estate Agent?</h2>
           <p className="max-w-3xl mx-auto mb-8 text-lg opacity-90">
@@ -85,7 +85,7 @@ export default function HomePage() {
           </p>
           <Link
             href="/for-agents"
-            className="inline-block bg-[#F7941D] text-white px-8 py-3 rounded font-semibold hover:bg-[#e6850a] transition-colors"
+            className="inline-block bg-[#B56244] text-white px-8 py-3 rounded font-semibold hover:bg-[#9A4F35] transition-colors"
           >
             Partner With DIGG
           </Link>

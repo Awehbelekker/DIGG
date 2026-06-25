@@ -34,7 +34,6 @@ export default function AdminImagesPage() {
   )
 
   const loadImages = useCallback(async () => {
-    setLoading(true)
     let query = supabase.from('images').select('*').order('created_at', { ascending: false })
     if (selectedFolder !== 'all') query = query.eq('folder', selectedFolder)
     const { data, error } = await query
@@ -44,8 +43,20 @@ export default function AdminImagesPage() {
   }, [selectedFolder, supabase])
 
   useEffect(() => {
-    loadImages()
-  }, [loadImages])
+    let cancelled = false
+    void (async () => {
+      let query = supabase.from('images').select('*').order('created_at', { ascending: false })
+      if (selectedFolder !== 'all') query = query.eq('folder', selectedFolder)
+      const { data, error } = await query
+      if (cancelled) return
+      if (error) console.error('Error loading images:', error)
+      else setImages((data as Image[]) || [])
+      setLoading(false)
+    })()
+    return () => {
+      cancelled = true
+    }
+  }, [selectedFolder, supabase])
 
   const toggleSelect = (id: string) => {
     setSelectedIds((prev) => {
@@ -124,9 +135,12 @@ export default function AdminImagesPage() {
         {folders.map((folder) => (
           <button
             key={folder}
-            onClick={() => setSelectedFolder(folder)}
+            onClick={() => {
+              if (folder !== selectedFolder) setLoading(true)
+              setSelectedFolder(folder)
+            }}
             className={`px-4 py-2 rounded-md font-medium transition-colors ${
-              selectedFolder === folder ? 'bg-[#F7941D] text-white' : 'bg-white text-gray-700 hover:bg-gray-100'
+              selectedFolder === folder ? 'bg-[#B56244] text-white' : 'bg-white text-gray-700 hover:bg-gray-100'
             }`}
           >
             {folder.charAt(0).toUpperCase() + folder.slice(1)}
@@ -165,13 +179,13 @@ export default function AdminImagesPage() {
                   <option key={f} value={f}>{f}</option>
                 ))}
               </select>
-              <button type="button" onClick={handleBulkSetFolder} className="text-sm px-3 py-1.5 rounded bg-[#F7941D] text-white hover:bg-[#e6850a]">Apply</button>
+              <button type="button" onClick={handleBulkSetFolder} className="text-sm px-3 py-1.5 rounded bg-[#B56244] text-white hover:bg-[#9A4F35]">Apply</button>
             </span>
           )}
           {bulkAction === 'alt' && selectedIds.size > 0 && (
             <span className="flex items-center gap-2">
               <input type="text" placeholder="Alt text" value={bulkAlt} onChange={(e) => setBulkAlt(e.target.value)} className="text-sm border border-gray-300 rounded px-2 py-1 min-w-[160px]" />
-              <button type="button" onClick={handleBulkSetAlt} className="text-sm px-3 py-1.5 rounded bg-[#F7941D] text-white hover:bg-[#e6850a]">Apply</button>
+              <button type="button" onClick={handleBulkSetAlt} className="text-sm px-3 py-1.5 rounded bg-[#B56244] text-white hover:bg-[#9A4F35]">Apply</button>
             </span>
           )}
         </div>
@@ -196,7 +210,7 @@ export default function AdminImagesPage() {
                 <p className="text-sm font-medium text-gray-900 truncate">{image.filename}</p>
                 <p className="text-xs text-gray-500 mt-1">{image.folder}</p>
                 <div className="mt-4 flex flex-wrap gap-2">
-                  <AdminSafeLink href={image.url} openInNewTab className="flex-1 min-w-0 text-center text-xs bg-[#5BC8E8] text-[#1B2A6B] px-3 py-1.5 rounded-lg hover:bg-[#4ab8d8] transition-colors">View</AdminSafeLink>
+                  <AdminSafeLink href={image.url} openInNewTab className="flex-1 min-w-0 text-center text-xs bg-[#8A9A7B] text-[#152232] px-3 py-1.5 rounded-lg hover:bg-[#7A8A6B] transition-colors">View</AdminSafeLink>
                   <button type="button" onClick={() => { navigator.clipboard.writeText(image.url); showToast('URL copied!'); }} className="flex-1 min-w-0 text-center text-xs bg-gray-100 text-gray-700 px-3 py-1.5 rounded-lg hover:bg-gray-200 transition-colors">Copy URL</button>
                   <button onClick={() => handleDelete(image.id)} className="flex-1 min-w-0 text-center text-xs bg-red-600 text-white px-3 py-1.5 rounded-lg hover:bg-red-700 transition-colors">Delete</button>
                 </div>

@@ -20,7 +20,7 @@ export default function FormFilterTabs({ current }: { current: Filter }) {
           href={value === 'all' ? '/admin/forms' : `/admin/forms?filter=${value}`}
           className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
             current === value
-              ? 'bg-white text-[#1B2A6B] shadow-sm'
+              ? 'bg-white text-[#152232] shadow-sm'
               : 'text-gray-600 hover:text-gray-900'
           }`}
         >

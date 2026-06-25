@@ -27,13 +27,13 @@ export default function InsightRowActions({ insight }: { insight: Insight }) {
   return (
     <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
       <div className="flex items-center justify-end gap-2">
-        <AdminSafeLink href={`/admin/insights/${insight.id}`} className="text-[#F7941D] hover:text-[#e6850a]">
+        <AdminSafeLink href={`/admin/insights/${insight.id}`} className="text-[#B56244] hover:text-[#9A4F35]">
           Edit
         </AdminSafeLink>
         <AdminSafeLink
           href={insight.published ? `/insights/${insight.slug}` : `/preview/insight/${insight.id}`}
           openInNewTab
-          className="text-gray-600 hover:text-[#1B2A6B]"
+          className="text-gray-600 hover:text-[#152232]"
           title={insight.published ? 'View on site' : 'Preview draft'}
         >
           {insight.published ? 'View' : 'Preview'}

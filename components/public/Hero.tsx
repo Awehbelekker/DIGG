@@ -9,15 +9,15 @@ interface HeroProps {
 }
 
 export default function Hero({
-  title = "Your Property Should Be Working Harder.",
-  subtitle = "DIGG is a Cape Town architecture practice built on one idea: great design should generate real returns. We help property owners, investors and developers unlock the financial potential sitting inside their buildings and land.",
-  primaryCTA = { text: "See What We Do", href: "#products" },
-  secondaryCTA = { text: "Talk to Our Team", href: "/contact" },
+  title = 'Design is an investment decision.',
+  subtitle = "DIGG is a property development and architecture practice in Cape Town. We bring an investor's mindset to every project — clarity, value, and follow-through.",
+  primaryCTA = { text: 'See our work', href: '/insights' },
+  secondaryCTA = { text: '', href: '/contact' },
   backgroundImage
 }: HeroProps) {
   return (
     <section 
-      className="relative min-h-[70vh] sm:min-h-[80vh] flex items-center bg-gradient-to-br from-[#1B2A6B] to-[#2a3d8a] text-white py-12 sm:py-16 px-4 sm:px-6"
+      className="relative min-h-[70vh] sm:min-h-[80vh] flex items-center bg-gradient-to-br from-[var(--color-ink)] to-[var(--color-navy)] text-white py-12 sm:py-16 px-4 sm:px-6"
       style={backgroundImage ? {
         backgroundImage: `linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.4)), url(${backgroundImage})`,
         backgroundSize: 'cover',
@@ -42,16 +42,18 @@ export default function Hero({
         <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
           <Link
             href={primaryCTA.href}
-            className="min-h-[48px] flex items-center justify-center bg-[#F7941D] text-white px-6 sm:px-8 py-3.5 rounded-xl font-semibold hover:bg-[#e6850a] hover:shadow-lg hover:-translate-y-0.5 active:translate-y-0 transition-all duration-200 text-center focus:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-[#1B2A6B]"
+            className="min-h-[48px] flex items-center justify-center bg-[var(--color-terracotta)] text-white px-6 sm:px-8 py-3.5 rounded-xl font-semibold hover:bg-[var(--color-terra-deep)] hover:shadow-lg hover:-translate-y-0.5 active:translate-y-0 transition-all duration-200 text-center focus:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--color-ink)]"
           >
             {primaryCTA.text}
           </Link>
-          <Link
-            href={secondaryCTA.href}
-            className="min-h-[48px] flex items-center justify-center bg-transparent border-2 border-white text-white px-6 sm:px-8 py-3.5 rounded-xl font-semibold hover:bg-white hover:text-[#1B2A6B] hover:shadow-lg hover:-translate-y-0.5 active:translate-y-0 transition-all duration-200 text-center focus:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-[#1B2A6B]"
-          >
-            {secondaryCTA.text}
-          </Link>
+          {secondaryCTA.text ? (
+            <Link
+              href={secondaryCTA.href}
+              className="min-h-[48px] flex items-center justify-center bg-transparent border-2 border-white text-white px-6 sm:px-8 py-3.5 rounded-xl font-semibold hover:bg-white hover:text-[var(--color-ink)] hover:shadow-lg hover:-translate-y-0.5 active:translate-y-0 transition-all duration-200 text-center focus:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--color-ink)]"
+            >
+              {secondaryCTA.text}
+            </Link>
+          ) : null}
         </div>
       </div>
     </section>

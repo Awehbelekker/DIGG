@@ -74,7 +74,7 @@ export default function InsightEditor({ insight }: { insight?: Insight | null })
             required
             value={formData.title}
             onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-            className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-[#F7941D] focus:border-transparent"
+            className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-[#B56244] focus:border-transparent"
           />
         </div>
         <div>
@@ -85,7 +85,7 @@ export default function InsightEditor({ insight }: { insight?: Insight | null })
             required
             value={formData.slug}
             onChange={(e) => setFormData({ ...formData, slug: e.target.value })}
-            className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-[#F7941D] focus:border-transparent"
+            className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-[#B56244] focus:border-transparent"
             placeholder="url-friendly-name"
           />
           <p className="mt-1 text-xs text-gray-500">Public URL: /insights/{formData.slug || '…'}</p>
@@ -97,7 +97,7 @@ export default function InsightEditor({ insight }: { insight?: Insight | null })
             value={formData.body}
             onChange={(e) => setFormData({ ...formData, body: e.target.value })}
             rows={12}
-            className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-[#F7941D] focus:border-transparent"
+            className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-[#B56244] focus:border-transparent"
             placeholder="Write your insight or article…"
           />
         </div>
@@ -107,7 +107,7 @@ export default function InsightEditor({ insight }: { insight?: Insight | null })
               type="checkbox"
               checked={formData.published}
               onChange={(e) => setFormData({ ...formData, published: e.target.checked })}
-              className="h-4 w-4 text-[#F7941D] focus:ring-[#F7941D] border-gray-300 rounded"
+              className="h-4 w-4 text-[#B56244] focus:ring-[#B56244] border-gray-300 rounded"
             />
             <span className="text-sm text-gray-700">Published</span>
           </label>
@@ -132,7 +132,7 @@ export default function InsightEditor({ insight }: { insight?: Insight | null })
         <button
           type="submit"
           disabled={loading}
-          className="px-6 py-2 bg-[#F7941D] text-white rounded-md font-semibold hover:bg-[#e6850a] disabled:opacity-50"
+          className="px-6 py-2 bg-[#B56244] text-white rounded-md font-semibold hover:bg-[#9A4F35] disabled:opacity-50"
         >
           {loading ? 'Saving…' : insight ? 'Update' : 'Create'}
         </button>

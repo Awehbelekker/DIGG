@@ -97,7 +97,7 @@ function mountFocalOverlay(editor: Editor, component: Component) {
     'position:absolute;top:4px;left:4px;right:4px;font:10px/1.3 system-ui,sans-serif;background:rgba(27,42,107,0.9);color:#fff;padding:4px 7px;border-radius:4px;pointer-events:none;text-align:left;'
 
   const dot = doc.createElement('div')
-  dot.style.cssText = `position:absolute;width:20px;height:20px;border:3px solid #F7941D;border-radius:50%;background:rgba(255,255,255,0.4);transform:translate(-50%,-50%);left:${px}%;top:${py}%;pointer-events:none;box-shadow:0 1px 4px rgba(0,0,0,0.25);`
+  dot.style.cssText = `position:absolute;width:20px;height:20px;border:3px solid #B56244;border-radius:50%;background:rgba(255,255,255,0.4);transform:translate(-50%,-50%);left:${px}%;top:${py}%;pointer-events:none;box-shadow:0 1px 4px rgba(0,0,0,0.25);`
 
   overlay.appendChild(hint)
   overlay.appendChild(dot)

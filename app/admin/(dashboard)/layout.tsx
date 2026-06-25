@@ -19,7 +19,7 @@ export default async function AdminDashboardLayout({
 
   return (
     <ToastProvider>
-      <div className="min-h-screen bg-[#FAFAFA]">
+      <div className="min-h-screen bg-[#F4F0E8]">
         <AdminLayoutClient>{children}</AdminLayoutClient>
       </div>
     </ToastProvider>

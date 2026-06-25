@@ -35,13 +35,13 @@ export default function NewsletterSignup({ source = 'footer' }: Props) {
         placeholder="Your email"
         required
         disabled={status === 'loading'}
-        className="flex-1 min-w-0 px-4 py-2.5 rounded-lg border border-white/30 bg-white/10 text-white placeholder-white/60 focus:outline-none focus:ring-2 focus:ring-[#F7941D] focus:border-transparent disabled:opacity-60"
+        className="flex-1 min-w-0 px-4 py-2.5 rounded-lg border border-white/30 bg-white/10 text-white placeholder-white/60 focus:outline-none focus:ring-2 focus:ring-[var(--color-terracotta)] focus:border-transparent disabled:opacity-60"
         aria-label="Email for newsletter"
       />
       <button
         type="submit"
         disabled={status === 'loading'}
-        className="px-5 py-2.5 rounded-lg bg-[#F7941D] text-white font-semibold hover:bg-[#e6850a] transition-colors disabled:opacity-60 whitespace-nowrap"
+        className="px-5 py-2.5 rounded-lg bg-[var(--color-terracotta)] text-white font-semibold hover:bg-[var(--color-terra-deep)] transition-colors disabled:opacity-60 whitespace-nowrap"
       >
         {status === 'loading' ? '…' : 'Subscribe'}
       </button>

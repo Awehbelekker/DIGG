@@ -44,12 +44,12 @@ export default function FormSubmissionRow({ submission }: { submission: FormSubm
           <div className="flex items-center flex-wrap gap-2">
             <AdminSafeLink
               href={`/admin/forms/${submission.id}`}
-              className={`text-lg font-semibold hover:text-[#F7941D] transition-colors ${!read ? 'text-[#1B2A6B]' : 'text-gray-700'}`}
+              className={`text-lg font-semibold hover:text-[#B56244] transition-colors ${!read ? 'text-[#152232]' : 'text-gray-700'}`}
             >
               {String((submission.data as Record<string, unknown>).name || 'Unknown')}
             </AdminSafeLink>
             <span className={`px-3 py-1 rounded-full text-xs font-semibold ${
-              submission.form_type === 'contact' ? 'bg-[#5BC8E8] text-[#1B2A6B]' : 'bg-[#F7941D] text-white'
+              submission.form_type === 'contact' ? 'bg-[#8A9A7B] text-[#152232]' : 'bg-[#B56244] text-white'
             }`}>
               {submission.form_type === 'contact' ? 'Contact' : 'Agent'}
             </span>
@@ -79,7 +79,7 @@ export default function FormSubmissionRow({ submission }: { submission: FormSubm
           </button>
           <AdminSafeLink
             href={`/admin/forms/${submission.id}`}
-            className="px-3 py-1.5 text-sm font-medium text-[#F7941D] hover:bg-[#F7941D]/10 rounded-lg transition-colors"
+            className="px-3 py-1.5 text-sm font-medium text-[#B56244] hover:bg-[#B56244]/10 rounded-lg transition-colors"
           >
             View
           </AdminSafeLink>

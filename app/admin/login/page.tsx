@@ -37,10 +37,10 @@ export default function AdminLoginPage() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-[#FAFAFA] py-12 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen flex items-center justify-center bg-[#F4F0E8] py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-md w-full space-y-8 bg-white p-8 rounded-lg shadow-md">
         <div>
-          <h2 className="mt-6 text-center text-3xl font-bold text-[#1B2A6B]">
+          <h2 className="mt-6 text-center text-3xl font-bold text-[#152232]">
             Admin Login
           </h2>
           <p className="mt-2 text-center text-sm text-gray-600">
@@ -66,7 +66,7 @@ export default function AdminLoginPage() {
                 required
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="mt-1 appearance-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-[#F7941D] focus:border-[#F7941D] focus:z-10 sm:text-sm"
+                className="mt-1 appearance-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-[#B56244] focus:border-[#B56244] focus:z-10 sm:text-sm"
                 placeholder="Email address"
               />
             </div>
@@ -82,7 +82,7 @@ export default function AdminLoginPage() {
                 required
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="mt-1 appearance-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-[#F7941D] focus:border-[#F7941D] focus:z-10 sm:text-sm"
+                className="mt-1 appearance-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-[#B56244] focus:border-[#B56244] focus:z-10 sm:text-sm"
                 placeholder="Password"
               />
             </div>
@@ -92,7 +92,7 @@ export default function AdminLoginPage() {
             <button
               type="submit"
               disabled={loading}
-              className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-[#F7941D] hover:bg-[#e6850a] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#F7941D] disabled:opacity-50 disabled:cursor-not-allowed"
+              className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-[#B56244] hover:bg-[#9A4F35] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#B56244] disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {loading ? 'Signing in...' : 'Sign in'}
             </button>

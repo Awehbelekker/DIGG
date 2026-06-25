@@ -5,7 +5,7 @@ type LogoBarProps = { title?: string; logos: Logo[] }
 
 export default function LogoBar({ title, logos }: LogoBarProps) {
   return (
-    <RevealSection className="bg-[#FAFAFA] py-12 lg:py-16">
+    <RevealSection className="bg-[var(--color-bone)] py-12 lg:py-16">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {title && (
           <p className="text-center text-sm font-semibold text-gray-400 uppercase tracking-widest mb-8">{title}</p>

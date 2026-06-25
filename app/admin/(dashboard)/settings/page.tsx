@@ -9,6 +9,8 @@ import { showToast } from '@/components/admin/Toast'
 import DropUpload from '@/components/admin/DropUpload'
 import { useRegisterAdminNavUnsaved } from '@/components/admin/AdminUnsavedProvider'
 import { useUnsavedChangesAlert } from '@/lib/hooks/useUnsavedChangesAlert'
+import BrandColorsEditor from '@/components/admin/BrandColorsEditor'
+import { parseBrandColors, type BrandColors } from '@/lib/brand-colors'
 
 type SelectedWorkItem = { title: string; place: string; imageUrl?: string; link?: string }
 
@@ -164,6 +166,20 @@ export default function AdminSettingsPage() {
     handleSave('homepage_products', homepageProducts)
   }
 
+  const brandColors = parseBrandColors(settings.brand_colors)
+  const savedBrandColors = parseBrandColors(savedSettings.brand_colors)
+  const setBrandColors = (next: BrandColors) => {
+    setSettings({ ...settings, brand_colors: next })
+  }
+  const saveBrandColors = async (next: BrandColors) => {
+    await handleSave('brand_colors', next)
+    try {
+      sessionStorage.removeItem('digg-brand-preview')
+    } catch {
+      /* ignore */
+    }
+  }
+
   if (loading) {
     return (
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -188,7 +204,7 @@ export default function AdminSettingsPage() {
       <div className="space-y-8">
         <SettingsUrlValidation settings={settings} />
         <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 space-y-6">
-          <h2 className="text-lg font-semibold text-[#1B2A6B]">Contact & identity</h2>
+          <h2 className="text-lg font-semibold text-[#152232]">Contact & identity</h2>
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">Contact Email</label>
             <div className="flex space-x-2">
@@ -196,12 +212,12 @@ export default function AdminSettingsPage() {
                 type="email"
                 value={String(strVal(settings.contact_email) || 'judy@digg-ct.co.za')}
                 onChange={(e) => setSettings({ ...settings, contact_email: e.target.value })}
-                className="flex-1 px-4 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#F7941D] focus:border-transparent"
+                className="flex-1 px-4 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#B56244] focus:border-transparent"
               />
               <button
                 onClick={() => handleSave('contact_email', strVal(settings.contact_email) || 'judy@digg-ct.co.za')}
                 disabled={saving}
-                className="px-6 py-2 bg-[#F7941D] text-white rounded-xl font-semibold hover:bg-[#e6850a] transition-colors disabled:opacity-50"
+                className="px-6 py-2 bg-[#B56244] text-white rounded-xl font-semibold hover:bg-[#9A4F35] transition-colors disabled:opacity-50"
               >
                 Save
               </button>
@@ -214,12 +230,12 @@ export default function AdminSettingsPage() {
                 type="tel"
                 value={strVal(settings.phone) || '082 707 7080'}
                 onChange={(e) => setSettings({ ...settings, phone: e.target.value })}
-                className="flex-1 px-4 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#F7941D] focus:border-transparent"
+                className="flex-1 px-4 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#B56244] focus:border-transparent"
               />
               <button
                 onClick={() => handleSave('phone', strVal(settings.phone) || '082 707 7080')}
                 disabled={saving}
-                className="px-6 py-2 bg-[#F7941D] text-white rounded-xl font-semibold hover:bg-[#e6850a] transition-colors disabled:opacity-50"
+                className="px-6 py-2 bg-[#B56244] text-white rounded-xl font-semibold hover:bg-[#9A4F35] transition-colors disabled:opacity-50"
               >
                 Save
               </button>
@@ -232,12 +248,12 @@ export default function AdminSettingsPage() {
                 type="text"
                 value={strVal(settings.site_name) || 'DIGG Architecture'}
                 onChange={(e) => setSettings({ ...settings, site_name: e.target.value })}
-                className="flex-1 px-4 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#F7941D] focus:border-transparent"
+                className="flex-1 px-4 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#B56244] focus:border-transparent"
               />
               <button
                 onClick={() => handleSave('site_name', strVal(settings.site_name) || 'DIGG Architecture')}
                 disabled={saving}
-                className="px-6 py-2 bg-[#F7941D] text-white rounded-xl font-semibold hover:bg-[#e6850a] transition-colors disabled:opacity-50"
+                className="px-6 py-2 bg-[#B56244] text-white rounded-xl font-semibold hover:bg-[#9A4F35] transition-colors disabled:opacity-50"
               >
                 Save
               </button>
@@ -246,7 +262,7 @@ export default function AdminSettingsPage() {
         </div>
 
         <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 space-y-6">
-          <h2 className="text-lg font-semibold text-[#1B2A6B]">Logo</h2>
+          <h2 className="text-lg font-semibold text-[#152232]">Logo</h2>
           <p className="text-sm text-gray-500">Logo image, size, and position in navbar and footer.</p>
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">Logo</label>
@@ -267,7 +283,7 @@ export default function AdminSettingsPage() {
                 aria-label="Logo size"
                 value={strVal(settings.logo_size) || 'medium'}
                 onChange={(e) => setSettings({ ...settings, logo_size: e.target.value })}
-                className="min-w-[140px] px-4 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#F7941D] focus:border-transparent"
+                className="min-w-[140px] px-4 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#B56244] focus:border-transparent"
               >
                 <option value="small">Small</option>
                 <option value="medium">Medium</option>
@@ -276,7 +292,7 @@ export default function AdminSettingsPage() {
               <button
                 onClick={() => handleSave('logo_size', settings.logo_size ?? 'medium')}
                 disabled={saving}
-                className="px-6 py-2 bg-[#F7941D] text-white rounded-xl font-semibold hover:bg-[#e6850a] transition-colors disabled:opacity-50"
+                className="px-6 py-2 bg-[#B56244] text-white rounded-xl font-semibold hover:bg-[#9A4F35] transition-colors disabled:opacity-50"
               >
                 Save
               </button>
@@ -289,7 +305,7 @@ export default function AdminSettingsPage() {
                 aria-label="Navbar logo position"
                 value={strVal(settings.navbar_logo_position) || 'left'}
                 onChange={(e) => setSettings({ ...settings, navbar_logo_position: e.target.value })}
-                className="min-w-[140px] px-4 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#F7941D] focus:border-transparent"
+                className="min-w-[140px] px-4 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#B56244] focus:border-transparent"
               >
                 <option value="left">Left</option>
                 <option value="center">Center</option>
@@ -297,7 +313,7 @@ export default function AdminSettingsPage() {
               <button
                 onClick={() => handleSave('navbar_logo_position', settings.navbar_logo_position ?? 'left')}
                 disabled={saving}
-                className="px-6 py-2 bg-[#F7941D] text-white rounded-xl font-semibold hover:bg-[#e6850a] transition-colors disabled:opacity-50"
+                className="px-6 py-2 bg-[#B56244] text-white rounded-xl font-semibold hover:bg-[#9A4F35] transition-colors disabled:opacity-50"
               >
                 Save
               </button>
@@ -310,7 +326,7 @@ export default function AdminSettingsPage() {
                 aria-label="Footer logo position"
                 value={strVal(settings.footer_logo_position) || 'left'}
                 onChange={(e) => setSettings({ ...settings, footer_logo_position: e.target.value })}
-                className="min-w-[140px] px-4 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#F7941D] focus:border-transparent"
+                className="min-w-[140px] px-4 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#B56244] focus:border-transparent"
               >
                 <option value="left">Left</option>
                 <option value="center">Center</option>
@@ -318,7 +334,7 @@ export default function AdminSettingsPage() {
               <button
                 onClick={() => handleSave('footer_logo_position', settings.footer_logo_position ?? 'left')}
                 disabled={saving}
-                className="px-6 py-2 bg-[#F7941D] text-white rounded-xl font-semibold hover:bg-[#e6850a] transition-colors disabled:opacity-50"
+                className="px-6 py-2 bg-[#B56244] text-white rounded-xl font-semibold hover:bg-[#9A4F35] transition-colors disabled:opacity-50"
               >
                 Save
               </button>
@@ -326,8 +342,16 @@ export default function AdminSettingsPage() {
           </div>
         </div>
 
+        <BrandColorsEditor
+          value={brandColors}
+          savedValue={savedBrandColors}
+          onChange={setBrandColors}
+          onSave={saveBrandColors}
+          saving={saving}
+        />
+
         <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 space-y-6">
-          <h2 className="text-lg font-semibold text-[#1B2A6B]">Typography</h2>
+          <h2 className="text-lg font-semibold text-[#152232]">Typography</h2>
           <p className="text-sm text-gray-500">Choose fonts for headings and body text. Options are from Google Fonts and apply across the whole site.</p>
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">Heading font</label>
@@ -336,7 +360,7 @@ export default function AdminSettingsPage() {
                 aria-label="Heading font"
                 value={strVal(settings.heading_font) || DEFAULT_HEADING_FONT}
                 onChange={(e) => setSettings({ ...settings, heading_font: e.target.value })}
-                className="min-w-[220px] px-4 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#F7941D] focus:border-transparent"
+                className="min-w-[220px] px-4 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#B56244] focus:border-transparent"
               >
                 {GOOGLE_FONT_OPTIONS.map((font) => (
                   <option key={font} value={font}>
@@ -347,7 +371,7 @@ export default function AdminSettingsPage() {
               <button
                 onClick={() => handleSave('heading_font', settings.heading_font ?? DEFAULT_HEADING_FONT)}
                 disabled={saving}
-                className="px-6 py-2 bg-[#F7941D] text-white rounded-xl font-semibold hover:bg-[#e6850a] transition-colors disabled:opacity-50"
+                className="px-6 py-2 bg-[#B56244] text-white rounded-xl font-semibold hover:bg-[#9A4F35] transition-colors disabled:opacity-50"
               >
                 Save
               </button>
@@ -360,7 +384,7 @@ export default function AdminSettingsPage() {
                 aria-label="Body font"
                 value={strVal(settings.body_font) || DEFAULT_BODY_FONT}
                 onChange={(e) => setSettings({ ...settings, body_font: e.target.value })}
-                className="min-w-[220px] px-4 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#F7941D] focus:border-transparent"
+                className="min-w-[220px] px-4 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#B56244] focus:border-transparent"
               >
                 {GOOGLE_FONT_OPTIONS.map((font) => (
                   <option key={font} value={font}>
@@ -371,7 +395,7 @@ export default function AdminSettingsPage() {
               <button
                 onClick={() => handleSave('body_font', settings.body_font ?? DEFAULT_BODY_FONT)}
                 disabled={saving}
-                className="px-6 py-2 bg-[#F7941D] text-white rounded-xl font-semibold hover:bg-[#e6850a] transition-colors disabled:opacity-50"
+                className="px-6 py-2 bg-[#B56244] text-white rounded-xl font-semibold hover:bg-[#9A4F35] transition-colors disabled:opacity-50"
               >
                 Save
               </button>
@@ -380,7 +404,7 @@ export default function AdminSettingsPage() {
         </div>
 
         <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 space-y-6">
-          <h2 className="text-lg font-semibold text-[#1B2A6B]">Homepage content (headlines & copy)</h2>
+          <h2 className="text-lg font-semibold text-[#152232]">Homepage content (headlines & copy)</h2>
           <p className="text-sm text-gray-500">Edit the main text on the homepage. Leave blank to use the default copy.</p>
           {[
             { key: 'hero_title', label: 'Hero headline', value: strVal(settings.hero_title), placeholder: 'Your Property Should Be Working Harder.' },
@@ -405,13 +429,13 @@ export default function AdminSettingsPage() {
                   type="text"
                   value={value}
                   onChange={(e) => setSettings({ ...settings, [key]: e.target.value })}
-                  className="flex-1 px-4 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#F7941D] focus:border-transparent"
+                  className="flex-1 px-4 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#B56244] focus:border-transparent"
                   placeholder={placeholder}
                 />
                 <button
                   onClick={() => handleSave(key, settings[key] ?? '')}
                   disabled={saving}
-                  className="px-6 py-2 bg-[#F7941D] text-white rounded-xl font-semibold hover:bg-[#e6850a] transition-colors disabled:opacity-50"
+                  className="px-6 py-2 bg-[#B56244] text-white rounded-xl font-semibold hover:bg-[#9A4F35] transition-colors disabled:opacity-50"
                 >
                   Save
                 </button>
@@ -459,7 +483,7 @@ export default function AdminSettingsPage() {
             <button
               onClick={() => handleSave('homepage_strip', settings.homepage_strip ?? [])}
               disabled={saving}
-              className="mt-2 px-6 py-2 bg-[#F7941D] text-white rounded-xl font-semibold hover:bg-[#e6850a] transition-colors disabled:opacity-50"
+              className="mt-2 px-6 py-2 bg-[#B56244] text-white rounded-xl font-semibold hover:bg-[#9A4F35] transition-colors disabled:opacity-50"
             >
               Save strip
             </button>
@@ -467,7 +491,7 @@ export default function AdminSettingsPage() {
         </div>
 
         <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 space-y-6">
-          <h2 className="text-lg font-semibold text-[#1B2A6B]">Homepage hero & sharing</h2>
+          <h2 className="text-lg font-semibold text-[#152232]">Homepage hero & sharing</h2>
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">Hero image (homepage)</label>
             <p className="text-xs text-gray-500 mb-1">Drop an image or paste URL. Leave blank for gradient.</p>
@@ -505,10 +529,10 @@ export default function AdminSettingsPage() {
         </div>
 
         <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 space-y-4">
-          <h2 className="text-lg font-semibold text-[#1B2A6B]">Selected Work (homepage)</h2>
+          <h2 className="text-lg font-semibold text-[#152232]">Selected Work (homepage)</h2>
           <p className="text-sm text-gray-500">Projects shown on the homepage. Add 3–5 items. Image URL can be from Images (copy link after upload) or any URL.</p>
           {selectedWork.map((item, index) => (
-            <div key={index} className="flex flex-wrap gap-3 items-start p-4 rounded-xl bg-[#FAFAFA] border border-gray-100">
+            <div key={index} className="flex flex-wrap gap-3 items-start p-4 rounded-xl bg-[#F4F0E8] border border-gray-100">
               <div className="flex flex-col gap-1 shrink-0">
                 <button type="button" onClick={() => moveSelectedWorkItem(index, 'up')} disabled={index === 0} className="p-1.5 rounded border border-gray-200 text-gray-600 hover:bg-gray-100 disabled:opacity-40 disabled:pointer-events-none" aria-label="Move up">↑</button>
                 <button type="button" onClick={() => moveSelectedWorkItem(index, 'down')} disabled={index === selectedWork.length - 1} className="p-1.5 rounded border border-gray-200 text-gray-600 hover:bg-gray-100 disabled:opacity-40 disabled:pointer-events-none" aria-label="Move down">↓</button>
@@ -556,7 +580,7 @@ export default function AdminSettingsPage() {
           <button
             type="button"
             onClick={addSelectedWorkItem}
-            className="px-4 py-2 border-2 border-dashed border-gray-300 rounded-xl text-gray-600 hover:border-[#F7941D] hover:text-[#F7941D] text-sm font-medium"
+            className="px-4 py-2 border-2 border-dashed border-gray-300 rounded-xl text-gray-600 hover:border-[#B56244] hover:text-[#B56244] text-sm font-medium"
           >
             + Add project
           </button>
@@ -565,7 +589,7 @@ export default function AdminSettingsPage() {
               type="button"
               onClick={saveSelectedWork}
               disabled={saving}
-              className="px-6 py-2 bg-[#F7941D] text-white rounded-xl font-semibold hover:bg-[#e6850a] disabled:opacity-50"
+              className="px-6 py-2 bg-[#B56244] text-white rounded-xl font-semibold hover:bg-[#9A4F35] disabled:opacity-50"
             >
               Save Selected Work
             </button>
@@ -573,10 +597,10 @@ export default function AdminSettingsPage() {
         </div>
 
         <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 space-y-4">
-          <h2 className="text-lg font-semibold text-[#1B2A6B]">Homepage Products (Built Products)</h2>
+          <h2 className="text-lg font-semibold text-[#152232]">Homepage Products (Built Products)</h2>
           <p className="text-sm text-gray-500">Products shown in the &quot;Built Products. Proven Solutions.&quot; section on the homepage. Add, edit, reorder; set link or leave blank to go to Contact.</p>
           {homepageProducts.map((item, index) => (
-            <div key={index} className="p-4 rounded-xl bg-[#FAFAFA] border border-gray-100 space-y-3">
+            <div key={index} className="p-4 rounded-xl bg-[#F4F0E8] border border-gray-100 space-y-3">
               <div className="flex flex-wrap gap-2 items-center">
                 <button type="button" onClick={() => moveHomepageProduct(index, 'up')} disabled={index === 0} className="p-1.5 rounded border border-gray-200 text-gray-600 hover:bg-gray-100 disabled:opacity-40" aria-label="Move up">↑</button>
                 <button type="button" onClick={() => moveHomepageProduct(index, 'down')} disabled={index === homepageProducts.length - 1} className="p-1.5 rounded border border-gray-200 text-gray-600 hover:bg-gray-100 disabled:opacity-40" aria-label="Move down">↓</button>
@@ -592,7 +616,7 @@ export default function AdminSettingsPage() {
                     type="checkbox"
                     checked={!!item.comingSoon}
                     onChange={(e) => updateHomepageProduct(index, { comingSoon: e.target.checked })}
-                    className="rounded text-[#F7941D]"
+                    className="rounded text-[#B56244]"
                   />
                   <span className="text-sm text-gray-700">Coming soon</span>
                 </label>
@@ -625,7 +649,7 @@ export default function AdminSettingsPage() {
           <button
             type="button"
             onClick={addHomepageProduct}
-            className="px-4 py-2 border-2 border-dashed border-gray-300 rounded-xl text-gray-600 hover:border-[#F7941D] hover:text-[#F7941D] text-sm font-medium"
+            className="px-4 py-2 border-2 border-dashed border-gray-300 rounded-xl text-gray-600 hover:border-[#B56244] hover:text-[#B56244] text-sm font-medium"
           >
             + Add product
           </button>
@@ -634,7 +658,7 @@ export default function AdminSettingsPage() {
               type="button"
               onClick={saveHomepageProducts}
               disabled={saving}
-              className="px-6 py-2 bg-[#F7941D] text-white rounded-xl font-semibold hover:bg-[#e6850a] disabled:opacity-50"
+              className="px-6 py-2 bg-[#B56244] text-white rounded-xl font-semibold hover:bg-[#9A4F35] disabled:opacity-50"
             >
               Save Homepage Products
             </button>
