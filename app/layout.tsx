@@ -101,8 +101,9 @@ export default async function RootLayout({
           logoSize={logoSize}
           logoPosition={footerLogoPosition}
           links={navLinks}
+          siteSettings={settings}
         />
-        <WhatsAppButton />
+        <WhatsAppButton siteSettings={settings} />
         <Analytics />
         <SuppressPlayAbortError />
       </body>

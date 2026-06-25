@@ -4,7 +4,7 @@ import type { Metadata } from 'next'
 import SectionRenderer from '@/components/public/SectionRenderer'
 import GjsPageRenderer from '@/components/public/GjsPageRenderer'
 import { getSiteSettings } from '@/lib/site-settings'
-import { isBuiltinPageSlug, resolveBuiltinSections } from '@/lib/builtin-pages'
+import { isBuiltinPageSlug, resolvePageSections } from '@/lib/builtin-pages'
 import type { PageSection } from '@/lib/types/database'
 
 type Props = { params: Promise<{ slug: string }> }
@@ -50,14 +50,16 @@ export default async function DynamicPage({ params }: Props) {
     )
   }
 
-  const builtin = isBuiltinPageSlug(slug) ? resolveBuiltinSections(slug, settings) : null
+  const builtin = isBuiltinPageSlug(slug)
   const content = page.content as { sections?: PageSection[] } | null
-  const sections = builtin ?? content?.sections ?? []
+  const sections = builtin
+    ? resolvePageSections(slug, content?.sections, settings)
+    : content?.sections ?? []
 
   return (
     <div className="min-h-screen bg-[var(--color-bone)]">
       {sections.map((section, index) => (
-        <SectionRenderer key={`${section.type}-${index}`} section={section} />
+        <SectionRenderer key={`${section.type}-${index}`} section={section} siteSettings={settings} />
       ))}
       {sections.length === 0 && (
         <section className="py-20 text-center text-[var(--color-muted)]">

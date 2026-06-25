@@ -259,6 +259,140 @@ export default function AdminSettingsPage() {
               </button>
             </div>
           </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">Location</label>
+            <div className="flex space-x-2">
+              <input
+                type="text"
+                value={strVal(settings.location) || 'Cape Town, South Africa'}
+                onChange={(e) => setSettings({ ...settings, location: e.target.value })}
+                className="flex-1 px-4 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#B56244] focus:border-transparent"
+                placeholder="Cape Town, South Africa"
+              />
+              <button
+                onClick={() => handleSave('location', strVal(settings.location) || 'Cape Town, South Africa')}
+                disabled={saving}
+                className="px-6 py-2 bg-[#B56244] text-white rounded-xl font-semibold hover:bg-[#9A4F35] transition-colors disabled:opacity-50"
+              >
+                Save
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 space-y-6">
+          <h2 className="text-lg font-semibold text-[#152232]">Social & WhatsApp</h2>
+          <p className="text-sm text-gray-500">Used on the contact page, footer, and floating WhatsApp button.</p>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">WhatsApp pre-filled message</label>
+            <div className="flex space-x-2">
+              <input
+                type="text"
+                value={strVal(settings.whatsapp_message) || "Hi DIGG, I'd like to talk about a project."}
+                onChange={(e) => setSettings({ ...settings, whatsapp_message: e.target.value })}
+                className="flex-1 px-4 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#B56244] focus:border-transparent"
+              />
+              <button
+                onClick={() => handleSave('whatsapp_message', strVal(settings.whatsapp_message))}
+                disabled={saving}
+                className="px-6 py-2 bg-[#B56244] text-white rounded-xl font-semibold hover:bg-[#9A4F35] transition-colors disabled:opacity-50"
+              >
+                Save
+              </button>
+            </div>
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">Instagram URL</label>
+            <div className="flex space-x-2">
+              <input
+                type="url"
+                value={strVal(settings.instagram_url)}
+                onChange={(e) => setSettings({ ...settings, instagram_url: e.target.value })}
+                placeholder="https://instagram.com/..."
+                className="flex-1 px-4 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#B56244] focus:border-transparent"
+              />
+              <button
+                onClick={() => handleSave('instagram_url', strVal(settings.instagram_url))}
+                disabled={saving}
+                className="px-6 py-2 bg-[#B56244] text-white rounded-xl font-semibold hover:bg-[#9A4F35] transition-colors disabled:opacity-50"
+              >
+                Save
+              </button>
+            </div>
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">LinkedIn URL</label>
+            <div className="flex space-x-2">
+              <input
+                type="url"
+                value={strVal(settings.linkedin_url)}
+                onChange={(e) => setSettings({ ...settings, linkedin_url: e.target.value })}
+                placeholder="https://linkedin.com/..."
+                className="flex-1 px-4 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#B56244] focus:border-transparent"
+              />
+              <button
+                onClick={() => handleSave('linkedin_url', strVal(settings.linkedin_url))}
+                disabled={saving}
+                className="px-6 py-2 bg-[#B56244] text-white rounded-xl font-semibold hover:bg-[#9A4F35] transition-colors disabled:opacity-50"
+              >
+                Save
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 space-y-6">
+          <h2 className="text-lg font-semibold text-[#152232]">Footer copy</h2>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">Practice description</label>
+            <textarea
+              value={strVal(settings.footer_tagline)}
+              onChange={(e) => setSettings({ ...settings, footer_tagline: e.target.value })}
+              rows={3}
+              placeholder="Short description under the logo in the footer"
+              className="w-full px-4 py-2 border border-gray-300 rounded-xl text-sm"
+            />
+            <button
+              onClick={() => handleSave('footer_tagline', strVal(settings.footer_tagline))}
+              disabled={saving}
+              className="mt-2 px-6 py-2 bg-[#B56244] text-white rounded-xl font-semibold hover:bg-[#9A4F35] transition-colors disabled:opacity-50"
+            >
+              Save
+            </button>
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">Pillars line</label>
+            <input
+              type="text"
+              value={strVal(settings.pillars) || 'Develop · Invest · Grow · Give'}
+              onChange={(e) => setSettings({ ...settings, pillars: e.target.value })}
+              className="w-full px-4 py-2 border border-gray-300 rounded-xl text-sm"
+            />
+            <button
+              onClick={() => handleSave('pillars', strVal(settings.pillars))}
+              disabled={saving}
+              className="mt-2 px-6 py-2 bg-[#B56244] text-white rounded-xl font-semibold hover:bg-[#9A4F35] transition-colors disabled:opacity-50"
+            >
+              Save
+            </button>
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">Company line</label>
+            <textarea
+              value={strVal(settings.company_line)}
+              onChange={(e) => setSettings({ ...settings, company_line: e.target.value })}
+              rows={2}
+              placeholder="Trading as … Reg …"
+              className="w-full px-4 py-2 border border-gray-300 rounded-xl text-sm"
+            />
+            <button
+              onClick={() => handleSave('company_line', strVal(settings.company_line))}
+              disabled={saving}
+              className="mt-2 px-6 py-2 bg-[#B56244] text-white rounded-xl font-semibold hover:bg-[#9A4F35] transition-colors disabled:opacity-50"
+            >
+              Save
+            </button>
+          </div>
         </div>
 
         <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 space-y-6">

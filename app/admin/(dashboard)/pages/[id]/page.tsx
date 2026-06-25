@@ -1,6 +1,7 @@
 import { createClient } from '@/lib/supabase/server'
 import { notFound } from 'next/navigation'
 import GrapesjsEditorWrapper from '@/components/admin/GrapesjsEditorWrapper'
+import SectionPageEditor from '@/components/admin/SectionPageEditor'
 import type { Page } from '@/lib/types/database'
 
 export const dynamic = 'force-dynamic'
@@ -18,5 +19,9 @@ export default async function EditPagePage({ params }: { params: Promise<{ id: s
     notFound()
   }
 
-  return <GrapesjsEditorWrapper page={page as Page} />
+  if ((page.editor_type as string) === 'grapesjs') {
+    return <GrapesjsEditorWrapper page={page as Page} />
+  }
+
+  return <SectionPageEditor page={page as Page} />
 }

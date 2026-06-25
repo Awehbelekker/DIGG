@@ -1,0 +1,437 @@
+'use client'
+
+import { useState, useMemo, useCallback } from 'react'
+import { useRouter } from 'next/navigation'
+import Link from 'next/link'
+import type { Page, PageSection } from '@/lib/types/database'
+import { SECTION_TYPES } from '@/lib/section-config'
+import { isBuiltinPageSlug } from '@/lib/builtin-pages'
+import { defaultSectionsForSlug } from '@/lib/builtin-pages'
+import DropUpload from '@/components/admin/DropUpload'
+import { showToast } from '@/components/admin/Toast'
+import { savePageSections, resetPageToDefaults } from '@/app/admin/(dashboard)/pages/actions'
+import { useUnsavedChangesAlert } from '@/lib/hooks/useUnsavedChangesAlert'
+
+type GridItem = { title: string; description: string; imageUrl?: string }
+type ProductItem = {
+  title: string
+  description: string
+  link?: string
+  status?: string
+  comingSoon?: boolean
+  imageUrl?: string
+}
+type StatItem = { label: string; value: string }
+
+function sectionLabel(type: string, index: number): string {
+  const found = SECTION_TYPES.find((s) => s.type === type)
+  return `${found?.label ?? type} #${index + 1}`
+}
+
+function HeroFields({
+  data,
+  onChange,
+}: {
+  data: Record<string, unknown>
+  onChange: (d: Record<string, unknown>) => void
+}) {
+  const set = (key: string, value: string) => onChange({ ...data, [key]: value })
+  return (
+    <div className="space-y-3">
+      <label className="block">
+        <span className="text-sm font-medium text-gray-700">Headline</span>
+        <input
+          type="text"
+          value={String(data.title ?? '')}
+          onChange={(e) => set('title', e.target.value)}
+          className="mt-1 w-full px-3 py-2 border border-gray-300 rounded-lg text-sm"
+        />
+      </label>
+      <label className="block">
+        <span className="text-sm font-medium text-gray-700">Subtitle</span>
+        <textarea
+          value={String(data.subtitle ?? '')}
+          onChange={(e) => set('subtitle', e.target.value)}
+          rows={4}
+          className="mt-1 w-full px-3 py-2 border border-gray-300 rounded-lg text-sm"
+        />
+      </label>
+      <div className="grid sm:grid-cols-2 gap-3">
+        <label className="block">
+          <span className="text-sm font-medium text-gray-700">Primary button text</span>
+          <input
+            type="text"
+            value={String(data.primaryCTAtext ?? '')}
+            onChange={(e) => set('primaryCTAtext', e.target.value)}
+            className="mt-1 w-full px-3 py-2 border border-gray-300 rounded-lg text-sm"
+          />
+        </label>
+        <label className="block">
+          <span className="text-sm font-medium text-gray-700">Primary button link</span>
+          <input
+            type="text"
+            value={String(data.primaryCTAhref ?? '')}
+            onChange={(e) => set('primaryCTAhref', e.target.value)}
+            placeholder="/insights or https://instagram.com/..."
+            className="mt-1 w-full px-3 py-2 border border-gray-300 rounded-lg text-sm"
+          />
+        </label>
+        <label className="block">
+          <span className="text-sm font-medium text-gray-700">Secondary button text</span>
+          <input
+            type="text"
+            value={String(data.secondaryCTAtext ?? '')}
+            onChange={(e) => set('secondaryCTAtext', e.target.value)}
+            className="mt-1 w-full px-3 py-2 border border-gray-300 rounded-lg text-sm"
+          />
+        </label>
+        <label className="block">
+          <span className="text-sm font-medium text-gray-700">Secondary button link</span>
+          <input
+            type="text"
+            value={String(data.secondaryCTAhref ?? '')}
+            onChange={(e) => set('secondaryCTAhref', e.target.value)}
+            className="mt-1 w-full px-3 py-2 border border-gray-300 rounded-lg text-sm"
+          />
+        </label>
+      </div>
+      <div>
+        <span className="text-sm font-medium text-gray-700">Background image</span>
+        <p className="text-xs text-gray-500 mb-1">Or set site-wide hero image in Settings.</p>
+        <DropUpload
+          compact
+          value={String(data.backgroundImageUrl ?? '')}
+          onChange={(url) => set('backgroundImageUrl', url)}
+          bucket="images"
+          folder="hero"
+          label="Hero background"
+        />
+      </div>
+    </div>
+  )
+}
+
+function TextFields({
+  data,
+  onChange,
+}: {
+  data: Record<string, unknown>
+  onChange: (d: Record<string, unknown>) => void
+}) {
+  const set = (key: string, value: string) => onChange({ ...data, [key]: value })
+  return (
+    <div className="space-y-3">
+      <label className="block">
+        <span className="text-sm font-medium text-gray-700">Heading</span>
+        <input
+          type="text"
+          value={String(data.heading ?? '')}
+          onChange={(e) => set('heading', e.target.value)}
+          className="mt-1 w-full px-3 py-2 border border-gray-300 rounded-lg text-sm"
+        />
+      </label>
+      <label className="block">
+        <span className="text-sm font-medium text-gray-700">Body</span>
+        <textarea
+          value={String(data.body ?? '')}
+          onChange={(e) => set('body', e.target.value)}
+          rows={8}
+          className="mt-1 w-full px-3 py-2 border border-gray-300 rounded-lg text-sm font-mono text-[13px]"
+        />
+      </label>
+    </div>
+  )
+}
+
+function CtaFields({
+  data,
+  onChange,
+}: {
+  data: Record<string, unknown>
+  onChange: (d: Record<string, unknown>) => void
+}) {
+  const set = (key: string, value: string) => onChange({ ...data, [key]: value })
+  return (
+    <div className="space-y-3">
+      <label className="block">
+        <span className="text-sm font-medium text-gray-700">Title</span>
+        <input type="text" value={String(data.title ?? '')} onChange={(e) => set('title', e.target.value)} className="mt-1 w-full px-3 py-2 border rounded-lg text-sm" />
+      </label>
+      <label className="block">
+        <span className="text-sm font-medium text-gray-700">Description</span>
+        <textarea value={String(data.description ?? '')} onChange={(e) => set('description', e.target.value)} rows={3} className="mt-1 w-full px-3 py-2 border rounded-lg text-sm" />
+      </label>
+      <div className="grid sm:grid-cols-2 gap-3">
+        <label className="block">
+          <span className="text-sm font-medium text-gray-700">Button text</span>
+          <input type="text" value={String(data.buttonText ?? '')} onChange={(e) => set('buttonText', e.target.value)} className="mt-1 w-full px-3 py-2 border rounded-lg text-sm" />
+        </label>
+        <label className="block">
+          <span className="text-sm font-medium text-gray-700">Button link</span>
+          <input type="text" value={String(data.buttonLink ?? '')} onChange={(e) => set('buttonLink', e.target.value)} placeholder="/contact or https://..." className="mt-1 w-full px-3 py-2 border rounded-lg text-sm" />
+        </label>
+      </div>
+    </div>
+  )
+}
+
+export default function SectionPageEditor({ page }: { page: Page }) {
+  const router = useRouter()
+  const initial = (page.content as { sections?: PageSection[] })?.sections ?? []
+  const fallback = defaultSectionsForSlug(page.slug) ?? []
+  const [sections, setSections] = useState<PageSection[]>(
+    initial.length > 0 ? initial : fallback
+  )
+  const [savedSnapshot, setSavedSnapshot] = useState(() => JSON.stringify(initial.length > 0 ? initial : fallback))
+  const [title, setTitle] = useState(page.title)
+  const [slug, setSlug] = useState(page.slug)
+  const [published, setPublished] = useState(page.published)
+  const [metaTitle, setMetaTitle] = useState(page.meta_title ?? '')
+  const [metaDescription, setMetaDescription] = useState(page.meta_description ?? '')
+  const [saving, setSaving] = useState(false)
+  const [openIndex, setOpenIndex] = useState<number | null>(0)
+
+  const dirty = useMemo(
+    () =>
+      JSON.stringify(sections) !== savedSnapshot ||
+      title !== page.title ||
+      slug !== page.slug ||
+      published !== page.published ||
+      metaTitle !== (page.meta_title ?? '') ||
+      metaDescription !== (page.meta_description ?? ''),
+    [sections, savedSnapshot, title, slug, published, metaTitle, metaDescription, page]
+  )
+  useUnsavedChangesAlert(dirty)
+
+  const updateSection = useCallback((index: number, data: Record<string, unknown>) => {
+    setSections((prev) => prev.map((s, i) => (i === index ? { ...s, data } : s)))
+  }, [])
+
+  const handleSave = async () => {
+    setSaving(true)
+    try {
+      await savePageSections(page.id, {
+        title,
+        slug,
+        published,
+        meta_title: metaTitle,
+        meta_description: metaDescription,
+        sections,
+      })
+      setSavedSnapshot(JSON.stringify(sections))
+      showToast('Page saved — changes are live.')
+      router.refresh()
+    } catch (e) {
+      showToast(e instanceof Error ? e.message : 'Save failed', 'error')
+    } finally {
+      setSaving(false)
+    }
+  }
+
+  const handleReset = async () => {
+    if (!isBuiltinPageSlug(page.slug)) return
+    if (!globalThis.confirm('Reset all sections to the default brief-aligned content? This replaces your edits.')) return
+    setSaving(true)
+    try {
+      await resetPageToDefaults(page.id, page.slug)
+      const defaults = defaultSectionsForSlug(page.slug) ?? []
+      setSections(defaults)
+      setSavedSnapshot(JSON.stringify(defaults))
+      showToast('Reset to defaults.')
+      router.refresh()
+    } catch (e) {
+      showToast(e instanceof Error ? e.message : 'Reset failed', 'error')
+    } finally {
+      setSaving(false)
+    }
+  }
+
+  const renderSectionBody = (section: PageSection, index: number) => {
+    const { type, data } = section
+    const onChange = (d: Record<string, unknown>) => updateSection(index, d)
+
+    if (type === 'hero') return <HeroFields data={data} onChange={onChange} />
+    if (type === 'text') return <TextFields data={data} onChange={onChange} />
+    if (type === 'cta') return <CtaFields data={data} onChange={onChange} />
+    if (type === 'contact_details') {
+      return (
+        <p className="text-sm text-gray-600">
+          Email, phone, location, WhatsApp and Instagram are edited in{' '}
+          <Link href="/admin/settings" className="text-[#B56244] font-semibold hover:underline">
+            Settings → Contact & social
+          </Link>
+          .
+        </p>
+      )
+    }
+    if (type === 'form') {
+      return <p className="text-sm text-gray-500">Contact form — submissions appear under Form Submissions.</p>
+    }
+    if (type === 'grid') {
+      const items = (data.items as GridItem[]) ?? []
+      return (
+        <div className="space-y-4">
+          <label className="block">
+            <span className="text-sm font-medium text-gray-700">Section title</span>
+            <input
+              type="text"
+              value={String(data.title ?? '')}
+              onChange={(e) => onChange({ ...data, title: e.target.value })}
+              className="mt-1 w-full px-3 py-2 border rounded-lg text-sm"
+            />
+          </label>
+          {items.map((item, i) => (
+            <div key={i} className="p-3 bg-gray-50 rounded-lg border border-gray-100 space-y-2">
+              <p className="text-xs font-semibold text-gray-500">Item {i + 1}</p>
+              <input
+                type="text"
+                value={item.title}
+                placeholder="Title"
+                onChange={(e) => {
+                  const next = [...items]
+                  next[i] = { ...item, title: e.target.value }
+                  onChange({ ...data, items: next })
+                }}
+                className="w-full px-3 py-2 border rounded-lg text-sm"
+              />
+              <textarea
+                value={item.description}
+                placeholder="Description"
+                rows={2}
+                onChange={(e) => {
+                  const next = [...items]
+                  next[i] = { ...item, description: e.target.value }
+                  onChange({ ...data, items: next })
+                }}
+                className="w-full px-3 py-2 border rounded-lg text-sm"
+              />
+            </div>
+          ))}
+        </div>
+      )
+    }
+    if (type === 'products') {
+      const items = (data.items as ProductItem[]) ?? []
+      return (
+        <div className="space-y-4">
+          <label className="block">
+            <span className="text-sm font-medium text-gray-700">Section title</span>
+            <input type="text" value={String(data.title ?? '')} onChange={(e) => onChange({ ...data, title: e.target.value })} className="mt-1 w-full px-3 py-2 border rounded-lg text-sm" />
+          </label>
+          <label className="block">
+            <span className="text-sm font-medium text-gray-700">Subtitle</span>
+            <input type="text" value={String(data.subtitle ?? '')} onChange={(e) => onChange({ ...data, subtitle: e.target.value })} className="mt-1 w-full px-3 py-2 border rounded-lg text-sm" />
+          </label>
+          {items.map((item, i) => (
+            <div key={i} className="p-3 bg-gray-50 rounded-lg border space-y-2">
+              <p className="text-xs font-semibold text-gray-500">Project {i + 1}</p>
+              <input type="text" value={item.title} placeholder="Title" onChange={(e) => { const next = [...items]; next[i] = { ...item, title: e.target.value }; onChange({ ...data, items: next }) }} className="w-full px-3 py-2 border rounded-lg text-sm" />
+              <textarea value={item.description} rows={2} onChange={(e) => { const next = [...items]; next[i] = { ...item, description: e.target.value }; onChange({ ...data, items: next }) }} className="w-full px-3 py-2 border rounded-lg text-sm" />
+              <input type="text" value={item.link ?? ''} placeholder="Link (/insights/...)" onChange={(e) => { const next = [...items]; next[i] = { ...item, link: e.target.value }; onChange({ ...data, items: next }) }} className="w-full px-3 py-2 border rounded-lg text-sm" />
+              <input type="text" value={item.status ?? ''} placeholder="Status badge" onChange={(e) => { const next = [...items]; next[i] = { ...item, status: e.target.value }; onChange({ ...data, items: next }) }} className="w-full px-3 py-2 border rounded-lg text-sm" />
+              <DropUpload compact value={item.imageUrl ?? ''} onChange={(url) => { const next = [...items]; next[i] = { ...item, imageUrl: url }; onChange({ ...data, items: next }) }} bucket="images" folder="portfolio" label="Image" />
+            </div>
+          ))}
+        </div>
+      )
+    }
+    if (type === 'stats') {
+      const items = (data.items as StatItem[]) ?? []
+      return (
+        <div className="space-y-3">
+          {items.map((item, i) => (
+            <div key={i} className="grid grid-cols-2 gap-2">
+              <input type="text" value={item.value} placeholder="Value" onChange={(e) => { const next = [...items]; next[i] = { ...item, value: e.target.value }; onChange({ ...data, items: next }) }} className="px-3 py-2 border rounded-lg text-sm" />
+              <input type="text" value={item.label} placeholder="Label" onChange={(e) => { const next = [...items]; next[i] = { ...item, label: e.target.value }; onChange({ ...data, items: next }) }} className="px-3 py-2 border rounded-lg text-sm" />
+            </div>
+          ))}
+        </div>
+      )
+    }
+    return <p className="text-sm text-gray-500">This section type is read-only here. Use Settings or contact support.</p>
+  }
+
+  return (
+    <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <div className="flex flex-wrap items-start justify-between gap-4 mb-8">
+        <div>
+          <Link href="/admin/pages" className="text-sm text-[#B56244] hover:underline mb-2 inline-block">
+            ← All pages
+          </Link>
+          <h1 className="text-2xl font-bold text-[#152232]">Edit page: {page.slug}</h1>
+          <p className="text-sm text-gray-500 mt-1">
+            Change text, images, and button links. Global colours and contact details are in Settings.
+          </p>
+        </div>
+        <div className="flex flex-wrap gap-2">
+          <Link
+            href={`/${slug}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="px-4 py-2 rounded-xl border border-gray-300 text-sm font-medium hover:bg-gray-50"
+          >
+            View live
+          </Link>
+          {isBuiltinPageSlug(page.slug) && (
+            <button type="button" onClick={handleReset} disabled={saving} className="px-4 py-2 rounded-xl border border-amber-300 text-amber-800 text-sm font-medium hover:bg-amber-50 disabled:opacity-50">
+              Reset defaults
+            </button>
+          )}
+          <button type="button" onClick={handleSave} disabled={saving || !dirty} className="px-5 py-2 rounded-xl bg-[#B56244] text-white text-sm font-semibold hover:bg-[#9A4F35] disabled:opacity-50">
+            {saving ? 'Saving…' : 'Save & publish'}
+          </button>
+        </div>
+      </div>
+
+      <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 mb-6 space-y-4">
+        <h2 className="font-semibold text-[#152232]">Page settings</h2>
+        <div className="grid sm:grid-cols-2 gap-4">
+          <label className="block">
+            <span className="text-sm font-medium text-gray-700">Title</span>
+            <input type="text" value={title} onChange={(e) => setTitle(e.target.value)} className="mt-1 w-full px-3 py-2 border rounded-lg text-sm" />
+          </label>
+          <label className="block">
+            <span className="text-sm font-medium text-gray-700">URL slug</span>
+            <input type="text" value={slug} onChange={(e) => setSlug(e.target.value)} className="mt-1 w-full px-3 py-2 border rounded-lg text-sm" />
+          </label>
+        </div>
+        <label className="flex items-center gap-2 text-sm">
+          <input type="checkbox" checked={published} onChange={(e) => setPublished(e.target.checked)} />
+          Published (visible on site)
+        </label>
+        <label className="block">
+          <span className="text-sm font-medium text-gray-700">SEO title</span>
+          <input type="text" value={metaTitle} onChange={(e) => setMetaTitle(e.target.value)} className="mt-1 w-full px-3 py-2 border rounded-lg text-sm" />
+        </label>
+        <label className="block">
+          <span className="text-sm font-medium text-gray-700">SEO description</span>
+          <textarea value={metaDescription} onChange={(e) => setMetaDescription(e.target.value)} rows={2} className="mt-1 w-full px-3 py-2 border rounded-lg text-sm" />
+        </label>
+      </div>
+
+      <div className="space-y-3">
+        {sections.map((section, index) => (
+          <div key={index} className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
+            <button
+              type="button"
+              onClick={() => setOpenIndex(openIndex === index ? null : index)}
+              className="w-full flex items-center justify-between px-6 py-4 text-left hover:bg-gray-50"
+            >
+              <span className="font-semibold text-[#152232]">{sectionLabel(section.type, index)}</span>
+              <span className="text-gray-400 text-sm">{openIndex === index ? '▲' : '▼'}</span>
+            </button>
+            {openIndex === index && (
+              <div className="px-6 pb-6 border-t border-gray-100 pt-4">{renderSectionBody(section, index)}</div>
+            )}
+          </div>
+        ))}
+      </div>
+
+      {dirty && (
+        <p className="mt-6 text-sm text-amber-700 bg-amber-50 border border-amber-200 rounded-xl px-4 py-3">
+          You have unsaved changes. Click Save & publish to update the live site.
+        </p>
+      )}
+    </div>
+  )
+}

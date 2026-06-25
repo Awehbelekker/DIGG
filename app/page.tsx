@@ -3,7 +3,7 @@ import { notFound } from 'next/navigation'
 import SectionRenderer from '@/components/public/SectionRenderer'
 import GjsPageRenderer from '@/components/public/GjsPageRenderer'
 import { getSiteSettings } from '@/lib/site-settings'
-import { resolveBuiltinSections } from '@/lib/builtin-pages'
+import { resolvePageSections } from '@/lib/builtin-pages'
 import type { PageSection } from '@/lib/types/database'
 
 export default async function HomePage() {
@@ -24,12 +24,13 @@ export default async function HomePage() {
     )
   }
 
-  const sections = resolveBuiltinSections('home', settings) ?? []
+  const content = page.content as { sections?: PageSection[] } | null
+  const sections = resolvePageSections('home', content?.sections, settings)
 
   return (
     <div className="min-h-screen bg-[var(--color-bone)]">
       {sections.map((section, index) => (
-        <SectionRenderer key={`${section.type}-${index}`} section={section as PageSection} />
+        <SectionRenderer key={`${section.type}-${index}`} section={section} siteSettings={settings} />
       ))}
     </div>
   )

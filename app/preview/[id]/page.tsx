@@ -2,6 +2,8 @@ import { createClient } from '@/lib/supabase/server'
 import { notFound, redirect } from 'next/navigation'
 import SectionRenderer from '@/components/public/SectionRenderer'
 import GjsPageRenderer from '@/components/public/GjsPageRenderer'
+import { getSiteSettings } from '@/lib/site-settings'
+import { resolvePageSections } from '@/lib/builtin-pages'
 import type { PageSection } from '@/lib/types/database'
 
 type Props = { params: Promise<{ id: string }> }
@@ -47,8 +49,10 @@ export default async function PreviewPage({ params }: Props) {
     )
   }
 
-  const content = page.content as { sections?: Array<{ type: string; data: Record<string, unknown> }> } | null
-  const sections = content?.sections ?? []
+  const settings = await getSiteSettings()
+  const content = page.content as { sections?: PageSection[] } | null
+  const slug = page.slug as string
+  const sections = resolvePageSections(slug, content?.sections, settings)
 
   return (
     <div className="min-h-screen">
@@ -56,7 +60,7 @@ export default async function PreviewPage({ params }: Props) {
         Preview — section-based page. This page is {published ? 'published' : 'unpublished'}.
       </div>
       {sections.map((section, index) => (
-        <SectionRenderer key={`${section.type}-${index}`} section={section as PageSection} />
+        <SectionRenderer key={`${section.type}-${index}`} section={section} siteSettings={settings} />
       ))}
       {sections.length === 0 && (
         <section className="py-20 text-center text-gray-500">

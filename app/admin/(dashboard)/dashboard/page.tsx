@@ -71,6 +71,12 @@ export default async function AdminDashboard() {
           </AdminSafeLink>
         )}
         <AdminSafeLink
+          href="/admin/pages"
+          className="inline-flex items-center px-4 py-2 rounded-xl border border-[#152232] bg-white text-[#152232] text-sm font-medium hover:bg-[#152232] hover:text-white transition-colors"
+        >
+          All pages
+        </AdminSafeLink>
+        <AdminSafeLink
           href="/"
           openInNewTab
           className="inline-flex items-center px-4 py-2 rounded-xl border border-gray-300 bg-white text-gray-700 text-sm font-medium hover:bg-gray-50 transition-colors"
