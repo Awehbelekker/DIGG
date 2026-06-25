@@ -26,11 +26,11 @@ function PillarBackground({ pillar, bg }: { pillar: Pillar; bg: string }) {
       <ImageWithPlaceholder
         src={image}
         alt=""
-        aspectRatio="auto"
-        className="absolute inset-0 w-full h-full object-cover"
+        aspectRatio="fill"
+        className="absolute inset-0 w-full h-full"
         placeholderLabel={pillar.title}
       />
-      <div className="absolute inset-0 bg-black/45" style={{ backgroundColor: `${bg}cc` }} aria-hidden />
+      <div className="absolute inset-0 bg-black/40" aria-hidden />
     </>
   )
 }

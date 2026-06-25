@@ -15,18 +15,14 @@ function Avatar({ member }: { member: Member }) {
       .toUpperCase()
 
   return (
-    <div className="relative mx-auto mb-4 w-[72px] h-[72px] group">
-      <div
-        className="absolute -inset-1 rounded-full bg-[var(--color-coral)]/40 blur-md group-hover:bg-[var(--color-coral)]/60 transition-all duration-300 motion-reduce:transition-none"
-        aria-hidden
-      />
-      <div className="relative w-[72px] h-[72px] rounded-full overflow-hidden ring-2 ring-[var(--color-coral)]/80 shadow-[0_0_20px_rgba(232,98,77,0.45)]">
+    <div className="relative mx-auto mb-4 w-[72px] h-[72px]">
+      <div className="relative w-[72px] h-[72px] rounded-full overflow-hidden border border-[var(--color-greige)]/80">
         {member.photoUrl?.trim() ? (
           <ImageWithPlaceholder
             src={member.photoUrl}
             alt={member.name}
-            aspectRatio="square"
-            className="w-full h-full object-cover"
+            aspectRatio="fill"
+            className="w-full h-full"
             placeholderLabel={initials}
           />
         ) : (

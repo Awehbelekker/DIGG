@@ -41,8 +41,8 @@ export default function AboutHero({
               <ImageWithPlaceholder
                 src={portraitImageUrl}
                 alt=""
-                aspectRatio="auto"
-                className="absolute inset-0 w-full h-full object-cover"
+                aspectRatio="fill"
+                className="absolute inset-0 w-full h-full"
                 placeholderLabel="Portrait"
               />
             ) : (
