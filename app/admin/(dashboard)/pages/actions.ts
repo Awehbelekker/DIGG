@@ -3,7 +3,23 @@
 import { createClient } from '@/lib/supabase/server'
 import { revalidatePath } from 'next/cache'
 import type { PageSection } from '@/lib/types/database'
-import { defaultSectionsForSlug } from '@/lib/builtin-pages'
+import { defaultSectionsForSlug, isBuiltinPageSlug } from '@/lib/builtin-pages'
+import { sectionsToHtml } from '@/lib/grapesjs/sections-to-html'
+
+function revalidatePublicPaths(slug: string, pageId: string) {
+  revalidatePath('/', 'layout')
+  revalidatePath('/')
+  if (slug === 'home') {
+    revalidatePath('/')
+  } else {
+    revalidatePath(`/${slug}`)
+  }
+  revalidatePath('/about')
+  revalidatePath('/contact')
+  revalidatePath('/insights')
+  revalidatePath('/admin/pages')
+  revalidatePath(`/admin/pages/${pageId}`)
+}
 
 export async function savePageSections(
   pageId: string,
@@ -33,13 +49,58 @@ export async function savePageSections(
 
   if (error) throw new Error(error.message)
 
-  revalidatePath('/', 'layout')
-  revalidatePath('/')
-  revalidatePath('/about')
-  revalidatePath('/contact')
-  revalidatePath('/insights')
-  revalidatePath('/admin/pages')
-  revalidatePath(`/admin/pages/${pageId}`)
+  revalidatePublicPaths(payload.slug, pageId)
+}
+
+export async function switchPageToGrapesjs(pageId: string) {
+  const supabase = await createClient()
+  const { data: page, error: fetchError } = await supabase.from('pages').select('*').eq('id', pageId).single()
+  if (fetchError || !page) throw new Error('Page not found')
+
+  const content = page.content as { sections?: PageSection[] } | null
+  let sections = content?.sections ?? []
+  if (sections.length === 0 && isBuiltinPageSlug(page.slug as string)) {
+    sections = defaultSectionsForSlug(page.slug as string) ?? []
+  }
+
+  const html = sectionsToHtml(sections)
+  const { error } = await supabase
+    .from('pages')
+    .update({
+      editor_type: 'grapesjs',
+      content_html: html,
+      content_css: '',
+      content: { sections },
+      updated_at: new Date().toISOString(),
+    })
+    .eq('id', pageId)
+
+  if (error) throw new Error(error.message)
+  revalidatePublicPaths(page.slug as string, pageId)
+}
+
+export async function switchPageToSections(pageId: string) {
+  const supabase = await createClient()
+  const { data: page, error: fetchError } = await supabase.from('pages').select('slug').eq('id', pageId).single()
+  if (fetchError || !page) throw new Error('Page not found')
+
+  const slug = page.slug as string
+  const sections = isBuiltinPageSlug(slug) ? defaultSectionsForSlug(slug) ?? [] : []
+
+  const { error } = await supabase
+    .from('pages')
+    .update({
+      editor_type: 'sections',
+      content: { sections },
+      content_html: null,
+      content_css: null,
+      gjs_data: null,
+      updated_at: new Date().toISOString(),
+    })
+    .eq('id', pageId)
+
+  if (error) throw new Error(error.message)
+  revalidatePublicPaths(slug, pageId)
 }
 
 export async function resetPageToDefaults(pageId: string, slug: string) {
@@ -58,9 +119,7 @@ export async function resetPageToDefaults(pageId: string, slug: string) {
 
   if (error) throw new Error(error.message)
 
-  revalidatePath('/')
-  revalidatePath(`/${slug}`)
-  revalidatePath(`/admin/pages/${pageId}`)
+  revalidatePublicPaths(slug, pageId)
 }
 
 export async function deletePage(id: string) {

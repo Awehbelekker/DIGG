@@ -3,15 +3,16 @@
 import { useState, useMemo, useCallback, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
-import type { Page, PageSection, Insight } from '@/lib/types/database'
-import { SECTION_TYPES } from '@/lib/section-config'
+import type { Page, PageSection, Insight, SectionType } from '@/lib/types/database'
+import { SECTION_TYPES, DEFAULT_SECTION_DATA } from '@/lib/section-config'
 import { isBuiltinPageSlug } from '@/lib/builtin-pages'
 import { defaultSectionsForSlug } from '@/lib/builtin-pages'
+import { allowedSectionTypesForPage } from '@/lib/page-section-allowlist'
 import DropUpload from '@/components/admin/DropUpload'
 import WorkItemPicker, { WorkItemBulkFill } from '@/components/admin/WorkItemPicker'
 import { createClient } from '@/lib/supabase/client'
 import { showToast } from '@/components/admin/Toast'
-import { savePageSections, resetPageToDefaults } from '@/app/admin/(dashboard)/pages/actions'
+import { savePageSections, resetPageToDefaults, switchPageToGrapesjs } from '@/app/admin/(dashboard)/pages/actions'
 import { useUnsavedChangesAlert } from '@/lib/hooks/useUnsavedChangesAlert'
 import type { WorkCardEditorItem } from '@/lib/insight-work-card'
 
@@ -209,6 +210,8 @@ export default function SectionPageEditor({ page }: { page: Page }) {
   const [metaDescription, setMetaDescription] = useState(page.meta_description ?? '')
   const [saving, setSaving] = useState(false)
   const [openIndex, setOpenIndex] = useState<number | null>(0)
+  const [addSectionType, setAddSectionType] = useState<SectionType>('text')
+  const [switchingEditor, setSwitchingEditor] = useState(false)
   const [publishedInsights, setPublishedInsights] = useState<
     Pick<Insight, 'id' | 'slug' | 'title' | 'excerpt' | 'cover_image_url' | 'content_type' | 'project_status'>[]
   >([])
@@ -238,6 +241,64 @@ export default function SectionPageEditor({ page }: { page: Page }) {
   const updateSection = useCallback((index: number, data: Record<string, unknown>) => {
     setSections((prev) => prev.map((s, i) => (i === index ? { ...s, data } : s)))
   }, [])
+
+  const addableTypes = useMemo(() => {
+    const allowed = allowedSectionTypesForPage(page.slug)
+    const pool = allowed
+      ? SECTION_TYPES.filter((s) => allowed.includes(s.type))
+      : SECTION_TYPES
+    return pool
+  }, [page.slug])
+
+  const addSection = () => {
+    const data = DEFAULT_SECTION_DATA[addSectionType]
+    const next = [...sections, { type: addSectionType, data: structuredClone(data) }]
+    setSections(next)
+    setOpenIndex(next.length - 1)
+  }
+
+  const removeSection = (index: number) => {
+    const label = sectionLabel(sections[index].type, index)
+    if (!globalThis.confirm(`Remove “${label}”?`)) return
+    setSections((prev) => prev.filter((_, i) => i !== index))
+    setOpenIndex((prev) => {
+      if (prev === null) return null
+      if (prev === index) return null
+      if (prev > index) return prev - 1
+      return prev
+    })
+  }
+
+  const moveSection = (index: number, direction: -1 | 1) => {
+    const target = index + direction
+    if (target < 0 || target >= sections.length) return
+    setSections((prev) => {
+      const next = [...prev]
+      ;[next[index], next[target]] = [next[target], next[index]]
+      return next
+    })
+    setOpenIndex(target)
+  }
+
+  const handleSwitchToGrapesjs = async () => {
+    const msg =
+      'Switch to the visual builder? Your current sections will be converted to HTML as a starting point. Mockup components will not auto-sync after that — layout becomes freeform. You can switch back to the section editor later (sections reset to defaults).'
+    if (!globalThis.confirm(msg)) return
+    if (dirty) {
+      showToast('Save your changes first, then switch to the visual builder.', 'error')
+      return
+    }
+    setSwitchingEditor(true)
+    try {
+      await switchPageToGrapesjs(page.id)
+      showToast('Switched to visual builder.')
+      router.refresh()
+    } catch (e) {
+      showToast(e instanceof Error ? e.message : 'Could not switch editor', 'error')
+    } finally {
+      setSwitchingEditor(false)
+    }
+  }
 
   const handleSave = async () => {
     setSaving(true)
@@ -658,8 +719,23 @@ export default function SectionPageEditor({ page }: { page: Page }) {
           <p className="text-sm text-gray-500 mt-1">
             Change text, images, and button links. Global colours and contact details are in Settings.
           </p>
+          {page.slug === 'home' && (
+            <p className="text-xs text-gray-600 bg-blue-50 border border-blue-100 rounded-lg px-3 py-2 mt-2 max-w-xl">
+              <strong>What we do</strong> = Services grid · <strong>Projects on the ground</strong> = Work card grid.
+              Upload images or choose from the media library on each card.
+            </p>
+          )}
         </div>
         <div className="flex flex-wrap gap-2">
+          <Link
+            href={`/preview/${page.id}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="px-4 py-2 rounded-xl border border-gray-300 text-sm font-medium hover:bg-gray-50"
+            title="Shows the last saved version — save first to preview your latest edits"
+          >
+            Preview draft
+          </Link>
           <Link
             href={`/${slug}`}
             target="_blank"
@@ -673,6 +749,15 @@ export default function SectionPageEditor({ page }: { page: Page }) {
               Reset defaults
             </button>
           )}
+          <button
+            type="button"
+            onClick={handleSwitchToGrapesjs}
+            disabled={switchingEditor || saving}
+            className="px-4 py-2 rounded-xl border border-[#152232]/20 text-[#152232] text-sm font-medium hover:bg-gray-50 disabled:opacity-50"
+            title="Advanced freeform layout — mockup sections will not auto-sync"
+          >
+            {switchingEditor ? 'Switching…' : 'Open visual builder (advanced)'}
+          </button>
           <button type="button" onClick={handleSave} disabled={saving || !dirty} className="px-5 py-2 rounded-xl bg-[#B56244] text-white text-sm font-semibold hover:bg-[#9A4F35] disabled:opacity-50">
             {saving ? 'Saving…' : 'Save & publish'}
           </button>
@@ -705,19 +790,74 @@ export default function SectionPageEditor({ page }: { page: Page }) {
         </label>
       </div>
 
+      <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-4 mb-6 flex flex-wrap items-end gap-3">
+        <label className="block flex-1 min-w-[200px]">
+          <span className="text-sm font-medium text-gray-700">Add section</span>
+          <select
+            value={addSectionType}
+            onChange={(e) => setAddSectionType(e.target.value as SectionType)}
+            className="mt-1 w-full px-3 py-2 border rounded-lg text-sm"
+          >
+            {addableTypes.map((s) => (
+              <option key={s.type} value={s.type}>
+                {s.label}
+              </option>
+            ))}
+          </select>
+        </label>
+        <button
+          type="button"
+          onClick={addSection}
+          className="px-4 py-2 rounded-xl bg-[#152232] text-white text-sm font-semibold hover:bg-[#1a2d42]"
+        >
+          + Add section
+        </button>
+        <p className="text-xs text-gray-500 w-full">Save first, then use Preview draft to check changes before publishing.</p>
+      </div>
+
       <div className="space-y-3">
         {sections.map((section, index) => (
           <div key={index} className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
-            <button
-              type="button"
-              onClick={() => setOpenIndex(openIndex === index ? null : index)}
-              className="w-full flex items-center justify-between px-6 py-4 text-left hover:bg-gray-50"
-            >
-              <span className="font-semibold text-[#152232]">{sectionLabel(section.type, index)}</span>
-              <span className="text-gray-400 text-sm">{openIndex === index ? '▲' : '▼'}</span>
-            </button>
+            <div className="flex items-center gap-2 px-4 py-3 border-b border-gray-50">
+              <button
+                type="button"
+                onClick={() => setOpenIndex(openIndex === index ? null : index)}
+                className="flex-1 flex items-center justify-between text-left hover:bg-gray-50 -mx-2 px-2 py-1 rounded-lg"
+              >
+                <span className="font-semibold text-[#152232]">{sectionLabel(section.type, index)}</span>
+                <span className="text-gray-400 text-sm">{openIndex === index ? '▲' : '▼'}</span>
+              </button>
+              <div className="flex items-center gap-1 shrink-0">
+                <button
+                  type="button"
+                  onClick={() => moveSection(index, -1)}
+                  disabled={index === 0}
+                  className="p-1.5 rounded-lg text-gray-500 hover:bg-gray-100 disabled:opacity-30"
+                  title="Move up"
+                >
+                  ↑
+                </button>
+                <button
+                  type="button"
+                  onClick={() => moveSection(index, 1)}
+                  disabled={index === sections.length - 1}
+                  className="p-1.5 rounded-lg text-gray-500 hover:bg-gray-100 disabled:opacity-30"
+                  title="Move down"
+                >
+                  ↓
+                </button>
+                <button
+                  type="button"
+                  onClick={() => removeSection(index)}
+                  className="p-1.5 rounded-lg text-red-600 hover:bg-red-50"
+                  title="Remove section"
+                >
+                  ✕
+                </button>
+              </div>
+            </div>
             {openIndex === index && (
-              <div className="px-6 pb-6 border-t border-gray-100 pt-4">{renderSectionBody(section, index)}</div>
+              <div className="px-6 pb-6 pt-4">{renderSectionBody(section, index)}</div>
             )}
           </div>
         ))}

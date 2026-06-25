@@ -32,15 +32,15 @@ export default function WorkCard({ item }: { item: WorkCardItem }) {
       className="block bg-white rounded-[20px] sm:rounded-[22px] overflow-hidden border border-[var(--color-greige)]/50 active:scale-[0.99] md:hover:-translate-y-1 md:hover:shadow-xl transition-all duration-250 group"
     >
       <div
-        className="h-[160px] sm:h-[180px] md:h-[200px] relative flex items-end p-4 sm:p-5"
+        className="h-[160px] sm:h-[180px] md:h-[200px] relative flex items-end p-4 sm:p-5 overflow-hidden"
         style={item.imageUrl?.trim() ? undefined : { background: grad }}
       >
         {item.imageUrl?.trim() ? (
           <ImageWithPlaceholder
             src={item.imageUrl}
             alt={item.title}
-            aspectRatio="auto"
-            className="absolute inset-0 w-full h-full object-cover"
+            aspectRatio="fill"
+            className="absolute inset-0 w-full h-full"
             placeholderLabel={item.title}
           />
         ) : (

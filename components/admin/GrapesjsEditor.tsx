@@ -30,6 +30,8 @@ import { PAGE_STARTERS } from '@/lib/grapesjs/page-starters'
 import { sectionsToHtml } from '@/lib/grapesjs/sections-to-html'
 import { GOOGLE_FONT_OPTIONS, googleFontsUrl } from '@/lib/google-fonts'
 import type { BuilderSnippet, Page, PageSection } from '@/lib/types/database'
+import { isBuiltinPageSlug } from '@/lib/builtin-pages'
+import { switchPageToSections } from '@/app/admin/(dashboard)/pages/actions'
 import { useUnsavedChangesAlert } from '@/lib/hooks/useUnsavedChangesAlert'
 
 interface GrapesjsEditorProps {
@@ -65,6 +67,7 @@ export default function GrapesjsEditor({ page }: GrapesjsEditorProps) {
   const [dirty, setDirty] = useState(false)
   const [previewDeviceName, setPreviewDeviceName] = useState('desktop')
   const [selectionMobileHints, setSelectionMobileHints] = useState<string[]>([])
+  const [switchingEditor, setSwitchingEditor] = useState(false)
   const saveRef = useRef<() => void>(() => {})
   const ignoreDirtyRef = useRef(true)
   const markDirtyRef = useRef<() => void>(() => {})
@@ -185,6 +188,27 @@ export default function GrapesjsEditor({ page }: GrapesjsEditorProps) {
   const touchPageFieldsDirty = useCallback(() => {
     setDirty(true)
   }, [])
+
+  const handleSwitchToSections = useCallback(async () => {
+    if (!page?.id) return
+    const msg =
+      'Switch back to the section editor? The visual layout will be replaced with the default mockup sections (or code defaults for this page). Your GrapesJS layout is not kept.'
+    if (!globalThis.confirm(msg)) return
+    if (dirty) {
+      showToast('Save or discard unsaved changes before switching editors.', 'error')
+      return
+    }
+    setSwitchingEditor(true)
+    try {
+      await switchPageToSections(page.id)
+      showToast('Switched to section editor.')
+      router.refresh()
+    } catch (err) {
+      showToast(err instanceof Error ? err.message : 'Could not switch editor', 'error')
+    } finally {
+      setSwitchingEditor(false)
+    }
+  }, [page?.id, dirty, router])
 
   useEffect(() => {
     const handler = (e: KeyboardEvent) => {
@@ -727,6 +751,17 @@ export default function GrapesjsEditor({ page }: GrapesjsEditorProps) {
         >
           Preview
         </button>
+        {page?.slug && isBuiltinPageSlug(page.slug) && (
+          <button
+            type="button"
+            onClick={handleSwitchToSections}
+            disabled={switchingEditor}
+            className="hidden lg:flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-semibold text-white/90 bg-white/10 hover:bg-white/20 disabled:opacity-40"
+            title="Return to structured section editor (resets to defaults)"
+          >
+            {switchingEditor ? '…' : 'Section editor'}
+          </button>
+        )}
         <button
           type="button"
           onClick={openLiveSite}
