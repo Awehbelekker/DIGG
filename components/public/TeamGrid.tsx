@@ -1,7 +1,7 @@
 import PageWrap from '@/components/public/ui/PageWrap'
 import SectionHead from '@/components/public/ui/SectionHead'
 import TeamAvatar from '@/components/public/TeamAvatar'
-import { normalizeStoragePublicUrl } from '@/lib/image-storage'
+import { resolveMemberPhotoUrl } from '@/lib/image-storage'
 
 type Member = {
   name: string
@@ -14,9 +14,7 @@ type Member = {
 }
 
 function memberPhotoUrl(member: Member): string | undefined {
-  const raw = member.photoUrl ?? member.photo_url ?? member.imageUrl
-  const normalized = normalizeStoragePublicUrl(raw)
-  return normalized || undefined
+  return resolveMemberPhotoUrl(member as Record<string, unknown>)
 }
 
 function memberInitials(member: Member): string {

@@ -1,6 +1,8 @@
+'use client'
+
 import PageWrap from '@/components/public/ui/PageWrap'
 import Eyebrow from '@/components/public/ui/Eyebrow'
-import ImageWithPlaceholder from '@/components/public/ImageWithPlaceholder'
+import { useStorageImageSrc } from '@/components/public/useStorageImageSrc'
 
 export default function AboutHero({
   kick,
@@ -14,6 +16,7 @@ export default function AboutHero({
   portraitImageUrl?: string
 }) {
   const paragraphs = body.split('\n\n').filter(Boolean)
+  const { src, showImage, onError } = useStorageImageSrc(portraitImageUrl)
 
   return (
     <section className="page-top pb-8 sm:pb-10 bg-[var(--color-bone)]">
@@ -37,14 +40,16 @@ export default function AboutHero({
             className="order-1 lg:order-2 aspect-[4/5] max-h-[360px] sm:max-h-[420px] lg:max-h-none w-full mx-auto max-w-sm lg:max-w-none rounded-2xl sm:rounded-3xl relative overflow-hidden flex items-center justify-center"
             style={{ background: 'linear-gradient(135deg, var(--color-lead), var(--color-lead-deep))' }}
           >
-            {portraitImageUrl?.trim() ? (
-              <ImageWithPlaceholder
-                src={portraitImageUrl}
-                alt=""
-                aspectRatio="fill"
-                className="absolute inset-0 w-full h-full"
-                placeholderLabel="Portrait"
-              />
+            {showImage ? (
+              <>
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src={src}
+                  alt=""
+                  className="absolute inset-0 w-full h-full object-cover"
+                  onError={onError}
+                />
+              </>
             ) : (
               <span
                 className="font-black text-[6rem] sm:text-[8rem] lg:text-[10rem] text-white/20"

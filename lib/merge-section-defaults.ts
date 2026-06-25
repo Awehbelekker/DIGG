@@ -1,4 +1,5 @@
 import { DEFAULT_SECTION_DATA } from '@/lib/section-config'
+import { resolveMemberPhotoUrl } from '@/lib/image-storage'
 import type { PageSection, SectionType } from '@/lib/types/database'
 
 type StatItem = { label: string; value: string }
@@ -42,10 +43,24 @@ export function mergeSectionsWithCodeDefaults(sections: PageSection[]): PageSect
       }
     }
 
+    if (type === 'about_hero') {
+      const portrait = String(section.data.portraitImageUrl ?? section.data.portrait_image_url ?? '').trim()
+      if (portrait) data.portraitImageUrl = portrait
+    }
+
     if (type === 'team') {
-      const userMembers = section.data.members as unknown[] | undefined
+      const userMembers = section.data.members as Record<string, unknown>[] | undefined
+      const defaultMembers = (defaults.members as Record<string, unknown>[]) ?? []
       if (Array.isArray(userMembers) && userMembers.length > 0) {
-        data.members = userMembers
+        data.members = userMembers.map((member, index) => {
+          const fallback = defaultMembers[index] ?? {}
+          const photoUrl = resolveMemberPhotoUrl(member) || resolveMemberPhotoUrl(fallback)
+          return {
+            ...fallback,
+            ...member,
+            ...(photoUrl ? { photoUrl } : {}),
+          }
+        })
       }
     }
 

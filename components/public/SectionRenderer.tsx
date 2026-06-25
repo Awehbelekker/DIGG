@@ -21,6 +21,7 @@ import TeamGrid from './TeamGrid'
 import PillarsInteractive from './PillarsInteractive'
 import PillarsPanel from './PillarsPanel'
 import ContactLayout from './ContactLayout'
+import { resolvePortraitImageUrl } from '@/lib/image-storage'
 import type { SiteSettings } from '@/lib/site-settings'
 import type { WorkCardItem } from './WorkCard'
 
@@ -85,7 +86,7 @@ export default function SectionRenderer({ section, siteSettings }: SectionRender
         kick={(data.kick as string) || undefined}
         title={(data.title as string) || ''}
         body={(data.body as string) || ''}
-        portraitImageUrl={(data.portraitImageUrl as string) || undefined}
+        portraitImageUrl={resolvePortraitImageUrl(data)}
       />
     )
   }

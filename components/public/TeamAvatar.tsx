@@ -1,7 +1,6 @@
 'use client'
 
-import { useState } from 'react'
-import { normalizeStoragePublicUrl } from '@/lib/image-storage'
+import { useStorageImageSrc } from '@/components/public/useStorageImageSrc'
 
 type TeamAvatarProps = {
   name: string
@@ -10,20 +9,18 @@ type TeamAvatarProps = {
 }
 
 export default function TeamAvatar({ name, photoUrl, initials }: TeamAvatarProps) {
-  const [failed, setFailed] = useState(false)
-  const src = normalizeStoragePublicUrl(photoUrl)
-  const showPhoto = src && !failed
+  const { src, showImage, onError } = useStorageImageSrc(photoUrl)
 
   return (
     <div className="relative mx-auto mb-5 w-24 h-24 sm:w-28 sm:h-28 lg:w-32 lg:h-32">
       <div className="relative w-full h-full rounded-full overflow-hidden border border-[var(--color-greige)]/80 bg-[var(--color-lead)]">
-        {showPhoto ? (
+        {showImage ? (
           // eslint-disable-next-line @next/next/no-img-element
           <img
             src={src}
             alt={name}
             className="w-full h-full object-cover"
-            onError={() => setFailed(true)}
+            onError={onError}
           />
         ) : (
           <div
