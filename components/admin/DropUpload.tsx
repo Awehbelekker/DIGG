@@ -3,6 +3,7 @@
 import { useState, useRef, useCallback, useEffect } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { showToast } from '@/components/admin/Toast'
+import { libraryFolderForPath, resolveStorageBucket } from '@/lib/image-storage'
 
 type DropUploadProps = {
   value: string
@@ -11,21 +12,25 @@ type DropUploadProps = {
   folder?: string
   label?: string
   compact?: boolean
+  /** Register upload in Admin → Images library (default true) */
+  registerInLibrary?: boolean
 }
 
 export default function DropUpload({
   value,
   onChange,
-  bucket = 'hero-images',
-  folder = 'uploads',
+  bucket,
+  folder = 'portfolio',
   label = 'Image',
   compact = false,
+  registerInLibrary = true,
 }: DropUploadProps) {
   const [uploading, setUploading] = useState(false)
   const [dragging, setDragging] = useState(false)
   const [preview, setPreview] = useState<string | null>(null)
   const fileRef = useRef<HTMLInputElement>(null)
   const supabase = createClient()
+  const storageBucket = resolveStorageBucket(bucket, folder)
 
   useEffect(() => {
     return () => { if (preview) URL.revokeObjectURL(preview) }
@@ -46,19 +51,31 @@ export default function DropUpload({
     setUploading(true)
 
     try {
-      const ext = file.name.split('.').pop()
+      const ext = file.name.split('.').pop() || 'jpg'
       const path = `${folder}/${Date.now()}.${ext}`
-      const { error } = await supabase.storage.from(bucket).upload(path, file)
+      const { error } = await supabase.storage.from(storageBucket).upload(path, file)
       if (error) throw error
-      const { data } = supabase.storage.from(bucket).getPublicUrl(path)
-      onChange(data.publicUrl)
+      const { data } = supabase.storage.from(storageBucket).getPublicUrl(path)
+      const publicUrl = data.publicUrl
+
+      if (registerInLibrary) {
+        const { error: dbError } = await supabase.from('images').insert({
+          filename: file.name,
+          url: publicUrl,
+          folder: libraryFolderForPath(folder),
+          alt_text: null,
+        })
+        if (dbError) console.warn('Image uploaded but library record failed:', dbError.message)
+      }
+
+      onChange(publicUrl)
       showToast('Image uploaded!')
     } catch (err) {
       showToast('Upload failed: ' + (err instanceof Error ? err.message : String(err)), 'error')
     } finally {
       setUploading(false)
     }
-  }, [bucket, folder, onChange, preview, supabase])
+  }, [folder, onChange, preview, registerInLibrary, storageBucket, supabase])
 
   const handleDrop = useCallback((e: React.DragEvent) => {
     e.preventDefault()

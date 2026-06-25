@@ -141,7 +141,6 @@ export default function InsightEditor({ insight }: { insight?: Insight | null })
             compact
             value={formData.cover_image_url}
             onChange={(url) => setFormData({ ...formData, cover_image_url: url })}
-            bucket="images"
             folder="portfolio"
             label="Work card cover"
           />

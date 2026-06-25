@@ -3,6 +3,7 @@
 import { useState, useRef, useEffect } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { showToast } from '@/components/admin/Toast'
+import { storageBucketForFolder, libraryFolderForPath } from '@/lib/image-storage'
 
 interface ImageUploadProps {
   onUpload: () => void
@@ -54,7 +55,7 @@ export default function ImageUpload({ onUpload }: ImageUploadProps) {
       const fileExt = file.name.split('.').pop()
       const fileName = `${Date.now()}.${fileExt}`
       const filePath = `${folder}/${fileName}`
-      const bucketName = folder === 'hero' ? 'hero-images' : folder === 'logo' ? 'logos' : folder === 'team' ? 'team-photos' : 'portfolio'
+      const bucketName = storageBucketForFolder(folder)
 
       const { error: uploadError } = await supabase.storage
         .from(bucketName)
@@ -71,7 +72,7 @@ export default function ImageUpload({ onUpload }: ImageUploadProps) {
         .insert({
           filename: file.name,
           url: urlData.publicUrl,
-          folder,
+          folder: libraryFolderForPath(folder),
           alt_text: altText || null
         })
 

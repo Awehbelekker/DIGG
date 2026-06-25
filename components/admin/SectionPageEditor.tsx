@@ -122,7 +122,6 @@ function HeroFields({
           compact
           value={String(data.backgroundImageUrl ?? '')}
           onChange={(url) => set('backgroundImageUrl', url)}
-          bucket="images"
           folder="hero"
           label="Hero background"
         />
@@ -345,7 +344,7 @@ export default function SectionPageEditor({ page }: { page: Page }) {
             <span className="text-sm font-medium text-gray-700">Body</span>
             <textarea value={String(data.body ?? '')} onChange={(e) => set('body', e.target.value)} rows={8} className="mt-1 w-full px-3 py-2 border rounded-lg text-sm" />
           </label>
-          <DropUpload compact value={String(data.portraitImageUrl ?? '')} onChange={(url) => set('portraitImageUrl', url)} bucket="images" folder="team" label="Portrait" />
+          <DropUpload compact value={String(data.portraitImageUrl ?? '')} onChange={(url) => set('portraitImageUrl', url)} folder="team" label="Portrait" />
         </div>
       )
     }
@@ -398,7 +397,6 @@ export default function SectionPageEditor({ page }: { page: Page }) {
                   next[i] = { ...item, imageUrl: url }
                   onChange({ ...data, items: next })
                 }}
-                bucket="images"
                 folder="grid"
                 label="Image (optional)"
               />
@@ -468,7 +466,6 @@ export default function SectionPageEditor({ page }: { page: Page }) {
                   next[i] = { ...item, imageUrl: url }
                   onChange({ ...data, items: next })
                 }}
-                bucket="images"
                 folder="services"
                 label="Icon image (overrides emoji)"
               />
@@ -523,7 +520,7 @@ export default function SectionPageEditor({ page }: { page: Page }) {
               <textarea value={item.description} rows={2} onChange={(e) => { const next = [...items]; next[i] = { ...item, description: e.target.value }; onChange({ ...data, items: next }) }} className="w-full px-3 py-2 border rounded-lg text-sm" />
               <input type="text" value={item.link ?? ''} placeholder="Link (/insights/...)" onChange={(e) => { const next = [...items]; next[i] = { ...item, link: e.target.value }; onChange({ ...data, items: next }) }} className="w-full px-3 py-2 border rounded-lg text-sm" />
               <input type="text" value={item.status ?? ''} placeholder="Status badge" onChange={(e) => { const next = [...items]; next[i] = { ...item, status: e.target.value }; onChange({ ...data, items: next }) }} className="w-full px-3 py-2 border rounded-lg text-sm" />
-              <DropUpload compact value={item.imageUrl ?? ''} onChange={(url) => { const next = [...items]; next[i] = { ...item, imageUrl: url }; onChange({ ...data, items: next }) }} bucket="images" folder="portfolio" label="Image" />
+              <DropUpload compact value={item.imageUrl ?? ''} onChange={(url) => { const next = [...items]; next[i] = { ...item, imageUrl: url }; onChange({ ...data, items: next }) }} folder="portfolio" label="Image" />
             </div>
           ))}
         </div>
@@ -562,7 +559,7 @@ export default function SectionPageEditor({ page }: { page: Page }) {
               <input type="text" value={m.name} placeholder="Name" onChange={(e) => { const next = [...members]; next[i] = { ...m, name: e.target.value }; onChange({ ...data, members: next }) }} className="w-full px-3 py-2 border rounded-lg text-sm" />
               <input type="text" value={m.role} placeholder="Role" onChange={(e) => { const next = [...members]; next[i] = { ...m, role: e.target.value }; onChange({ ...data, members: next }) }} className="w-full px-3 py-2 border rounded-lg text-sm" />
               <input type="text" value={m.credential ?? ''} placeholder="Credential (optional)" onChange={(e) => { const next = [...members]; next[i] = { ...m, credential: e.target.value }; onChange({ ...data, members: next }) }} className="w-full px-3 py-2 border rounded-lg text-sm" />
-              <DropUpload compact value={m.photoUrl ?? ''} onChange={(url) => { const next = [...members]; next[i] = { ...m, photoUrl: url }; onChange({ ...data, members: next }) }} bucket="images" folder="team" label="Photo" />
+              <DropUpload compact value={m.photoUrl ?? ''} onChange={(url) => { const next = [...members]; next[i] = { ...m, photoUrl: url }; onChange({ ...data, members: next }) }} folder="team" label="Photo" />
             </div>
           ))}
         </div>
@@ -610,7 +607,6 @@ export default function SectionPageEditor({ page }: { page: Page }) {
                   compact
                   value={item.imageUrl ?? ''}
                   onChange={(url) => { const next = [...items]; next[i] = { ...item, imageUrl: url }; onChange({ ...data, items: next }) }}
-                  bucket="images"
                   folder="pillars"
                   label="Background image (optional)"
                 />
