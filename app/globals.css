@@ -123,6 +123,34 @@ h2, h3, h4, h5, h6 {
   }
 }
 
+/* Section spacing rhythm (mockup pages) */
+.section-y {
+  padding-top: 3rem;
+  padding-bottom: 3rem;
+}
+@media (min-width: 640px) {
+  .section-y { padding-top: 3.5rem; padding-bottom: 3.5rem; }
+}
+@media (min-width: 1024px) {
+  .section-y { padding-top: 4rem; padding-bottom: 4rem; }
+}
+.section-y-tight {
+  padding-top: 2.5rem;
+  padding-bottom: 2.5rem;
+}
+@media (min-width: 640px) {
+  .section-y-tight { padding-top: 3rem; padding-bottom: 3rem; }
+}
+.page-top {
+  padding-top: 2.5rem;
+}
+@media (min-width: 640px) {
+  .page-top { padding-top: 3rem; }
+}
+@media (min-width: 1024px) {
+  .page-top { padding-top: 3.5rem; }
+}
+
 /* Work / insight article body */
 .prose-digg {
   font-size: 1rem;

@@ -13,6 +13,7 @@ import { savePageSections, resetPageToDefaults } from '@/app/admin/(dashboard)/p
 import { useUnsavedChangesAlert } from '@/lib/hooks/useUnsavedChangesAlert'
 
 type GridItem = { title: string; description: string; imageUrl?: string }
+type ServiceItem = { title: string; description: string; icon?: string; imageUrl?: string }
 type ProductItem = {
   title: string
   description: string
@@ -351,7 +352,7 @@ export default function SectionPageEditor({ page }: { page: Page }) {
     if (type === 'form') {
       return <p className="text-sm text-gray-500">Contact form — submissions appear under Form Submissions.</p>
     }
-    if (type === 'grid' || type === 'services') {
+    if (type === 'grid') {
       const items = (data.items as GridItem[]) ?? []
       return (
         <div className="space-y-4">
@@ -389,6 +390,88 @@ export default function SectionPageEditor({ page }: { page: Page }) {
                 }}
                 className="w-full px-3 py-2 border rounded-lg text-sm"
               />
+              <DropUpload
+                compact
+                value={item.imageUrl ?? ''}
+                onChange={(url) => {
+                  const next = [...items]
+                  next[i] = { ...item, imageUrl: url }
+                  onChange({ ...data, items: next })
+                }}
+                bucket="images"
+                folder="grid"
+                label="Image (optional)"
+              />
+            </div>
+          ))}
+        </div>
+      )
+    }
+    if (type === 'services') {
+      const items = (data.items as ServiceItem[]) ?? []
+      const set = (key: string, value: string) => onChange({ ...data, [key]: value })
+      return (
+        <div className="space-y-4">
+          <label className="block">
+            <span className="text-sm font-medium text-gray-700">Eyebrow</span>
+            <input type="text" value={String(data.kick ?? '')} onChange={(e) => set('kick', e.target.value)} className="mt-1 w-full px-3 py-2 border rounded-lg text-sm" />
+          </label>
+          <label className="block">
+            <span className="text-sm font-medium text-gray-700">Section title</span>
+            <input type="text" value={String(data.title ?? '')} onChange={(e) => set('title', e.target.value)} className="mt-1 w-full px-3 py-2 border rounded-lg text-sm" />
+          </label>
+          <label className="block">
+            <span className="text-sm font-medium text-gray-700">Side text (optional)</span>
+            <textarea value={String(data.side ?? '')} onChange={(e) => set('side', e.target.value)} rows={2} className="mt-1 w-full px-3 py-2 border rounded-lg text-sm" placeholder="Short line shown beside the heading on desktop" />
+          </label>
+          {items.map((item, i) => (
+            <div key={i} className="p-3 bg-gray-50 rounded-lg border border-gray-100 space-y-2">
+              <p className="text-xs font-semibold text-gray-500">Service {i + 1}</p>
+              <input
+                type="text"
+                value={item.title}
+                placeholder="Title"
+                onChange={(e) => {
+                  const next = [...items]
+                  next[i] = { ...item, title: e.target.value }
+                  onChange({ ...data, items: next })
+                }}
+                className="w-full px-3 py-2 border rounded-lg text-sm"
+              />
+              <textarea
+                value={item.description}
+                placeholder="Description"
+                rows={2}
+                onChange={(e) => {
+                  const next = [...items]
+                  next[i] = { ...item, description: e.target.value }
+                  onChange({ ...data, items: next })
+                }}
+                className="w-full px-3 py-2 border rounded-lg text-sm"
+              />
+              <input
+                type="text"
+                value={item.icon ?? ''}
+                placeholder="Emoji icon (if no image)"
+                onChange={(e) => {
+                  const next = [...items]
+                  next[i] = { ...item, icon: e.target.value }
+                  onChange({ ...data, items: next })
+                }}
+                className="w-full px-3 py-2 border rounded-lg text-sm"
+              />
+              <DropUpload
+                compact
+                value={item.imageUrl ?? ''}
+                onChange={(url) => {
+                  const next = [...items]
+                  next[i] = { ...item, imageUrl: url }
+                  onChange({ ...data, items: next })
+                }}
+                bucket="images"
+                folder="services"
+                label="Icon image (overrides emoji)"
+              />
             </div>
           ))}
         </div>
@@ -396,16 +479,43 @@ export default function SectionPageEditor({ page }: { page: Page }) {
     }
     if (type === 'products' || type === 'work_cards') {
       const items = (data.items as ProductItem[]) ?? []
+      const set = (key: string, value: string) => onChange({ ...data, [key]: value })
       return (
         <div className="space-y-4">
+          {type === 'work_cards' && page.slug === 'home' && (
+            <p className="text-xs text-amber-800 bg-amber-50 border border-amber-200 rounded-lg px-3 py-2">
+              On the live homepage, card titles and links may be overridden by{' '}
+              <Link href="/admin/settings" className="font-semibold underline">
+                Settings → Homepage products
+              </Link>
+              . Eyebrow and &ldquo;View all&rdquo; link are always from this section.
+            </p>
+          )}
+          <label className="block">
+            <span className="text-sm font-medium text-gray-700">Eyebrow</span>
+            <input type="text" value={String(data.kick ?? '')} onChange={(e) => set('kick', e.target.value)} className="mt-1 w-full px-3 py-2 border rounded-lg text-sm" />
+          </label>
           <label className="block">
             <span className="text-sm font-medium text-gray-700">Section title</span>
-            <input type="text" value={String(data.title ?? '')} onChange={(e) => onChange({ ...data, title: e.target.value })} className="mt-1 w-full px-3 py-2 border rounded-lg text-sm" />
+            <input type="text" value={String(data.title ?? '')} onChange={(e) => set('title', e.target.value)} className="mt-1 w-full px-3 py-2 border rounded-lg text-sm" />
           </label>
-          <label className="block">
-            <span className="text-sm font-medium text-gray-700">Subtitle</span>
-            <input type="text" value={String(data.subtitle ?? '')} onChange={(e) => onChange({ ...data, subtitle: e.target.value })} className="mt-1 w-full px-3 py-2 border rounded-lg text-sm" />
-          </label>
+          {type === 'work_cards' ? (
+            <div className="grid sm:grid-cols-2 gap-3">
+              <label className="block">
+                <span className="text-sm font-medium text-gray-700">Side link text</span>
+                <input type="text" value={String(data.sideLinkText ?? '')} onChange={(e) => set('sideLinkText', e.target.value)} placeholder="View all work →" className="mt-1 w-full px-3 py-2 border rounded-lg text-sm" />
+              </label>
+              <label className="block">
+                <span className="text-sm font-medium text-gray-700">Side link URL</span>
+                <input type="text" value={String(data.sideLinkHref ?? '')} onChange={(e) => set('sideLinkHref', e.target.value)} placeholder="/insights" className="mt-1 w-full px-3 py-2 border rounded-lg text-sm" />
+              </label>
+            </div>
+          ) : (
+            <label className="block">
+              <span className="text-sm font-medium text-gray-700">Subtitle</span>
+              <input type="text" value={String(data.subtitle ?? '')} onChange={(e) => set('subtitle', e.target.value)} className="mt-1 w-full px-3 py-2 border rounded-lg text-sm" />
+            </label>
+          )}
           {items.map((item, i) => (
             <div key={i} className="p-3 bg-gray-50 rounded-lg border space-y-2">
               <p className="text-xs font-semibold text-gray-500">Project {i + 1}</p>
@@ -459,7 +569,7 @@ export default function SectionPageEditor({ page }: { page: Page }) {
       )
     }
     if (type === 'pillars_interactive' || type === 'pillars_panel') {
-      type Pillar = { letter?: string; title: string; description: string; colorKey?: string }
+      type Pillar = { letter?: string; title: string; description: string; colorKey?: string; imageUrl?: string }
       const items = (data.items as Pillar[]) ?? []
       const set = (key: string, value: string) => onChange({ ...data, [key]: value })
       return (
@@ -496,6 +606,14 @@ export default function SectionPageEditor({ page }: { page: Page }) {
                   <option value="sage">Sage</option>
                   <option value="coral">Coral</option>
                 </select>
+                <DropUpload
+                  compact
+                  value={item.imageUrl ?? ''}
+                  onChange={(url) => { const next = [...items]; next[i] = { ...item, imageUrl: url }; onChange({ ...data, items: next }) }}
+                  bucket="images"
+                  folder="pillars"
+                  label="Background image (optional)"
+                />
               </div>
             ))
           )}

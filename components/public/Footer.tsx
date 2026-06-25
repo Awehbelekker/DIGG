@@ -35,7 +35,7 @@ export default function Footer({ logoUrl = '', links = [], siteSettings = {} }: 
   const logoSrc = logoUrl?.trim()
 
   return (
-    <footer className="bg-[var(--color-ink)] text-[var(--color-greige)] mt-6 sm:mt-8 pt-10 sm:pt-12 pb-[max(2.25rem,env(safe-area-inset-bottom))]">
+    <footer className="bg-[var(--color-ink)] text-[var(--color-greige)] pt-10 sm:pt-12 pb-[max(2.25rem,env(safe-area-inset-bottom))]">
       <div className="max-w-[1080px] mx-auto px-4 sm:px-6 lg:px-7">
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 sm:gap-10">
           <div>

@@ -22,7 +22,7 @@ export default function Hero({
   backgroundImage,
 }: HeroProps) {
   return (
-    <section className="relative py-12 sm:py-16 lg:py-[70px] pb-10 sm:pb-12 overflow-hidden bg-[var(--color-bone)]">
+    <section className="relative page-top pb-10 sm:pb-12 overflow-hidden bg-[var(--color-bone)]">
       {backgroundImage && (
         <div
           className="absolute inset-0 opacity-20 bg-cover bg-center"

@@ -21,7 +21,7 @@ Since 2016 Judy has also been an active property investor in Cape Town — we br
     data: {
       kick: 'Our pillars',
       title: 'Develop. Invest. Grow. Give.',
-      intro: 'Hover each letter to see what it means for how we work.',
+      intro: 'Four pillars that guide every project.',
       items: [
         {
           letter: 'D',

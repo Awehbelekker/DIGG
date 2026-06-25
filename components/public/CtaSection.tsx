@@ -15,7 +15,7 @@ export default function CtaSection({
   buttonLink: string
 }) {
   return (
-    <section className="py-12 sm:py-16 lg:py-[72px] bg-[var(--color-bone)]">
+    <section className="section-y bg-[var(--color-bone)]">
       <PageWrap className="text-center">
         {kick && (
           <p className="text-xs font-bold tracking-[0.25em] uppercase text-[var(--color-lead-deep)] mb-3">{kick}</p>

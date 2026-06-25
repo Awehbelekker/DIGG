@@ -7,7 +7,7 @@ interface Stat {
 
 export default function StatsBar({ stats }: { stats: Stat[] }) {
   return (
-    <section className="py-10 sm:py-12 lg:py-16 bg-[var(--color-bone)]">
+    <section className="section-y-tight bg-[var(--color-bone)]">
       <PageWrap>
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
           {stats.map((stat, i) => (

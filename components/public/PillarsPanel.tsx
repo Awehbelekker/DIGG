@@ -11,7 +11,7 @@ export default function PillarsPanel({
   body: string
 }) {
   return (
-    <section className="py-12 sm:py-16 bg-[var(--color-bone)]">
+    <section className="section-y-tight bg-[var(--color-bone)]">
       <PageWrap>
         <div className="bg-[var(--color-ink)] rounded-2xl sm:rounded-[28px] p-6 sm:p-8 lg:p-12 text-[var(--color-bone)]">
           {kick && (

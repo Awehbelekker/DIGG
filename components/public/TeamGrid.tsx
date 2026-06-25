@@ -1,4 +1,5 @@
 import PageWrap from '@/components/public/ui/PageWrap'
+import SectionHead from '@/components/public/ui/SectionHead'
 import ImageWithPlaceholder from '@/components/public/ImageWithPlaceholder'
 
 type Member = { name: string; role: string; credential?: string; photoUrl?: string; initials?: string }
@@ -51,15 +52,10 @@ export default function TeamGrid({
   members: Member[]
 }) {
   return (
-    <section className="py-12 sm:py-16 bg-[var(--color-bone)]">
+    <section className="section-y bg-[var(--color-bone)]">
       <PageWrap>
-        {kick && (
-          <p className="text-xs font-bold tracking-[0.25em] uppercase text-[var(--color-lead-deep)] mb-2">{kick}</p>
-        )}
-        <h2 className="text-3xl sm:text-4xl font-extrabold tracking-tight text-[var(--color-ink)] mb-8" style={{ fontFamily: 'var(--font-heading)' }}>
-          {title}
-        </h2>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
+        <SectionHead kick={kick} title={title} />
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5">
           {members.map((m, i) => (
             <div key={i} className="bg-white rounded-[18px] sm:rounded-[20px] p-5 sm:p-6 lg:p-7 border border-[var(--color-greige)]/50 text-center">
               <Avatar member={m} />

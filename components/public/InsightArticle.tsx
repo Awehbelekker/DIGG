@@ -52,7 +52,7 @@ export default function InsightArticle({
           </div>
         )}
 
-        <PageWrap className={`max-w-3xl ${cover ? 'pt-8 sm:pt-10' : 'pt-10 sm:pt-14'} pb-12 sm:pb-16`}>
+        <PageWrap className={`max-w-3xl ${cover ? 'pt-8 sm:pt-10' : 'page-top'} pb-12 sm:pb-16`}>
           {showBackLink && (
             <Link
               href="/insights"

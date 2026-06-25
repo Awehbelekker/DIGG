@@ -1,3 +1,5 @@
+import type { ReactNode } from 'react'
+
 export default function SectionHead({
   kick,
   title,
@@ -6,12 +8,12 @@ export default function SectionHead({
 }: {
   kick?: string
   title: string
-  side?: string
+  side?: ReactNode
   centered?: boolean
 }) {
   if (centered) {
     return (
-      <div className="text-center mb-8 sm:mb-10">
+      <div className="text-center mb-8 lg:mb-10">
         {kick && (
           <p className="text-xs font-bold tracking-[0.25em] uppercase text-[var(--color-lead-deep)] mb-3">{kick}</p>
         )}
@@ -26,7 +28,7 @@ export default function SectionHead({
   }
 
   return (
-    <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-4 sm:gap-5 mb-7 sm:mb-9">
+    <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-4 sm:gap-5 mb-8 lg:mb-10">
       <div>
         {kick && (
           <p className="text-xs font-bold tracking-[0.25em] uppercase text-[var(--color-lead-deep)] mb-2">{kick}</p>
@@ -39,9 +41,9 @@ export default function SectionHead({
         </h2>
       </div>
       {side && (
-        <p className="text-[var(--color-muted)] text-sm max-w-sm leading-relaxed md:text-right md:shrink-0">
+        <div className="text-[var(--color-muted)] text-sm max-w-sm leading-relaxed md:text-right md:shrink-0">
           {side}
-        </p>
+        </div>
       )}
     </div>
   )

@@ -16,7 +16,7 @@ export default function AboutHero({
   const paragraphs = body.split('\n\n').filter(Boolean)
 
   return (
-    <section className="pt-10 sm:pt-14 pb-8 sm:pb-10 bg-[var(--color-bone)]">
+    <section className="page-top pb-8 sm:pb-10 bg-[var(--color-bone)]">
       <PageWrap>
         <div className="grid grid-cols-1 lg:grid-cols-[1.2fr_1fr] gap-8 lg:gap-10 items-center">
           <div className="order-2 lg:order-1">

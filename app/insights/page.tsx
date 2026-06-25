@@ -36,7 +36,7 @@ export default async function WorkListPage() {
 
   return (
     <div className="min-h-screen bg-[var(--color-bone)]">
-      <section className="pt-10 sm:pt-14 pb-12 sm:pb-16">
+      <section className="page-top pb-12 sm:pb-16">
         <PageWrap>
           <Eyebrow className="mb-4 sm:mb-6">{kick}</Eyebrow>
           <h1

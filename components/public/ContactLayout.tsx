@@ -36,7 +36,7 @@ export default function ContactLayout({
   ]
 
   return (
-    <section className="pt-10 sm:pt-14 pb-12 sm:pb-16 bg-[var(--color-bone)]">
+    <section className="page-top pb-12 sm:pb-16 bg-[var(--color-bone)]">
       <PageWrap>
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 items-start">
           <div>

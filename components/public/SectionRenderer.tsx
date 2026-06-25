@@ -61,7 +61,7 @@ export default function SectionRenderer({ section, siteSettings }: SectionRender
         kick={(data.kick as string) || undefined}
         title={(data.title as string) || 'What we do'}
         side={(data.side as string) || undefined}
-        items={(data.items as { title: string; description: string; icon?: string }[]) ?? []}
+        items={(data.items as { title: string; description: string; icon?: string; imageUrl?: string }[]) ?? []}
       />
     )
   }
@@ -215,7 +215,7 @@ export default function SectionRenderer({ section, siteSettings }: SectionRender
           ? 'grid-cols-1 md:grid-cols-2'
           : 'grid-cols-1 md:grid-cols-3'
     return (
-      <RevealSection className="bg-white py-16 lg:py-20">
+      <RevealSection className="bg-white section-y">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           {title && (
             <h2 className="text-3xl font-bold text-[var(--color-ink)] mb-3 text-center" style={{ fontFamily: 'var(--font-heading)' }}>
