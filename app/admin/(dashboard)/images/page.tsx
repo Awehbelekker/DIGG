@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback, useMemo } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import type { Image } from '@/lib/types/database'
 import ImageUpload from '@/components/admin/ImageUpload'
+import StorageSetupBanner from '@/components/admin/StorageSetupBanner'
 import AdminPageHeading from '@/components/admin/AdminPageHeading'
 import { showToast } from '@/components/admin/Toast'
 import AdminSafeLink from '@/components/admin/AdminSafeLink'
@@ -130,6 +131,8 @@ export default function AdminImagesPage() {
           )}
         </span>
       </AdminPageHeading>
+
+      <StorageSetupBanner />
 
       <div className="mb-6 flex flex-wrap gap-2">
         {folders.map((folder) => (

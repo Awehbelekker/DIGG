@@ -5,6 +5,7 @@ import { createClient } from '@/lib/supabase/client'
 import { showToast } from '@/components/admin/Toast'
 import { libraryFolderForPath, resolveStorageBucket } from '@/lib/image-storage'
 import MediaLibraryModal from '@/components/admin/MediaLibraryModal'
+import { ensureStorageBuckets } from '@/app/admin/(dashboard)/images/actions'
 
 type DropUploadProps = {
   value: string
@@ -58,8 +59,30 @@ export default function DropUpload({
     try {
       const ext = file.name.split('.').pop() || 'jpg'
       const path = `${folder}/${Date.now()}.${ext}`
-      const { error } = await supabase.storage.from(storageBucket).upload(path, file)
-      if (error) throw error
+
+      const tryUpload = async () =>
+        supabase.storage.from(storageBucket).upload(path, file)
+
+      let { error } = await tryUpload()
+
+      if (error && /bucket not found/i.test(error.message)) {
+        const setup = await ensureStorageBuckets()
+        if (setup.ok) {
+          const retry = await tryUpload()
+          error = retry.error
+        }
+        if (error) {
+          showToast(
+            setup.message ||
+              'Storage buckets missing. Run supabase/fix_storage_buckets.sql in Supabase SQL Editor.',
+            'error'
+          )
+          throw error
+        }
+      } else if (error) {
+        throw error
+      }
+
       const { data } = supabase.storage.from(storageBucket).getPublicUrl(path)
       const publicUrl = data.publicUrl
 
@@ -76,7 +99,15 @@ export default function DropUpload({
       onChange(publicUrl)
       showToast('Image uploaded!')
     } catch (err) {
-      showToast('Upload failed: ' + (err instanceof Error ? err.message : String(err)), 'error')
+      const msg = err instanceof Error ? err.message : String(err)
+      if (/bucket not found/i.test(msg)) {
+        showToast(
+          'Storage bucket missing. In Supabase → SQL Editor, paste and run supabase/fix_storage_buckets.sql, then upload again.',
+          'error'
+        )
+      } else {
+        showToast('Upload failed: ' + msg, 'error')
+      }
     } finally {
       setUploading(false)
     }
