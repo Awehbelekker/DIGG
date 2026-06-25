@@ -1,27 +1,23 @@
 'use client'
 
-import { useState, useMemo, useCallback } from 'react'
+import { useState, useMemo, useCallback, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
-import type { Page, PageSection } from '@/lib/types/database'
+import type { Page, PageSection, Insight } from '@/lib/types/database'
 import { SECTION_TYPES } from '@/lib/section-config'
 import { isBuiltinPageSlug } from '@/lib/builtin-pages'
 import { defaultSectionsForSlug } from '@/lib/builtin-pages'
 import DropUpload from '@/components/admin/DropUpload'
+import WorkItemPicker, { WorkItemBulkFill } from '@/components/admin/WorkItemPicker'
+import { createClient } from '@/lib/supabase/client'
 import { showToast } from '@/components/admin/Toast'
 import { savePageSections, resetPageToDefaults } from '@/app/admin/(dashboard)/pages/actions'
 import { useUnsavedChangesAlert } from '@/lib/hooks/useUnsavedChangesAlert'
+import type { WorkCardEditorItem } from '@/lib/insight-work-card'
 
 type GridItem = { title: string; description: string; imageUrl?: string }
 type ServiceItem = { title: string; description: string; icon?: string; imageUrl?: string }
-type ProductItem = {
-  title: string
-  description: string
-  link?: string
-  status?: string
-  comingSoon?: boolean
-  imageUrl?: string
-}
+type ProductItem = WorkCardEditorItem
 type StatItem = { label: string; value: string }
 
 function sectionLabel(type: string, index: number): string {
@@ -213,6 +209,19 @@ export default function SectionPageEditor({ page }: { page: Page }) {
   const [metaDescription, setMetaDescription] = useState(page.meta_description ?? '')
   const [saving, setSaving] = useState(false)
   const [openIndex, setOpenIndex] = useState<number | null>(0)
+  const [publishedInsights, setPublishedInsights] = useState<
+    Pick<Insight, 'id' | 'slug' | 'title' | 'excerpt' | 'cover_image_url' | 'content_type' | 'project_status'>[]
+  >([])
+
+  useEffect(() => {
+    const supabase = createClient()
+    supabase
+      .from('insights')
+      .select('id, slug, title, excerpt, cover_image_url, content_type, project_status')
+      .eq('published', true)
+      .order('updated_at', { ascending: false })
+      .then(({ data }) => setPublishedInsights(data ?? []))
+  }, [])
 
   const dirty = useMemo(
     () =>
@@ -513,9 +522,32 @@ export default function SectionPageEditor({ page }: { page: Page }) {
               <input type="text" value={String(data.subtitle ?? '')} onChange={(e) => set('subtitle', e.target.value)} className="mt-1 w-full px-3 py-2 border rounded-lg text-sm" />
             </label>
           )}
+          {type === 'work_cards' && (
+            <div className="flex flex-wrap items-center gap-3">
+              <WorkItemBulkFill
+                insights={publishedInsights}
+                max={4}
+                onFill={(filled) => onChange({ ...data, items: filled })}
+              />
+              <Link href="/admin/insights/new" className="text-xs text-[#B56244] font-semibold hover:underline">
+                + New Work item
+              </Link>
+            </div>
+          )}
           {items.map((item, i) => (
             <div key={i} className="p-3 bg-gray-50 rounded-lg border space-y-2">
               <p className="text-xs font-semibold text-gray-500">Project {i + 1}</p>
+              {type === 'work_cards' && (
+                <WorkItemPicker
+                  insights={publishedInsights}
+                  cardIndex={i}
+                  onSelect={(picked) => {
+                    const next = [...items]
+                    next[i] = { ...item, ...picked }
+                    onChange({ ...data, items: next })
+                  }}
+                />
+              )}
               <input type="text" value={item.title} placeholder="Title" onChange={(e) => { const next = [...items]; next[i] = { ...item, title: e.target.value }; onChange({ ...data, items: next }) }} className="w-full px-3 py-2 border rounded-lg text-sm" />
               <textarea value={item.description} rows={2} onChange={(e) => { const next = [...items]; next[i] = { ...item, description: e.target.value }; onChange({ ...data, items: next }) }} className="w-full px-3 py-2 border rounded-lg text-sm" />
               <input type="text" value={item.link ?? ''} placeholder="Link (/insights/...)" onChange={(e) => { const next = [...items]; next[i] = { ...item, link: e.target.value }; onChange({ ...data, items: next }) }} className="w-full px-3 py-2 border rounded-lg text-sm" />

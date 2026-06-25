@@ -4,6 +4,7 @@ import { useState, useRef, useCallback, useEffect } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { showToast } from '@/components/admin/Toast'
 import { libraryFolderForPath, resolveStorageBucket } from '@/lib/image-storage'
+import MediaLibraryModal from '@/components/admin/MediaLibraryModal'
 
 type DropUploadProps = {
   value: string
@@ -14,6 +15,8 @@ type DropUploadProps = {
   compact?: boolean
   /** Register upload in Admin → Images library (default true) */
   registerInLibrary?: boolean
+  /** Show “Choose from library” button (default true) */
+  showLibrary?: boolean
 }
 
 export default function DropUpload({
@@ -24,10 +27,12 @@ export default function DropUpload({
   label = 'Image',
   compact = false,
   registerInLibrary = true,
+  showLibrary = true,
 }: DropUploadProps) {
   const [uploading, setUploading] = useState(false)
   const [dragging, setDragging] = useState(false)
   const [preview, setPreview] = useState<string | null>(null)
+  const [libraryOpen, setLibraryOpen] = useState(false)
   const fileRef = useRef<HTMLInputElement>(null)
   const supabase = createClient()
   const storageBucket = resolveStorageBucket(bucket, folder)
@@ -92,9 +97,33 @@ export default function DropUpload({
 
   const displayUrl = preview || (value && value.trim() ? value : null)
 
+  const libraryButton = showLibrary ? (
+    <button
+      type="button"
+      onClick={() => setLibraryOpen(true)}
+      className="text-xs font-semibold text-[#B56244] hover:underline"
+    >
+      Choose from library
+    </button>
+  ) : null
+
+  const libraryModal = (
+    <MediaLibraryModal
+      open={libraryOpen}
+      onClose={() => setLibraryOpen(false)}
+      onSelect={(url) => {
+        onChange(url)
+        setPreview(null)
+        showToast('Image selected from library')
+      }}
+      title={`Choose ${label}`}
+    />
+  )
+
   if (compact) {
     return (
       <div className="space-y-2">
+        {libraryModal}
         <div
           className={`relative flex items-center gap-3 border-2 border-dashed rounded-xl p-3 transition-colors cursor-pointer ${
             dragging ? 'border-[#B56244] bg-orange-50' : 'border-gray-200 hover:border-gray-300'
@@ -130,6 +159,9 @@ export default function DropUpload({
           )}
         </div>
         <input ref={fileRef} type="file" accept="image/*" className="hidden" onChange={handleFileChange} />
+        <div className="flex items-center justify-between gap-2">
+          {libraryButton}
+        </div>
         <input
           type="url"
           value={value}
@@ -143,6 +175,7 @@ export default function DropUpload({
 
   return (
     <div className="space-y-2">
+      {libraryModal}
       <div
         className={`relative border-2 border-dashed rounded-xl transition-colors cursor-pointer overflow-hidden ${
           dragging ? 'border-[#B56244] bg-orange-50' : 'border-gray-200 hover:border-gray-300'
@@ -182,6 +215,9 @@ export default function DropUpload({
         )}
       </div>
       <input ref={fileRef} type="file" accept="image/*" className="hidden" onChange={handleFileChange} />
+      <div className="flex items-center justify-between gap-2">
+        {libraryButton}
+      </div>
       <input
         type="url"
         value={value}
