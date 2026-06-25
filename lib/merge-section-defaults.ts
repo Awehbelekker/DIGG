@@ -42,6 +42,13 @@ export function mergeSectionsWithCodeDefaults(sections: PageSection[]): PageSect
       }
     }
 
+    if (type === 'team') {
+      const userMembers = section.data.members as unknown[] | undefined
+      if (Array.isArray(userMembers) && userMembers.length > 0) {
+        data.members = userMembers
+      }
+    }
+
     return { ...section, data }
   })
 }

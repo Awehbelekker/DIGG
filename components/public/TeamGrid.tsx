@@ -1,41 +1,32 @@
 import PageWrap from '@/components/public/ui/PageWrap'
 import SectionHead from '@/components/public/ui/SectionHead'
-import ImageWithPlaceholder from '@/components/public/ImageWithPlaceholder'
+import TeamAvatar from '@/components/public/TeamAvatar'
+import { normalizeStoragePublicUrl } from '@/lib/image-storage'
 
-type Member = { name: string; role: string; credential?: string; photoUrl?: string; initials?: string }
+type Member = {
+  name: string
+  role: string
+  credential?: string
+  photoUrl?: string
+  photo_url?: string
+  imageUrl?: string
+  initials?: string
+}
 
-function Avatar({ member }: { member: Member }) {
-  const initials =
-    member.initials ||
-    member.name
-      .split(' ')
-      .map((n) => n[0])
-      .join('')
-      .slice(0, 2)
-      .toUpperCase()
+function memberPhotoUrl(member: Member): string | undefined {
+  const raw = member.photoUrl ?? member.photo_url ?? member.imageUrl
+  const normalized = normalizeStoragePublicUrl(raw)
+  return normalized || undefined
+}
 
-  return (
-    <div className="relative mx-auto mb-4 w-[72px] h-[72px]">
-      <div className="relative w-[72px] h-[72px] rounded-full overflow-hidden border border-[var(--color-greige)]/80">
-        {member.photoUrl?.trim() ? (
-          <ImageWithPlaceholder
-            src={member.photoUrl}
-            alt={member.name}
-            aspectRatio="fill"
-            className="w-full h-full"
-            placeholderLabel={initials}
-          />
-        ) : (
-          <div
-            className="w-full h-full flex items-center justify-center bg-[var(--color-lead)] text-white font-extrabold text-xl"
-            style={{ fontFamily: 'var(--font-heading)' }}
-          >
-            {initials}
-          </div>
-        )}
-      </div>
-    </div>
-  )
+function memberInitials(member: Member): string {
+  if (member.initials?.trim()) return member.initials.trim().slice(0, 2).toUpperCase()
+  return member.name
+    .split(' ')
+    .map((n) => n[0])
+    .join('')
+    .slice(0, 2)
+    .toUpperCase()
 }
 
 export default function TeamGrid({
@@ -53,8 +44,8 @@ export default function TeamGrid({
         <SectionHead kick={kick} title={title} />
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5">
           {members.map((m, i) => (
-            <div key={i} className="bg-white rounded-[18px] sm:rounded-[20px] p-5 sm:p-6 lg:p-7 border border-[var(--color-greige)]/50 text-center">
-              <Avatar member={m} />
+            <div key={i} className="bg-white rounded-[18px] sm:rounded-[20px] p-5 sm:p-6 lg:p-8 border border-[var(--color-greige)]/50 text-center">
+              <TeamAvatar name={m.name} photoUrl={memberPhotoUrl(m)} initials={memberInitials(m)} />
               <h3 className="font-bold text-lg text-[var(--color-ink)]" style={{ fontFamily: 'var(--font-heading)' }}>
                 {m.name}
               </h3>

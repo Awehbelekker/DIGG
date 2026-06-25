@@ -29,3 +29,18 @@ export function resolveStorageBucket(bucket: string | undefined, folder: string)
   if (bucket && bucket !== 'images') return bucket
   return storageBucketForFolder(folder)
 }
+
+/** Fix legacy Supabase URLs that used the old `images` bucket id. */
+export function normalizeStoragePublicUrl(url: string | null | undefined): string {
+  if (!url) return ''
+  const trimmed = url.trim()
+  if (!trimmed) return ''
+
+  return trimmed.replace(
+    /\/storage\/v1\/object\/public\/images\/(team|hero|logo|portfolio)\//gi,
+    (_, folder: string) => {
+      const f = folder.toLowerCase()
+      return `/storage/v1/object/public/${storageBucketForFolder(f)}/${f}/`
+    }
+  )
+}
