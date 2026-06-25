@@ -278,6 +278,65 @@ export default function AdminSettingsPage() {
               </button>
             </div>
           </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">Nav contact button</label>
+            <div className="flex space-x-2">
+              <input
+                type="text"
+                value={strVal(settings.nav_cta_text) || "Let's talk"}
+                onChange={(e) => setSettings({ ...settings, nav_cta_text: e.target.value })}
+                className="flex-1 px-4 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#B56244] focus:border-transparent"
+                placeholder="Let's talk"
+              />
+              <button
+                onClick={() => handleSave('nav_cta_text', strVal(settings.nav_cta_text) || "Let's talk")}
+                disabled={saving}
+                className="px-6 py-2 bg-[#B56244] text-white rounded-xl font-semibold hover:bg-[#9A4F35] transition-colors disabled:opacity-50"
+              >
+                Save
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 space-y-6">
+          <h2 className="text-lg font-semibold text-[#152232]">Work page header</h2>
+          <p className="text-sm text-gray-500">Heading and intro on /insights (Work feed).</p>
+          {[
+            { key: 'work_page_kick', label: 'Eyebrow', placeholder: 'Work' },
+            { key: 'work_page_title', label: 'Title', placeholder: 'Projects & insights' },
+            { key: 'work_page_intro', label: 'Intro', placeholder: 'A single feed of project writeups…' },
+          ].map(({ key, label, placeholder }) => (
+            <div key={key}>
+              <label className="block text-sm font-medium text-gray-700 mb-2">{label}</label>
+              <div className="flex space-x-2">
+                {key === 'work_page_intro' ? (
+                  <textarea
+                    value={strVal(settings[key])}
+                    onChange={(e) => setSettings({ ...settings, [key]: e.target.value })}
+                    rows={3}
+                    placeholder={placeholder}
+                    className="flex-1 px-4 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#B56244] focus:border-transparent"
+                  />
+                ) : (
+                  <input
+                    type="text"
+                    value={strVal(settings[key])}
+                    onChange={(e) => setSettings({ ...settings, [key]: e.target.value })}
+                    placeholder={placeholder}
+                    className="flex-1 px-4 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#B56244] focus:border-transparent"
+                  />
+                )}
+                <button
+                  onClick={() => handleSave(key, strVal(settings[key]))}
+                  disabled={saving}
+                  className="px-6 py-2 bg-[#B56244] text-white rounded-xl font-semibold hover:bg-[#9A4F35] transition-colors disabled:opacity-50 self-start"
+                >
+                  Save
+                </button>
+              </div>
+            </div>
+          ))}
         </div>
 
         <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 space-y-6">

@@ -1,7 +1,7 @@
 import { createClient } from '@/lib/supabase/server'
 import { notFound } from 'next/navigation'
 import type { Metadata } from 'next'
-import Link from 'next/link'
+import InsightArticle from '@/components/public/InsightArticle'
 
 type Props = { params: Promise<{ slug: string }> }
 
@@ -10,12 +10,15 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const supabase = await createClient()
   const { data } = await supabase
     .from('insights')
-    .select('title')
+    .select('title, excerpt')
     .eq('slug', slug)
     .eq('published', true)
     .single()
   if (!data) return { title: 'Not found' }
-  return { title: `${data.title as string} | DIGG Work` }
+  return {
+    title: `${data.title as string} | DIGG Work`,
+    description: (data.excerpt as string) || undefined,
+  }
 }
 
 export default async function InsightPage({ params }: Props) {
@@ -23,54 +26,24 @@ export default async function InsightPage({ params }: Props) {
   const supabase = await createClient()
   const { data: insight, error } = await supabase
     .from('insights')
-    .select('*')
+    .select('title, body, excerpt, cover_image_url, updated_at, content_type, project_status')
     .eq('slug', slug)
     .eq('published', true)
     .single()
 
   if (error || !insight) notFound()
 
-  const contentType = (insight.content_type as string) || 'insight'
-  const projectStatus = insight.project_status as string | null
-  const statusLabel =
-    projectStatus === 'complete'
-      ? 'Complete'
-      : projectStatus === 'on_site'
-        ? 'On site'
-        : projectStatus === 'starting_soon'
-          ? 'Starting soon'
-          : null
-
   return (
-    <div className="min-h-screen bg-[var(--color-bone)]">
-      <article className="max-w-3xl mx-auto px-4 py-16 sm:py-20">
-        <Link href="/insights" className="text-sm text-[var(--color-terracotta)] hover:text-[var(--color-terra-deep)] font-medium mb-6 inline-block">
-          ← Work
-        </Link>
-        <div className="flex flex-wrap gap-2 mb-4">
-          <span className="text-[10px] font-bold tracking-wider uppercase text-[var(--color-sage)] bg-white border border-[var(--color-greige)]/50 rounded-full px-2.5 py-0.5">
-            {contentType === 'project' ? 'Project' : 'Insight'}
-          </span>
-          {statusLabel && (
-            <span className="text-[10px] font-bold tracking-wider uppercase text-[var(--color-ink)] bg-[var(--color-terracotta)]/15 border border-[var(--color-terracotta)]/30 rounded-full px-2.5 py-0.5">
-              {statusLabel}
-            </span>
-          )}
-        </div>
-        <h1 className="text-3xl sm:text-4xl font-bold text-[var(--color-ink)] mb-4" style={{ fontFamily: 'var(--font-heading)' }}>
-          {insight.title as string}
-        </h1>
-        <time className="text-[var(--color-muted)] text-sm block mb-8" dateTime={insight.updated_at as string}>
-          {new Date(insight.updated_at as string).toLocaleDateString('en-ZA', {
-            year: 'numeric',
-            month: 'long',
-            day: 'numeric',
-          })}
-        </time>
-        <div className="text-[var(--color-ink)]/90 whitespace-pre-wrap leading-relaxed prose-digg">
-          {(insight.body as string) || ''}
-        </div>
-      </article>
-    </div>
+    <InsightArticle
+      insight={{
+        title: insight.title as string,
+        body: insight.body as string,
+        excerpt: insight.excerpt as string | null,
+        cover_image_url: insight.cover_image_url as string | null,
+        updated_at: insight.updated_at as string,
+        content_type: insight.content_type as string | null,
+        project_status: insight.project_status as string | null,
+      }}
+    />
   )
 }

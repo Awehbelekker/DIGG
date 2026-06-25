@@ -1,4 +1,3 @@
-import Link from 'next/link'
 import type { PageSection } from '@/lib/types/database'
 import Hero from './Hero'
 import StatsBar from './StatsBar'
@@ -13,7 +12,17 @@ import TwoColumn from './TwoColumn'
 import LogoBar from './LogoBar'
 import FAQ from './FAQ'
 import ContactDirectDetails from './ContactDirectDetails'
+import PillarsMarquee from './PillarsMarquee'
+import ServicesGrid from './ServicesGrid'
+import WorkCardGrid from './WorkCardGrid'
+import CtaSection from './CtaSection'
+import AboutHero from './AboutHero'
+import TeamGrid from './TeamGrid'
+import PillarsInteractive from './PillarsInteractive'
+import PillarsPanel from './PillarsPanel'
+import ContactLayout from './ContactLayout'
 import type { SiteSettings } from '@/lib/site-settings'
+import type { WorkCardItem } from './WorkCard'
 
 type SectionRendererProps = { section: PageSection; siteSettings?: SiteSettings }
 
@@ -24,7 +33,9 @@ export default function SectionRenderer({ section, siteSettings }: SectionRender
   if (type === 'hero') {
     return (
       <Hero
+        eyebrow={(data.eyebrow as string) || undefined}
         title={(data.title as string) ?? ''}
+        emphasisWord={(data.emphasisWord as string) || undefined}
         subtitle={(data.subtitle as string) ?? ''}
         primaryCTA={{
           text: (data.primaryCTAtext as string) || 'Learn more',
@@ -35,6 +46,101 @@ export default function SectionRenderer({ section, siteSettings }: SectionRender
           href: (data.secondaryCTAhref as string) || '/contact',
         }}
         backgroundImage={(data.backgroundImageUrl as string) || undefined}
+      />
+    )
+  }
+
+  if (type === 'marquee') {
+    const items = (data.items as { word: string }[]) ?? []
+    return <PillarsMarquee items={items} />
+  }
+
+  if (type === 'services') {
+    return (
+      <ServicesGrid
+        kick={(data.kick as string) || undefined}
+        title={(data.title as string) || 'What we do'}
+        side={(data.side as string) || undefined}
+        items={(data.items as { title: string; description: string; icon?: string }[]) ?? []}
+      />
+    )
+  }
+
+  if (type === 'work_cards') {
+    return (
+      <WorkCardGrid
+        kick={(data.kick as string) || undefined}
+        title={(data.title as string) || 'Recent work'}
+        sideLinkText={(data.sideLinkText as string) || undefined}
+        sideLinkHref={(data.sideLinkHref as string) || undefined}
+        items={(data.items as WorkCardItem[]) ?? []}
+        whiteBg={!!data.whiteBg}
+      />
+    )
+  }
+
+  if (type === 'about_hero') {
+    return (
+      <AboutHero
+        kick={(data.kick as string) || undefined}
+        title={(data.title as string) || ''}
+        body={(data.body as string) || ''}
+        portraitImageUrl={(data.portraitImageUrl as string) || undefined}
+      />
+    )
+  }
+
+  if (type === 'team') {
+    return (
+      <TeamGrid
+        kick={(data.kick as string) || undefined}
+        title={(data.title as string) || 'Team'}
+        members={
+          (data.members as {
+            name: string
+            role: string
+            credential?: string
+            photoUrl?: string
+            initials?: string
+          }[]) ?? []
+        }
+      />
+    )
+  }
+
+  if (type === 'pillars_interactive') {
+    return (
+      <PillarsInteractive
+        kick={(data.kick as string) || undefined}
+        title={(data.title as string) || ''}
+        intro={(data.intro as string) || undefined}
+        items={
+          (data.items as { letter: string; title: string; description: string; colorKey: string }[]) ?? []
+        }
+      />
+    )
+  }
+
+  if (type === 'pillars_panel') {
+    return (
+      <PillarsPanel
+        kick={(data.kick as string) || undefined}
+        title={(data.title as string) || ''}
+        body={(data.body as string) || ''}
+      />
+    )
+  }
+
+  if (type === 'contact_layout') {
+    return (
+      <ContactLayout
+        kick={(data.kick as string) || undefined}
+        title={(data.title as string) || ''}
+        intro={(data.intro as string) || ''}
+        siteSettings={siteSettings}
+        submitText={(data.submitText as string) || undefined}
+        reassurance={(data.reassurance as string) || undefined}
+        formAnchorId={(data.formAnchorId as string) || 'contact-form'}
       />
     )
   }
@@ -116,11 +222,6 @@ export default function SectionRenderer({ section, siteSettings }: SectionRender
               {title}
             </h2>
           )}
-          {title === 'What we do' && (
-            <p className="text-center text-[var(--color-muted)] mb-10 max-w-2xl mx-auto">
-              Four services. Plain language. No jargon.
-            </p>
-          )}
           <div className={`grid ${colClass} gap-6 lg:gap-8`}>
             {items.map((item, i) => (
               <div
@@ -156,74 +257,26 @@ export default function SectionRenderer({ section, siteSettings }: SectionRender
   if (type === 'stats') {
     const items = (data.items as { label: string; value: string }[]) ?? []
     const stats = items.map(({ label, value }) => ({ number: value, label }))
-    return <StatsBar stats={stats.length ? stats : undefined} />
+    return stats.length ? <StatsBar stats={stats} /> : null
   }
 
   if (type === 'products') {
-    const title = (data.title as string) || ''
-    const subtitle = (data.subtitle as string) || ''
-    const items = (data.items as {
-      title: string
-      description: string
-      link?: string
-      comingSoon?: boolean
-      status?: string
-      imageUrl?: string
-    }[]) ?? []
+    const items = (data.items as WorkCardItem[]) ?? []
     return (
-      <RevealSection className="bg-[var(--color-bone)] py-16 lg:py-20">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          {title && (
-            <h2 className="text-3xl md:text-4xl font-bold text-[var(--color-ink)] text-center mb-2" style={{ fontFamily: 'var(--font-heading)' }}>
-              {title}
-            </h2>
-          )}
-          {subtitle && <p className="text-center text-lg text-[var(--color-muted)] mb-10 max-w-2xl mx-auto">{subtitle}</p>}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {items.map((item, i) => {
-              const href = item.link?.trim() || '#'
-              const badge = item.status || (item.comingSoon ? 'Coming soon' : '')
-              return (
-                <Link
-                  key={i}
-                  href={href}
-                  className="bg-white rounded-2xl border border-[var(--color-greige)]/50 hover:border-[var(--color-terracotta)]/40 hover:shadow-md transition-all relative block overflow-hidden group"
-                >
-                  {item.imageUrl?.trim() ? (
-                    <div className="aspect-[4/3] overflow-hidden">
-                      <ImageWithPlaceholder
-                        src={item.imageUrl}
-                        alt={item.title}
-                        aspectRatio="4/3"
-                        placeholderLabel={item.title}
-                        className="rounded-t-2xl object-cover w-full h-full group-hover:scale-[1.02] transition-transform duration-300"
-                      />
-                    </div>
-                  ) : (
-                    <div className="h-2 bg-[var(--color-terracotta)]" aria-hidden />
-                  )}
-                  <div className="p-6">
-                    {badge && (
-                      <span className="inline-block mb-3 bg-[var(--color-sage)]/20 text-[var(--color-ink)] border border-[var(--color-sage)]/40 px-3 py-1 rounded-full text-xs font-semibold uppercase tracking-wide">
-                        {badge}
-                      </span>
-                    )}
-                    <h3 className="text-xl font-bold text-[var(--color-ink)] mb-2 group-hover:text-[var(--color-terracotta)] transition-colors">
-                      {item.title}
-                    </h3>
-                    <p className="text-[var(--color-muted)] text-sm leading-relaxed">{item.description}</p>
-                  </div>
-                </Link>
-              )
-            })}
-          </div>
-          <p className="text-center mt-8">
-            <Link href="/insights" className="text-[var(--color-terracotta)] font-semibold hover:text-[var(--color-terra-deep)] transition-colors">
-              View all work →
-            </Link>
-          </p>
-        </div>
-      </RevealSection>
+      <WorkCardGrid
+        kick={(data.subtitle as string) ? undefined : (data.kick as string) || undefined}
+        title={(data.title as string) || 'Recent work'}
+        sideLinkText="View all work →"
+        sideLinkHref="/insights"
+        items={items.map((item) => ({
+          title: item.title,
+          description: item.description,
+          link: item.link,
+          status: item.status,
+          imageUrl: item.imageUrl,
+          gradientKey: item.gradientKey || 'terra',
+        }))}
+      />
     )
   }
 
@@ -260,23 +313,14 @@ export default function SectionRenderer({ section, siteSettings }: SectionRender
   }
 
   if (type === 'cta') {
-    const title = (data.title as string) || ''
-    const description = (data.description as string) || ''
-    const buttonText = (data.buttonText as string) || 'Contact us'
-    const buttonLink = (data.buttonLink as string) || '/contact'
     return (
-      <RevealSection className="bg-[var(--color-ink)] py-16 lg:py-20">
-        <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 text-center text-white">
-          {title && <h2 className="text-3xl font-bold mb-4" style={{ fontFamily: 'var(--font-heading)' }}>{title}</h2>}
-          {description && <p className="text-lg opacity-90 mb-8">{description}</p>}
-          <Link
-            href={buttonLink}
-            className="inline-block bg-[var(--color-terracotta)] text-white px-8 py-3.5 rounded-xl font-semibold hover:bg-[var(--color-terra-deep)] transition-colors"
-          >
-            {buttonText}
-          </Link>
-        </div>
-      </RevealSection>
+      <CtaSection
+        kick={(data.kick as string) || undefined}
+        title={(data.title as string) || ''}
+        description={(data.description as string) || undefined}
+        buttonText={(data.buttonText as string) || 'Contact us'}
+        buttonLink={(data.buttonLink as string) || '/contact'}
+      />
     )
   }
 

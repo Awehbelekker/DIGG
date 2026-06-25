@@ -38,6 +38,14 @@ export type SectionType =
   | 'faq'
   | 'divider'
   | 'contact_details'
+  | 'marquee'
+  | 'services'
+  | 'work_cards'
+  | 'about_hero'
+  | 'team'
+  | 'pillars_interactive'
+  | 'pillars_panel'
+  | 'contact_layout'
 
 export interface PageSection {
   type: SectionType
@@ -74,6 +82,8 @@ export interface Insight {
   slug: string
   title: string
   body: string
+  excerpt?: string | null
+  cover_image_url?: string | null
   published: boolean
   content_type?: 'project' | 'insight'
   project_status?: 'complete' | 'on_site' | 'starting_soon' | null

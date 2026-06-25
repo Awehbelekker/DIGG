@@ -16,26 +16,27 @@ function codeDefaults(slug: BuiltinPageSlug): PageSection[] {
   }
 }
 
-type ProductItem = {
+type WorkCardItem = {
   title: string
   description: string
   link?: string
   comingSoon?: boolean
   status?: string
   imageUrl?: string
+  gradientKey?: string
 }
 
-function mapHomepageProducts(
-  items: SiteSettings['homepage_products']
-): ProductItem[] | null {
+function mapHomepageProducts(items: SiteSettings['homepage_products']): WorkCardItem[] | null {
   if (!items?.length) return null
-  return items.map((p) => ({
+  const gradients = ['terra', 'navy', 'sage', 'coral'] as const
+  return items.map((p, i) => ({
     title: p.title,
     description: p.description,
     link: p.link,
     comingSoon: p.comingSoon,
     status: p.comingSoon ? 'Starting soon' : undefined,
     imageUrl: p.imageUrl,
+    gradientKey: gradients[i % gradients.length],
   }))
 }
 
@@ -45,41 +46,35 @@ export function applySiteSettingsToSections(
   sections: PageSection[],
   settings: SiteSettings
 ): PageSection[] {
-  const productItems = slug === 'home' ? mapHomepageProducts(settings.homepage_products) : null
+  const workItems = slug === 'home' ? mapHomepageProducts(settings.homepage_products) : null
 
   return sections.map((section) => {
     const d = { ...section.data }
 
     if (section.type === 'hero') {
-      if (slug === 'home' || slug === 'about' || slug === 'contact') {
-        if (settings.hero_title?.trim() && slug === 'home') d.title = settings.hero_title.trim()
-        if (settings.hero_subtitle?.trim() && slug === 'home') d.subtitle = settings.hero_subtitle.trim()
-        if (settings.hero_primary_cta_text?.trim() && slug === 'home') {
-          d.primaryCTAtext = settings.hero_primary_cta_text.trim()
-        }
-        if (settings.hero_primary_cta_href?.trim() && slug === 'home') {
-          d.primaryCTAhref = settings.hero_primary_cta_href.trim()
-        }
-        if (settings.hero_secondary_cta_text !== undefined && slug === 'home') {
-          d.secondaryCTAtext = settings.hero_secondary_cta_text.trim()
-        }
-        if (settings.hero_secondary_cta_href?.trim() && slug === 'home') {
-          d.secondaryCTAhref = settings.hero_secondary_cta_href.trim()
-        }
+      if (slug === 'home') {
+        if (settings.hero_title?.trim()) d.title = settings.hero_title.trim()
+        if (settings.hero_subtitle?.trim()) d.subtitle = settings.hero_subtitle.trim()
+        if (settings.hero_primary_cta_text?.trim()) d.primaryCTAtext = settings.hero_primary_cta_text.trim()
+        if (settings.hero_primary_cta_href?.trim()) d.primaryCTAhref = settings.hero_primary_cta_href.trim()
+        if (settings.hero_secondary_cta_text !== undefined) d.secondaryCTAtext = settings.hero_secondary_cta_text.trim()
+        if (settings.hero_secondary_cta_href?.trim()) d.secondaryCTAhref = settings.hero_secondary_cta_href.trim()
       }
       if (settings.hero_image_url?.trim() && slug === 'home') {
         d.backgroundImageUrl = settings.hero_image_url.trim()
       }
     }
 
+    if (section.type === 'work_cards' && slug === 'home') {
+      if (settings.products_heading?.trim()) d.title = settings.products_heading.trim()
+      if (settings.products_intro?.trim()) d.kick = settings.products_intro.trim()
+      if (workItems?.length) d.items = workItems
+    }
+
     if (section.type === 'products' && slug === 'home') {
       if (settings.products_heading?.trim()) d.title = settings.products_heading.trim()
       if (settings.products_intro?.trim()) d.subtitle = settings.products_intro.trim()
-      if (productItems?.length) d.items = productItems
-    }
-
-    if (section.type === 'cta' && slug === 'home') {
-      // optional future settings keys
+      if (workItems?.length) d.items = workItems
     }
 
     return { ...section, data: d }

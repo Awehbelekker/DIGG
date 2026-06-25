@@ -3,7 +3,17 @@
 import { useState } from 'react'
 import { createClient } from '@/lib/supabase/client'
 
-export default function ContactForm() {
+type ContactFormProps = {
+  submitText?: string
+  reassurance?: string
+  embedded?: boolean
+}
+
+export default function ContactForm({
+  submitText = 'Send message',
+  reassurance = "A short note is enough. We'll come back to you within a day or two.",
+  embedded = false,
+}: ContactFormProps) {
   const [formData, setFormData] = useState({
     name: '',
     phone: '',
@@ -60,12 +70,21 @@ export default function ContactForm() {
   const inputClass =
     'w-full px-4 py-3 text-base border border-[var(--color-greige)] rounded-xl bg-white focus:ring-2 focus:ring-[var(--color-coral)] focus:border-transparent focus:outline-none transition-shadow'
 
+  const formClass = embedded
+    ? 'space-y-5'
+    : 'max-w-2xl mx-auto bg-white p-6 sm:p-8 lg:p-10 rounded-2xl shadow-sm border border-[var(--color-greige)]/60'
+
   return (
-    <form onSubmit={handleSubmit} className="max-w-2xl mx-auto bg-white p-6 sm:p-8 lg:p-10 rounded-2xl shadow-sm border border-[var(--color-greige)]/60">
-      <h2 className="text-2xl font-bold text-[var(--color-ink)] text-center mb-2 tracking-tight">Let&apos;s talk about your project</h2>
-      <p className="text-center text-[var(--color-muted)] text-sm mb-8">
-        A short note is enough. We&apos;ll come back to you within a day or two.
-      </p>
+    <form onSubmit={handleSubmit} className={formClass}>
+      {!embedded && (
+        <>
+          <h2 className="text-2xl font-bold text-[var(--color-ink)] text-center mb-2 tracking-tight">Let&apos;s talk about your project</h2>
+          <p className="text-center text-[var(--color-muted)] text-sm mb-8">{reassurance}</p>
+        </>
+      )}
+      {embedded && reassurance && (
+        <p className="text-[var(--color-muted)] text-sm mb-2">{reassurance}</p>
+      )}
 
       <div className="mb-6">
         <label htmlFor="name" className="block text-sm font-medium text-[var(--color-ink)] mb-2">
@@ -143,9 +162,9 @@ export default function ContactForm() {
       <button
         type="submit"
         disabled={loading}
-        className="w-full bg-[var(--color-terracotta)] text-white px-8 py-3.5 rounded-xl font-semibold hover:bg-[var(--color-terra-deep)] hover:shadow-md transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-coral)] focus-visible:ring-offset-2"
+        className="w-full bg-[var(--color-lead)] text-white px-8 py-3.5 rounded-xl font-semibold hover:bg-[var(--color-lead-deep)] hover:shadow-md transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-coral)] focus-visible:ring-offset-2"
       >
-        {loading ? 'Sending…' : 'Send message'}
+        {loading ? 'Sending…' : submitText}
       </button>
     </form>
   )

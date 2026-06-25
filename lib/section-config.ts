@@ -17,17 +17,28 @@ export const SECTION_TYPES: { type: SectionType; label: string }[] = [
   { type: 'divider', label: 'Divider' },
   { type: 'form', label: 'Form' },
   { type: 'contact_details', label: 'Contact details' },
+  { type: 'marquee', label: 'Marquee strip' },
+  { type: 'services', label: 'Services grid' },
+  { type: 'work_cards', label: 'Work card grid' },
+  { type: 'about_hero', label: 'About hero' },
+  { type: 'team', label: 'Team grid' },
+  { type: 'pillars_interactive', label: 'Pillars (interactive)' },
+  { type: 'pillars_panel', label: 'Pillars panel' },
+  { type: 'contact_layout', label: 'Contact layout' },
 ]
 
 export const DEFAULT_SECTION_DATA: Record<SectionType, Record<string, unknown>> = {
   hero: {
-    title: 'Design is an investment decision.',
-    subtitle: "DIGG is a property development and architecture practice in Cape Town. We bring an investor's mindset to every project — clarity, value, and follow-through.",
-    primaryCTAtext: 'See our work',
+    eyebrow: 'Property · Development · Architecture',
+    title: 'We design buildings like the',
+    emphasisWord: 'investments',
+    subtitle:
+      "DIGG is a Cape Town property development & architecture practice. Twelve years of experience, an investor's mindset, and a small team that actually does the work.",
+    primaryCTAtext: 'See our work →',
     primaryCTAhref: '/insights',
-    secondaryCTAtext: '',
-    secondaryCTAhref: '/contact',
-    backgroundImageUrl: 'https://images.unsplash.com/photo-1486325212027-8081e485255e?w=1600&q=80',
+    secondaryCTAtext: 'Meet the team',
+    secondaryCTAhref: '/about',
+    backgroundImageUrl: '',
   },
   text: {
     heading: 'Section heading',
@@ -108,8 +119,9 @@ export const DEFAULT_SECTION_DATA: Record<SectionType, Record<string, unknown>> 
     ],
   },
   cta: {
+    kick: 'Ready when you are',
     title: "Let's talk about your project.",
-    description: 'When you are ready — a short message is enough.',
+    description: 'Browse the work and get in touch when you are ready.',
     buttonText: 'Contact us',
     buttonLink: '/contact',
   },
@@ -121,6 +133,70 @@ export const DEFAULT_SECTION_DATA: Record<SectionType, Record<string, unknown>> 
     formType: 'contact',
   },
   contact_details: {},
+  marquee: {
+    items: [
+      { word: 'Develop' },
+      { word: 'Invest' },
+      { word: 'Grow' },
+      { word: 'Give' },
+    ],
+  },
+  services: {
+    kick: 'What we do',
+    title: 'Four services. Plain language.',
+    side: 'No jargon.',
+    items: [
+      { title: 'Service one', description: 'Description.', icon: '📐' },
+      { title: 'Service two', description: 'Description.', icon: '📊' },
+      { title: 'Service three', description: 'Description.', icon: '🏗️' },
+      { title: 'Service four', description: 'Description.', icon: '🔑' },
+    ],
+  },
+  work_cards: {
+    kick: 'Recent work',
+    title: 'Projects on the ground',
+    sideLinkText: 'View all work →',
+    sideLinkHref: '/insights',
+    items: [
+      { title: 'Project one', description: 'Description.', link: '/insights', status: 'Complete', gradientKey: 'terra' },
+      { title: 'Project two', description: 'Description.', link: '/insights', status: 'On site', gradientKey: 'navy' },
+    ],
+  },
+  about_hero: {
+    kick: 'About',
+    title: 'About headline',
+    body: 'Body copy.',
+    portraitImageUrl: '',
+  },
+  team: {
+    kick: 'Team',
+    title: 'The team',
+    members: [{ name: 'Name', role: 'Role', credential: '', photoUrl: '', initials: 'AB' }],
+  },
+  pillars_interactive: {
+    kick: 'Our pillars',
+    title: 'Develop. Invest. Grow. Give.',
+    intro: 'Hover each letter.',
+    items: [
+      { letter: 'D', title: 'Develop', description: 'Description.', colorKey: 'terra' },
+      { letter: 'I', title: 'Invest', description: 'Description.', colorKey: 'navy' },
+      { letter: 'G', title: 'Grow', description: 'Description.', colorKey: 'sage' },
+      { letter: 'G', title: 'Give', description: 'Description.', colorKey: 'coral' },
+    ],
+  },
+  pillars_panel: {
+    kick: 'The practice',
+    title: 'Property. Development. Architecture.',
+    body: 'Practice summary.',
+  },
+  contact_layout: {
+    kick: 'Contact',
+    title: "Let's talk about your property.",
+    intro: 'Intro copy.',
+    submitText: 'Send message',
+    reassurance: "We'll come back to you within a day or two.",
+    formAnchorId: 'contact-form',
+  },
 }
 
 export function createEmptySection(type: SectionType): PageSection {

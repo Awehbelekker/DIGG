@@ -39,12 +39,31 @@ function HeroFields({
   return (
     <div className="space-y-3">
       <label className="block">
-        <span className="text-sm font-medium text-gray-700">Headline</span>
+        <span className="text-sm font-medium text-gray-700">Eyebrow</span>
+        <input
+          type="text"
+          value={String(data.eyebrow ?? '')}
+          onChange={(e) => set('eyebrow', e.target.value)}
+          className="mt-1 w-full px-3 py-2 border border-gray-300 rounded-lg text-sm"
+        />
+      </label>
+      <label className="block">
+        <span className="text-sm font-medium text-gray-700">Headline (before emphasis word)</span>
         <input
           type="text"
           value={String(data.title ?? '')}
           onChange={(e) => set('title', e.target.value)}
           className="mt-1 w-full px-3 py-2 border border-gray-300 rounded-lg text-sm"
+        />
+      </label>
+      <label className="block">
+        <span className="text-sm font-medium text-gray-700">Emphasis word (coloured)</span>
+        <input
+          type="text"
+          value={String(data.emphasisWord ?? '')}
+          onChange={(e) => set('emphasisWord', e.target.value)}
+          className="mt-1 w-full px-3 py-2 border border-gray-300 rounded-lg text-sm"
+          placeholder="investments"
         />
       </label>
       <label className="block">
@@ -154,6 +173,10 @@ function CtaFields({
   return (
     <div className="space-y-3">
       <label className="block">
+        <span className="text-sm font-medium text-gray-700">Eyebrow (optional)</span>
+        <input type="text" value={String(data.kick ?? '')} onChange={(e) => set('kick', e.target.value)} className="mt-1 w-full px-3 py-2 border rounded-lg text-sm" />
+      </label>
+      <label className="block">
         <span className="text-sm font-medium text-gray-700">Title</span>
         <input type="text" value={String(data.title ?? '')} onChange={(e) => set('title', e.target.value)} className="mt-1 w-full px-3 py-2 border rounded-lg text-sm" />
       </label>
@@ -253,6 +276,27 @@ export default function SectionPageEditor({ page }: { page: Page }) {
     if (type === 'hero') return <HeroFields data={data} onChange={onChange} />
     if (type === 'text') return <TextFields data={data} onChange={onChange} />
     if (type === 'cta') return <CtaFields data={data} onChange={onChange} />
+    if (type === 'marquee') {
+      const items = (data.items as { word: string }[]) ?? []
+      return (
+        <div className="space-y-2">
+          {items.map((item, i) => (
+            <input
+              key={i}
+              type="text"
+              value={item.word}
+              placeholder={`Word ${i + 1}`}
+              onChange={(e) => {
+                const next = [...items]
+                next[i] = { word: e.target.value }
+                onChange({ ...data, items: next })
+              }}
+              className="w-full px-3 py-2 border rounded-lg text-sm"
+            />
+          ))}
+        </div>
+      )
+    }
     if (type === 'contact_details') {
       return (
         <p className="text-sm text-gray-600">
@@ -264,10 +308,50 @@ export default function SectionPageEditor({ page }: { page: Page }) {
         </p>
       )
     }
+    if (type === 'contact_layout') {
+      const set = (key: string, value: string) => onChange({ ...data, [key]: value })
+      return (
+        <div className="space-y-3">
+          <label className="block">
+            <span className="text-sm font-medium text-gray-700">Eyebrow</span>
+            <input type="text" value={String(data.kick ?? '')} onChange={(e) => set('kick', e.target.value)} className="mt-1 w-full px-3 py-2 border rounded-lg text-sm" />
+          </label>
+          <label className="block">
+            <span className="text-sm font-medium text-gray-700">Title</span>
+            <input type="text" value={String(data.title ?? '')} onChange={(e) => set('title', e.target.value)} className="mt-1 w-full px-3 py-2 border rounded-lg text-sm" />
+          </label>
+          <label className="block">
+            <span className="text-sm font-medium text-gray-700">Intro</span>
+            <textarea value={String(data.intro ?? '')} onChange={(e) => set('intro', e.target.value)} rows={6} className="mt-1 w-full px-3 py-2 border rounded-lg text-sm" />
+          </label>
+          <p className="text-xs text-gray-500">Contact details (email, phone, location) come from Settings.</p>
+        </div>
+      )
+    }
+    if (type === 'about_hero') {
+      const set = (key: string, value: string) => onChange({ ...data, [key]: value })
+      return (
+        <div className="space-y-3">
+          <label className="block">
+            <span className="text-sm font-medium text-gray-700">Eyebrow</span>
+            <input type="text" value={String(data.kick ?? '')} onChange={(e) => set('kick', e.target.value)} className="mt-1 w-full px-3 py-2 border rounded-lg text-sm" />
+          </label>
+          <label className="block">
+            <span className="text-sm font-medium text-gray-700">Title</span>
+            <textarea value={String(data.title ?? '')} onChange={(e) => set('title', e.target.value)} rows={2} className="mt-1 w-full px-3 py-2 border rounded-lg text-sm" />
+          </label>
+          <label className="block">
+            <span className="text-sm font-medium text-gray-700">Body</span>
+            <textarea value={String(data.body ?? '')} onChange={(e) => set('body', e.target.value)} rows={8} className="mt-1 w-full px-3 py-2 border rounded-lg text-sm" />
+          </label>
+          <DropUpload compact value={String(data.portraitImageUrl ?? '')} onChange={(url) => set('portraitImageUrl', url)} bucket="images" folder="team" label="Portrait" />
+        </div>
+      )
+    }
     if (type === 'form') {
       return <p className="text-sm text-gray-500">Contact form — submissions appear under Form Submissions.</p>
     }
-    if (type === 'grid') {
+    if (type === 'grid' || type === 'services') {
       const items = (data.items as GridItem[]) ?? []
       return (
         <div className="space-y-4">
@@ -310,7 +394,7 @@ export default function SectionPageEditor({ page }: { page: Page }) {
         </div>
       )
     }
-    if (type === 'products') {
+    if (type === 'products' || type === 'work_cards') {
       const items = (data.items as ProductItem[]) ?? []
       return (
         <div className="space-y-4">
@@ -345,6 +429,76 @@ export default function SectionPageEditor({ page }: { page: Page }) {
               <input type="text" value={item.label} placeholder="Label" onChange={(e) => { const next = [...items]; next[i] = { ...item, label: e.target.value }; onChange({ ...data, items: next }) }} className="px-3 py-2 border rounded-lg text-sm" />
             </div>
           ))}
+        </div>
+      )
+    }
+    if (type === 'team') {
+      type Member = { name: string; role: string; credential?: string; photoUrl?: string; initials?: string }
+      const members = (data.members as Member[]) ?? []
+      const set = (key: string, value: string) => onChange({ ...data, [key]: value })
+      return (
+        <div className="space-y-4">
+          <label className="block">
+            <span className="text-sm font-medium text-gray-700">Eyebrow</span>
+            <input type="text" value={String(data.kick ?? '')} onChange={(e) => set('kick', e.target.value)} className="mt-1 w-full px-3 py-2 border rounded-lg text-sm" />
+          </label>
+          <label className="block">
+            <span className="text-sm font-medium text-gray-700">Title</span>
+            <input type="text" value={String(data.title ?? '')} onChange={(e) => set('title', e.target.value)} className="mt-1 w-full px-3 py-2 border rounded-lg text-sm" />
+          </label>
+          {members.map((m, i) => (
+            <div key={i} className="p-3 bg-gray-50 rounded-lg border space-y-2">
+              <p className="text-xs font-semibold text-gray-500">Member {i + 1}</p>
+              <input type="text" value={m.name} placeholder="Name" onChange={(e) => { const next = [...members]; next[i] = { ...m, name: e.target.value }; onChange({ ...data, members: next }) }} className="w-full px-3 py-2 border rounded-lg text-sm" />
+              <input type="text" value={m.role} placeholder="Role" onChange={(e) => { const next = [...members]; next[i] = { ...m, role: e.target.value }; onChange({ ...data, members: next }) }} className="w-full px-3 py-2 border rounded-lg text-sm" />
+              <input type="text" value={m.credential ?? ''} placeholder="Credential (optional)" onChange={(e) => { const next = [...members]; next[i] = { ...m, credential: e.target.value }; onChange({ ...data, members: next }) }} className="w-full px-3 py-2 border rounded-lg text-sm" />
+              <DropUpload compact value={m.photoUrl ?? ''} onChange={(url) => { const next = [...members]; next[i] = { ...m, photoUrl: url }; onChange({ ...data, members: next }) }} bucket="images" folder="team" label="Photo" />
+            </div>
+          ))}
+        </div>
+      )
+    }
+    if (type === 'pillars_interactive' || type === 'pillars_panel') {
+      type Pillar = { letter?: string; title: string; description: string; colorKey?: string }
+      const items = (data.items as Pillar[]) ?? []
+      const set = (key: string, value: string) => onChange({ ...data, [key]: value })
+      return (
+        <div className="space-y-4">
+          <label className="block">
+            <span className="text-sm font-medium text-gray-700">Eyebrow</span>
+            <input type="text" value={String(data.kick ?? '')} onChange={(e) => set('kick', e.target.value)} className="mt-1 w-full px-3 py-2 border rounded-lg text-sm" />
+          </label>
+          <label className="block">
+            <span className="text-sm font-medium text-gray-700">Title</span>
+            <input type="text" value={String(data.title ?? '')} onChange={(e) => set('title', e.target.value)} className="mt-1 w-full px-3 py-2 border rounded-lg text-sm" />
+          </label>
+          {type === 'pillars_interactive' && (
+            <label className="block">
+              <span className="text-sm font-medium text-gray-700">Intro</span>
+              <input type="text" value={String(data.intro ?? '')} onChange={(e) => set('intro', e.target.value)} className="mt-1 w-full px-3 py-2 border rounded-lg text-sm" />
+            </label>
+          )}
+          {type === 'pillars_panel' ? (
+            <label className="block">
+              <span className="text-sm font-medium text-gray-700">Body</span>
+              <textarea value={String(data.body ?? '')} onChange={(e) => set('body', e.target.value)} rows={4} className="mt-1 w-full px-3 py-2 border rounded-lg text-sm" />
+            </label>
+          ) : (
+            items.map((item, i) => (
+              <div key={i} className="p-3 bg-gray-50 rounded-lg border space-y-2">
+                <p className="text-xs font-semibold text-gray-500">Pillar {i + 1}</p>
+                <input type="text" value={item.letter ?? ''} placeholder="Letter" onChange={(e) => { const next = [...items]; next[i] = { ...item, letter: e.target.value }; onChange({ ...data, items: next }) }} className="w-full px-3 py-2 border rounded-lg text-sm" />
+                <input type="text" value={item.title} placeholder="Title" onChange={(e) => { const next = [...items]; next[i] = { ...item, title: e.target.value }; onChange({ ...data, items: next }) }} className="w-full px-3 py-2 border rounded-lg text-sm" />
+                <textarea value={item.description} rows={2} onChange={(e) => { const next = [...items]; next[i] = { ...item, description: e.target.value }; onChange({ ...data, items: next }) }} className="w-full px-3 py-2 border rounded-lg text-sm" />
+                <select value={item.colorKey ?? 'terra'} onChange={(e) => { const next = [...items]; next[i] = { ...item, colorKey: e.target.value }; onChange({ ...data, items: next }) }} className="w-full px-3 py-2 border rounded-lg text-sm">
+                  <option value="terra">Terracotta</option>
+                  <option value="navy">Navy</option>
+                  <option value="sage">Sage</option>
+                  <option value="coral">Coral</option>
+                </select>
+              </div>
+            ))
+          )}
         </div>
       )
     }

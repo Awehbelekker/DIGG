@@ -1,37 +1,29 @@
+import PageWrap from '@/components/public/ui/PageWrap'
+
 interface Stat {
   number: string
   label: string
 }
 
-interface StatsBarProps {
-  stats?: Stat[]
-}
-
-const defaultStats: Stat[] = [
-  { number: "12+", label: "Years of experience" },
-  { number: "1,000+", label: "Residential units delivered" },
-  { number: "300,000m²", label: "Largest single project" },
-  { number: "2016", label: "Property investors since" }
-]
-
-export default function StatsBar({ stats = defaultStats }: StatsBarProps) {
+export default function StatsBar({ stats }: { stats: Stat[] }) {
   return (
-    <section className="bg-gradient-to-r from-[var(--color-ink)] via-[var(--color-navy)] to-[var(--color-ink)] text-white py-16 lg:py-20 my-20">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-8 lg:gap-12 text-center">
-          {stats.map((stat, index) => (
-            <div key={index} className="relative">
-              {index > 0 && (
-                <span className="hidden lg:block absolute left-0 top-1/2 -translate-y-1/2 w-px h-12 bg-white/20" aria-hidden />
-              )}
-              <span className="block text-4xl md:text-5xl font-bold text-[var(--color-terracotta)] mb-2 tabular-nums">
-                {stat.number}
-              </span>
-              <span className="text-sm md:text-base opacity-90">{stat.label}</span>
+    <section className="py-10 sm:py-12 lg:py-16 bg-[var(--color-bone)]">
+      <PageWrap>
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+          {stats.map((stat, i) => (
+            <div key={i} className="bg-[var(--color-ink)] text-[var(--color-bone)] rounded-2xl sm:rounded-[20px] p-4 sm:p-6 lg:p-7">
+              <div
+                className="text-[clamp(1.5rem,5vw,2.625rem)] font-black leading-none text-white"
+                style={{ fontFamily: 'var(--font-heading)' }}
+              >
+                {stat.number.replace('+', '')}
+                {stat.number.includes('+') && <span className="text-[var(--color-coral)]">+</span>}
+              </div>
+              <p className="text-[11px] sm:text-[13px] text-[var(--color-greige)] mt-1.5 sm:mt-2 leading-snug">{stat.label}</p>
             </div>
           ))}
         </div>
-      </div>
+      </PageWrap>
     </section>
   )
 }

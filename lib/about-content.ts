@@ -1,75 +1,92 @@
 import type { PageSection } from '@/lib/types/database'
-import { JUDY_CREDENTIAL, JUDY_TITLE, PILLARS } from '@/lib/brand'
+import { JUDY_CREDENTIAL, JUDY_TITLE } from '@/lib/brand'
 
-/** About page — Technical Brief §05 + Design & Voice Guide */
+/** About page — mockup-aligned */
 export const ABOUT_PAGE_SECTIONS: PageSection[] = [
   {
-    type: 'hero',
+    type: 'about_hero',
     data: {
-      title: 'A small, hands-on team with deep experience.',
-      subtitle:
-        'DIGG the company is young. Judy the practitioner is not. We lead with depth of experience and stay honest about being a team you deal with directly.',
-      primaryCTAtext: 'See our work',
-      primaryCTAhref: '/insights',
-      secondaryCTAtext: 'Contact',
-      secondaryCTAhref: '/contact',
-      backgroundImageUrl: '',
-    },
-  },
-  {
-    type: 'text',
-    data: {
-      heading: 'Team Downing',
-      body: `We're a small, hands-on practice — that's a selling point, not a weakness. You deal with the people doing the work.
+      kick: 'About DIGG',
+      title: 'A small, hands-on team\nwith deep experience.',
+      body: `DIGG the company is young. Judy the practitioner is not. We lead with depth of experience and stay honest about being a team you deal with directly.
 
-Judy Downing — ${JUDY_TITLE}
-${JUDY_CREDENTIAL}
-
-Richard Downing — operations and project delivery
-
-Nolo — keeps our work feed and project documentation current`,
-      alignment: 'left',
-    },
-  },
-  {
-    type: 'text',
-    data: {
-      heading: "Judy's portfolio",
-      body: `Twelve years across every scale — luxury coastal residences, Richmond Park, a 300,000m² mixed-use development in Cape Town, and the Wadi Safar / Aman resort in Saudi Arabia (14km², coordinated under Jean-Michel Gathy).
-
-1,000+ residential units delivered. SAPOA award-winning work. Experience across commercial, residential, industrial, retail, hospitality and government — at practices including Boogertman & Partners, Neo Architects and CNR Architects.
+Twelve years across every scale — luxury coastal residences, Richmond Park, a 300,000m² mixed-use development in Cape Town, and the Wadi Safar / Aman resort in Saudi Arabia.
 
 Since 2016 Judy has also been an active property investor in Cape Town — we bring an investor's lens because we use one ourselves.`,
-      alignment: 'left',
+      portraitImageUrl: '',
     },
   },
   {
-    type: 'grid',
+    type: 'pillars_interactive',
     data: {
-      title: PILLARS,
+      kick: 'Our pillars',
+      title: 'Develop. Invest. Grow. Give.',
+      intro: 'Hover each letter to see what it means for how we work.',
       items: [
-        { title: 'Develop', description: 'Development advisory and architectural design.' },
-        { title: 'Invest', description: "An investor's lens on every decision." },
-        { title: 'Grow', description: 'Long-term value for clients and community.' },
-        { title: 'Give', description: 'Contributing back — beyond the balance sheet.' },
+        {
+          letter: 'D',
+          title: 'Develop',
+          description: 'Development advisory and architectural design — from first sketch to council submission.',
+          colorKey: 'terra',
+        },
+        {
+          letter: 'I',
+          title: 'Invest',
+          description: "An investor's lens on every decision. We weigh design against yield, occupancy, and long-term value.",
+          colorKey: 'navy',
+        },
+        {
+          letter: 'G',
+          title: 'Grow',
+          description: 'Long-term value for clients and community — buildings that perform over decades, not just on handover.',
+          colorKey: 'sage',
+        },
+        {
+          letter: 'G',
+          title: 'Give',
+          description: 'Contributing back — beyond the balance sheet. Mentorship, community, and craft.',
+          colorKey: 'coral',
+        },
       ],
     },
   },
   {
-    type: 'grid',
+    type: 'team',
     data: {
-      title: 'Credentials',
-      items: [
-        { title: 'SACAP', description: 'PAT44740093' },
-        { title: '12+ years', description: 'Professional practice' },
-        { title: '1,000+ units', description: 'Group housing delivered' },
-        { title: 'Cape Town', description: 'Bloubergstrand — Western Cape' },
+      kick: 'Team Downing',
+      title: 'The people you deal with',
+      members: [
+        {
+          name: 'Judy Downing',
+          role: JUDY_TITLE,
+          credential: JUDY_CREDENTIAL,
+          initials: 'JD',
+        },
+        {
+          name: 'Richard Downing',
+          role: 'Operations & project delivery',
+          initials: 'RD',
+        },
+        {
+          name: 'Nolo',
+          role: 'Work feed & project documentation',
+          initials: 'N',
+        },
       ],
+    },
+  },
+  {
+    type: 'pillars_panel',
+    data: {
+      kick: 'The practice',
+      title: 'Property. Development. Architecture.',
+      body: 'We are based in Bloubergstrand, Cape Town. SACAP registered. Twelve years of practice. 1,000+ residential units delivered. SAPOA award-winning work.',
     },
   },
   {
     type: 'cta',
     data: {
+      kick: 'Next step',
       title: 'Ready when you are.',
       description: 'Browse the work first — get in touch when it feels right.',
       buttonText: 'Contact us',

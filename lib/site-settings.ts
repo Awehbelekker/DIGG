@@ -40,6 +40,11 @@ export type SiteSettings = {
   agents_heading?: string
   agents_intro?: string
   agents_cta_text?: string
+  nav_cta_text?: string
+  work_page_kick?: string
+  work_page_title?: string
+  work_page_intro?: string
+  footer_newsletter_enabled?: boolean
 }
 
 export async function getSiteSettings(): Promise<SiteSettings> {

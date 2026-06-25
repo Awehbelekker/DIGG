@@ -10,12 +10,13 @@ import SuppressPlayAbortError from "@/components/SuppressPlayAbortError";
 import { getSiteSettings, getBrandColorsFromSettings } from "@/lib/site-settings";
 import { brandColorsToCssProperties } from "@/lib/brand-colors";
 import BrandPreviewBanner from "@/components/BrandPreviewBanner";
+import PageColourway from "@/components/public/PageColourway";
 import { googleFontsUrl, DEFAULT_HEADING_FONT, DEFAULT_BODY_FONT } from "@/lib/google-fonts";
 import { getNavLinks } from "@/lib/get-nav-links";
 
 const poppins = Poppins({
   subsets: ["latin"],
-  weight: ["600", "700", "800"],
+  weight: ["600", "700", "800", "900"],
   variable: "--font-heading",
   display: "swap",
 });
@@ -75,6 +76,8 @@ export default async function RootLayout({
   const navbarLogoPosition = (settings.navbar_logo_position as 'left' | 'center') || 'left';
   const footerLogoPosition = (settings.footer_logo_position as 'left' | 'center') || 'left';
   const phone = (settings.phone && String(settings.phone).trim()) || '';
+  const siteName = (settings.site_name && String(settings.site_name).trim()) || 'digg';
+  const navCtaText = (settings.nav_cta_text && String(settings.nav_cta_text).trim()) || "Let's talk";
   const brandCss = brandColorsToCssProperties(getBrandColorsFromSettings(settings));
   const htmlStyle = {
     ...brandCss,
@@ -94,8 +97,12 @@ export default async function RootLayout({
           logoPosition={navbarLogoPosition}
           phoneNumber={phone}
           links={navLinks}
+          siteName={siteName}
+          navCtaText={navCtaText}
         />
-        <main id="main-content" tabIndex={-1}>{children}</main>
+        <PageColourway>
+          <main id="main-content" tabIndex={-1}>{children}</main>
+        </PageColourway>
         <Footer
           logoUrl={logoUrl}
           logoSize={logoSize}
