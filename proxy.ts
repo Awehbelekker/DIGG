@@ -40,11 +40,13 @@ export async function proxy(request: NextRequest) {
     }
   )
 
+  // Refresh session cookies on every admin request (required for SSR auth)
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
+
   // Protect admin routes
   if (request.nextUrl.pathname.startsWith('/admin')) {
-    const {
-      data: { user },
-    } = await supabase.auth.getUser()
 
     // Allow access to login page
     if (request.nextUrl.pathname === '/admin/login') {

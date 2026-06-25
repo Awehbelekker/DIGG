@@ -5,6 +5,30 @@ import Wordmark from '@/components/public/ui/Wordmark'
 
 type NavLink = { href: string; label: string }
 
+function FooterPillars({ pillars }: { pillars: string }) {
+  const words = pillars
+    .split(/\s*[·•]\s*|\s*,\s*|\s*\|\s*/)
+    .map((w) => w.trim())
+    .filter(Boolean)
+
+  if (words.length === 0) return null
+
+  return (
+    <ul className="mt-4 flex flex-col items-start gap-0.5 text-xs uppercase tracking-[0.2em]">
+      {words.map((word, i) => (
+        <li key={word + i} className="flex flex-col items-start">
+          <span className="leading-snug">{word}</span>
+          {i < words.length - 1 && (
+            <span className="text-[var(--color-coral)] text-sm leading-none py-0.5 select-none" aria-hidden>
+              ·
+            </span>
+          )}
+        </li>
+      ))}
+    </ul>
+  )
+}
+
 type FooterProps = {
   logoUrl?: string
   logoSize?: 'small' | 'medium' | 'large'
@@ -38,7 +62,7 @@ export default function Footer({ logoUrl = '', links = [], siteSettings = {} }: 
     <footer className="bg-[var(--color-ink)] text-[var(--color-greige)] pt-10 sm:pt-12 pb-[max(2.25rem,env(safe-area-inset-bottom))]">
       <div className="max-w-[1080px] mx-auto px-4 sm:px-6 lg:px-7">
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 sm:gap-10">
-          <div>
+          <div className="min-w-0">
             {logoSrc ? (
               <Link href="/" className="inline-block mb-3">
                 {logoSrc.startsWith('http') ? (
@@ -53,7 +77,7 @@ export default function Footer({ logoUrl = '', links = [], siteSettings = {} }: 
                 <Wordmark siteName={siteName} />
               </div>
             )}
-            <p className="text-xs uppercase tracking-wider mt-4">{pillars}</p>
+            <FooterPillars pillars={pillars} />
           </div>
           <div>
             <h5 className="text-white text-xs uppercase tracking-widest mb-3 font-semibold">Pages</h5>
