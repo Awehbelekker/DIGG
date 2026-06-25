@@ -12,6 +12,7 @@ import Gallery from './Gallery'
 import TwoColumn from './TwoColumn'
 import LogoBar from './LogoBar'
 import FAQ from './FAQ'
+import ContactDirectDetails from './ContactDirectDetails'
 
 type SectionRendererProps = { section: PageSection }
 
@@ -291,13 +292,18 @@ export default function SectionRenderer({ section }: SectionRendererProps) {
 
   if (type === 'form') {
     const formType = (data.formType as string) || 'contact'
+    const anchorId = (data.anchorId as string) || undefined
     return (
-      <RevealSection className="bg-[var(--color-bone)] py-16 lg:py-20">
+      <RevealSection className="bg-[var(--color-bone)] py-16 lg:py-20" id={anchorId}>
         <div className="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8">
           {formType === 'agent' ? <AgentForm /> : <ContactForm />}
         </div>
       </RevealSection>
     )
+  }
+
+  if (type === 'contact_details') {
+    return <ContactDirectDetails />
   }
 
   return null

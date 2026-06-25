@@ -37,6 +37,7 @@ export type SectionType =
   | 'logos'
   | 'faq'
   | 'divider'
+  | 'contact_details'
 
 export interface PageSection {
   type: SectionType
@@ -74,6 +75,8 @@ export interface Insight {
   title: string
   body: string
   published: boolean
+  content_type?: 'project' | 'insight'
+  project_status?: 'complete' | 'on_site' | 'starting_soon' | null
   created_at: string
   updated_at: string
 }

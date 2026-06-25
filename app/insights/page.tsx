@@ -1,6 +1,5 @@
 import { createClient } from '@/lib/supabase/server'
-import Link from 'next/link'
-import type { Insight } from '@/lib/types/database'
+import WorkFeed, { type WorkFeedItem } from '@/components/public/WorkFeed'
 
 export const metadata = {
   title: 'Work | DIGG — Cape Town',
@@ -9,11 +8,20 @@ export const metadata = {
 
 export default async function WorkListPage() {
   const supabase = await createClient()
-  const { data: insights } = await supabase
+  const { data: rows } = await supabase
     .from('insights')
-    .select('id, slug, title, updated_at')
+    .select('id, slug, title, updated_at, content_type, project_status')
     .eq('published', true)
     .order('updated_at', { ascending: false })
+
+  const items: WorkFeedItem[] = (rows ?? []).map((row) => ({
+    id: row.id as string,
+    slug: row.slug as string,
+    title: row.title as string,
+    updated_at: row.updated_at as string,
+    content_type: (row.content_type as WorkFeedItem['content_type']) || 'insight',
+    project_status: (row.project_status as WorkFeedItem['project_status']) ?? null,
+  }))
 
   return (
     <div className="min-h-screen bg-[var(--color-bone)]">
@@ -27,31 +35,7 @@ export default async function WorkListPage() {
             A single feed of project writeups and short pieces on development and investment. Real projects, plain language.
           </p>
 
-          {insights && insights.length > 0 ? (
-            <ul className="space-y-8">
-              {(insights as Pick<Insight, 'id' | 'slug' | 'title' | 'updated_at'>[]).map((insight) => (
-                <li key={insight.id} className="border-b border-[var(--color-greige)]/60 pb-8 last:border-0">
-                  <Link href={`/insights/${insight.slug}`} className="block group">
-                    <span className="inline-block text-[10px] font-bold tracking-wider uppercase text-[var(--color-sage)] bg-white/80 border border-[var(--color-greige)]/50 rounded-full px-2.5 py-0.5 mb-2">
-                      Insight
-                    </span>
-                    <h2 className="text-xl font-semibold text-[var(--color-ink)] group-hover:text-[var(--color-terracotta)] transition-colors">
-                      {insight.title}
-                    </h2>
-                    <time className="text-sm text-[var(--color-muted)]" dateTime={insight.updated_at}>
-                      {new Date(insight.updated_at).toLocaleDateString('en-ZA', {
-                        year: 'numeric',
-                        month: 'long',
-                        day: 'numeric',
-                      })}
-                    </time>
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          ) : (
-            <p className="text-[var(--color-muted)]">Nothing published yet. Check back soon.</p>
-          )}
+          <WorkFeed items={items} />
         </div>
       </section>
     </div>

@@ -40,12 +40,14 @@ export default function Hero({
           {subtitle}
         </p>
         <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
-          <Link
-            href={primaryCTA.href}
-            className="min-h-[48px] flex items-center justify-center bg-[var(--color-terracotta)] text-white px-6 sm:px-8 py-3.5 rounded-xl font-semibold hover:bg-[var(--color-terra-deep)] hover:shadow-lg hover:-translate-y-0.5 active:translate-y-0 transition-all duration-200 text-center focus:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--color-ink)]"
-          >
-            {primaryCTA.text}
-          </Link>
+          {primaryCTA.text ? (
+            <Link
+              href={primaryCTA.href}
+              className="min-h-[48px] flex items-center justify-center bg-[var(--color-terracotta)] text-white px-6 sm:px-8 py-3.5 rounded-xl font-semibold hover:bg-[var(--color-terra-deep)] hover:shadow-lg hover:-translate-y-0.5 active:translate-y-0 transition-all duration-200 text-center focus:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--color-ink)]"
+            >
+              {primaryCTA.text}
+            </Link>
+          ) : null}
           {secondaryCTA.text ? (
             <Link
               href={secondaryCTA.href}

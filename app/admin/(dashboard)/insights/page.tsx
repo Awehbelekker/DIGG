@@ -14,12 +14,12 @@ export default async function AdminInsightsPage() {
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
       <div className="flex justify-between items-center mb-8">
-        <AdminPageHeading subtitle="Articles and updates for your site.">Insights</AdminPageHeading>
+        <AdminPageHeading subtitle="Projects and insights for the Work feed.">Work</AdminPageHeading>
         <AdminSafeLink
           href="/admin/insights/new"
           className="bg-[#B56244] text-white px-6 py-2 rounded font-semibold hover:bg-[#9A4F35] transition-colors"
         >
-          New Insight
+          New item
         </AdminSafeLink>
       </div>
 

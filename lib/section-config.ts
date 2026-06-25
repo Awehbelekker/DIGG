@@ -16,6 +16,7 @@ export const SECTION_TYPES: { type: SectionType; label: string }[] = [
   { type: 'cta', label: 'Call to action' },
   { type: 'divider', label: 'Divider' },
   { type: 'form', label: 'Form' },
+  { type: 'contact_details', label: 'Contact details' },
 ]
 
 export const DEFAULT_SECTION_DATA: Record<SectionType, Record<string, unknown>> = {
@@ -119,6 +120,7 @@ export const DEFAULT_SECTION_DATA: Record<SectionType, Record<string, unknown>> 
   form: {
     formType: 'contact',
   },
+  contact_details: {},
 }
 
 export function createEmptySection(type: SectionType): PageSection {

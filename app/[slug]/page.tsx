@@ -3,6 +3,9 @@ import { notFound } from 'next/navigation'
 import type { Metadata } from 'next'
 import SectionRenderer from '@/components/public/SectionRenderer'
 import GjsPageRenderer from '@/components/public/GjsPageRenderer'
+import { getSiteSettings } from '@/lib/site-settings'
+import { isBuiltinPageSlug, resolveBuiltinSections } from '@/lib/builtin-pages'
+import type { PageSection } from '@/lib/types/database'
 
 type Props = { params: Promise<{ slug: string }> }
 
@@ -31,12 +34,10 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 export default async function DynamicPage({ params }: Props) {
   const { slug } = await params
   const supabase = await createClient()
-  const { data: page, error } = await supabase
-    .from('pages')
-    .select('*')
-    .eq('slug', slug)
-    .eq('published', true)
-    .single()
+  const [settings, { data: page, error }] = await Promise.all([
+    getSiteSettings(),
+    supabase.from('pages').select('*').eq('slug', slug).eq('published', true).single(),
+  ])
 
   if (error || !page) notFound()
 
@@ -49,21 +50,22 @@ export default async function DynamicPage({ params }: Props) {
     )
   }
 
-  const content = page.content as { sections?: Array<{ type: string; data: Record<string, unknown> }> } | null
-  const sections = content?.sections ?? []
+  const builtin = isBuiltinPageSlug(slug) ? resolveBuiltinSections(slug, settings) : null
+  const content = page.content as { sections?: PageSection[] } | null
+  const sections = builtin ?? content?.sections ?? []
 
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen bg-[var(--color-bone)]">
       {sections.map((section, index) => (
-        <SectionRenderer key={`${section.type}-${index}`} section={section as import('@/lib/types/database').PageSection} />
+        <SectionRenderer key={`${section.type}-${index}`} section={section} />
       ))}
       {sections.length === 0 && (
-        <section className="py-20 text-center text-gray-500">
+        <section className="py-20 text-center text-[var(--color-muted)]">
           <div className="max-w-7xl mx-auto px-4">
-            <h1 className="text-3xl font-bold text-[#152232] mb-4" style={{ fontFamily: 'var(--font-heading)' }}>
+            <h1 className="text-3xl font-bold text-[var(--color-ink)] mb-4" style={{ fontFamily: 'var(--font-heading)' }}>
               {page.title as string}
             </h1>
-            <p>This page has no content yet. Add sections in the admin page editor.</p>
+            <p>This page has no content yet.</p>
           </div>
         </section>
       )}

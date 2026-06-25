@@ -44,6 +44,18 @@ export const HOME_PAGE_SECTIONS: PageSection[] = [
     },
   },
   {
+    type: 'grid',
+    data: {
+      title: 'Develop · Invest · Grow · Give',
+      items: [
+        { title: 'Develop', description: 'Development advisory and architectural design.' },
+        { title: 'Invest', description: "An investor's lens on every decision." },
+        { title: 'Grow', description: 'Long-term value for clients and community.' },
+        { title: 'Give', description: 'Contributing back — beyond the balance sheet.' },
+      ],
+    },
+  },
+  {
     type: 'products',
     data: {
       title: 'Recent work',
