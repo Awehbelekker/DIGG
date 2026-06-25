@@ -7,30 +7,30 @@ import { logoImageClassName, logoWordmarkClassName, type LogoSize } from '@/lib/
 
 type NavLink = { href: string; label: string }
 
-function FooterPillars({ pillars }: { pillars: string }) {
+function FooterPillarsInline({ pillars }: { pillars: string }) {
   const words = parsePillarWords(pillars)
 
   if (words.length === 0) return null
 
   return (
-    <ul className="flex flex-col items-start gap-0 text-xs uppercase tracking-[0.18em] text-[var(--color-greige)]">
+    <p className="flex flex-wrap items-center gap-x-3 sm:gap-x-4 gap-y-1 text-xs uppercase tracking-[0.18em] text-[var(--color-greige)]">
       {words.map((word, i) => (
-        <li key={word + i} className="flex flex-col items-start">
-          <span className="leading-tight">{word}</span>
+        <span key={word + i} className="inline-flex items-center gap-3 sm:gap-4">
+          {word}
           {i < words.length - 1 && (
-            <span className="text-[var(--color-coral)] text-[10px] leading-none py-0.5 select-none" aria-hidden>
+            <span className="text-[var(--color-coral)] select-none" aria-hidden>
               ·
             </span>
           )}
-        </li>
+        </span>
       ))}
-    </ul>
+    </p>
   )
 }
 
 function FooterHeading({ children }: { children: React.ReactNode }) {
   return (
-    <h5 className="text-white text-xs uppercase tracking-widest font-semibold leading-none">
+    <h5 className="text-white text-xs uppercase tracking-widest font-semibold leading-none mb-3">
       {children}
     </h5>
   )
@@ -61,7 +61,6 @@ export default function Footer({
   const pillars = siteSettings.pillars?.trim() || 'Develop · Invest · Grow · Give'
   const companyLine = siteSettings.company_line?.trim() || 'Aweh Be Lekker (Pty) Ltd · Reg 2024/537986/07'
   const showNewsletter = siteSettings.footer_newsletter_enabled === true
-  const pillarWords = parsePillarWords(pillars)
 
   const pageLinks =
     links.length > 0
@@ -79,7 +78,7 @@ export default function Footer({
   const wordmarkClass = logoWordmarkClassName(size, 'footer')
 
   const logoBlock = logoSrc ? (
-    <Link href="/" className="inline-block">
+    <Link href="/" className="inline-block shrink-0">
       {logoSrc.startsWith('http') ? (
         // eslint-disable-next-line @next/next/no-img-element
         <img src={logoSrc} alt={siteName} className={`${logoClass} brightness-0 invert opacity-90`} />
@@ -88,7 +87,7 @@ export default function Footer({
       )}
     </Link>
   ) : (
-    <div className={`[&_a]:text-white ${wordmarkClass}`}>
+    <div className={`shrink-0 [&_a]:text-white ${wordmarkClass}`}>
       <Wordmark siteName={siteName} />
     </div>
   )
@@ -96,69 +95,43 @@ export default function Footer({
   return (
     <footer className="bg-[var(--color-ink)] text-[var(--color-greige)] pt-10 sm:pt-12 pb-[max(2.25rem,env(safe-area-inset-bottom))]">
       <div className="max-w-[1080px] mx-auto px-4 sm:px-6 lg:px-7">
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-x-8 lg:gap-x-10 gap-y-8 lg:gap-y-4">
-          {/* Brand */}
-          <div className="flex flex-col gap-3 lg:contents">
-            <div className="lg:col-start-1 lg:row-start-1">{logoBlock}</div>
-            <div className="lg:col-start-1 lg:row-start-2 lg:pt-3">
-              <FooterPillars pillars={pillars} />
-            </div>
-          </div>
+        {/* Row 1 — brand + pillars */}
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 sm:gap-8 pb-8 sm:pb-10 border-b border-white/10">
+          {logoBlock}
+          <FooterPillarsInline pillars={pillars} />
+        </div>
 
-          {/* Pages */}
-          <div className="flex flex-col gap-3 lg:contents">
-            <div className="lg:col-start-2 lg:row-start-1">
-              <FooterHeading>Pages</FooterHeading>
-            </div>
-            <div className="lg:col-start-2 lg:row-start-2 lg:pt-3">
-              {pageLinks.map((l) => (
-                <Link key={l.href} href={l.href} className={footerLinkClassName()}>
-                  {l.label}
-                </Link>
-              ))}
-            </div>
+        {/* Row 2 — link columns */}
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-8 sm:gap-10 lg:gap-12 pt-8 sm:pt-10">
+          <div>
+            <FooterHeading>Pages</FooterHeading>
+            {pageLinks.map((l) => (
+              <Link key={l.href} href={l.href} className={footerLinkClassName()}>
+                {l.label}
+              </Link>
+            ))}
           </div>
-
-          {/* Contact */}
-          <div className="flex flex-col gap-3 lg:contents">
-            <div className="lg:col-start-3 lg:row-start-1">
-              <FooterHeading>Contact</FooterHeading>
-            </div>
-            <div className="lg:col-start-3 lg:row-start-2 lg:pt-3">
-              <a href={`mailto:${email}`} className={`${footerLinkClassName()} break-all sm:break-normal`}>
-                {email}
-              </a>
-              <a href={`tel:${phone.replace(/\s/g, '')}`} className={footerLinkClassName()}>
-                {phone}
-              </a>
-              <p className="text-sm leading-snug py-0.5 sm:py-1">{location}</p>
-            </div>
+          <div>
+            <FooterHeading>Contact</FooterHeading>
+            <a href={`mailto:${email}`} className={`${footerLinkClassName()} break-all sm:break-normal`}>
+              {email}
+            </a>
+            <a href={`tel:${phone.replace(/\s/g, '')}`} className={footerLinkClassName()}>
+              {phone}
+            </a>
+            <p className="text-sm leading-snug py-0.5 sm:py-1">{location}</p>
           </div>
-
-          {/* The practice */}
-          <div className="flex flex-col gap-3 lg:contents">
-            <div className="lg:col-start-4 lg:row-start-1">
-              <FooterHeading>The practice</FooterHeading>
-            </div>
-            <div className="lg:col-start-4 lg:row-start-2 lg:pt-3 space-y-1.5 text-sm leading-relaxed">
+          <div>
+            <FooterHeading>The practice</FooterHeading>
+            <div className="space-y-1.5 text-sm leading-relaxed">
               <p>{companyLine}</p>
               <p>Property · Development · Architecture</p>
             </div>
           </div>
         </div>
 
-        <div className="mt-8 sm:mt-10 pt-5 sm:pt-6 border-t border-white/10 flex flex-col sm:flex-row sm:flex-wrap sm:justify-between sm:items-center gap-2 sm:gap-3 text-xs text-[#7d8694]">
+        <div className="mt-8 sm:mt-10 pt-5 sm:pt-6 border-t border-white/10 text-xs text-[#7d8694]">
           <span>© {new Date().getFullYear()} {siteName}. All rights reserved.</span>
-          {pillarWords.length > 0 && (
-            <span className="hidden sm:inline-flex sm:items-center sm:gap-1.5">
-              {pillarWords.map((word, i) => (
-                <span key={word + i}>
-                  {word}
-                  {i < pillarWords.length - 1 && <span className="text-[var(--color-coral)] mx-0.5">·</span>}
-                </span>
-              ))}
-            </span>
-          )}
         </div>
         {showNewsletter && null}
         <Link href="/admin/login" className="inline-block mt-4 text-[10px] text-white/20 hover:text-white/40">
