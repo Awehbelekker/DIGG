@@ -4,7 +4,14 @@ import { parseBrandColors, type BrandColors } from '@/lib/brand-colors'
 export type SiteSettings = {
   contact_email?: string
   phone?: string
+  location?: string
   site_name?: string
+  whatsapp_message?: string
+  instagram_url?: string
+  linkedin_url?: string
+  footer_tagline?: string
+  company_line?: string
+  pillars?: string
   hero_image_url?: string
   favicon_url?: string
   og_image_url?: string

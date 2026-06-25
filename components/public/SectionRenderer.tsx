@@ -13,10 +13,11 @@ import TwoColumn from './TwoColumn'
 import LogoBar from './LogoBar'
 import FAQ from './FAQ'
 import ContactDirectDetails from './ContactDirectDetails'
+import type { SiteSettings } from '@/lib/site-settings'
 
-type SectionRendererProps = { section: PageSection }
+type SectionRendererProps = { section: PageSection; siteSettings?: SiteSettings }
 
-export default function SectionRenderer({ section }: SectionRendererProps) {
+export default function SectionRenderer({ section, siteSettings }: SectionRendererProps) {
   const { type, data } = section
   if (!data) return null
 
@@ -303,7 +304,7 @@ export default function SectionRenderer({ section }: SectionRendererProps) {
   }
 
   if (type === 'contact_details') {
-    return <ContactDirectDetails />
+    return <ContactDirectDetails siteSettings={siteSettings} />
   }
 
   return null

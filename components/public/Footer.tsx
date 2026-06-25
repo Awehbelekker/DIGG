@@ -1,6 +1,7 @@
 import Link from 'next/link'
 import Image from 'next/image'
 import { COMPANY_LINE, PILLARS, PRACTICE_DESCRIPTION } from '@/lib/brand'
+import type { SiteSettings } from '@/lib/site-settings'
 import NewsletterSignup from '@/components/public/NewsletterSignup'
 
 const FOOTER_LOGO_SIZE_CLASS = {
@@ -16,9 +17,23 @@ type FooterProps = {
   logoSize?: 'small' | 'medium' | 'large'
   logoPosition?: 'left' | 'center'
   links?: NavLink[]
+  siteSettings?: SiteSettings
 }
 
-export default function Footer({ logoUrl = '', logoSize = 'medium', logoPosition = 'left', links = [] }: FooterProps) {
+export default function Footer({
+  logoUrl = '',
+  logoSize = 'medium',
+  logoPosition = 'left',
+  links = [],
+  siteSettings = {},
+}: FooterProps) {
+  const siteName = siteSettings.site_name?.trim() || 'DIGG'
+  const location = siteSettings.location?.trim() || 'Bloubergstrand, Cape Town'
+  const tagline = siteSettings.footer_tagline?.trim() || PRACTICE_DESCRIPTION
+  const pillars = siteSettings.pillars?.trim() || PILLARS
+  const companyLine = siteSettings.company_line?.trim() || COMPANY_LINE
+  const instagramUrl = siteSettings.instagram_url?.trim()
+  const linkedinUrl = siteSettings.linkedin_url?.trim()
   const logoSrc = logoUrl && logoUrl.trim() ? logoUrl.trim() : '/logo/digg-logo.png'
   const sizeClass = FOOTER_LOGO_SIZE_CLASS[logoSize]
   const isExternalLogo = logoSrc.startsWith('http')
@@ -50,8 +65,32 @@ export default function Footer({ logoUrl = '', logoSize = 'medium', logoPosition
         <div className={`flex flex-col md:flex-row md:items-center gap-8 ${logoPosition === 'center' ? 'md:flex-col md:text-center' : 'md:justify-between'}`}>
           <div className={logoPosition === 'center' ? 'flex flex-col items-center' : ''}>
             {logoBlock}
-            <p className="text-white/80 text-sm max-w-sm">Bloubergstrand, Cape Town</p>
-            <p className="text-white/60 text-xs mt-2 max-w-md">{PRACTICE_DESCRIPTION}</p>
+            <p className="text-white/80 text-sm max-w-sm">{location}</p>
+            <p className="text-white/60 text-xs mt-2 max-w-md">{tagline}</p>
+            {(instagramUrl || linkedinUrl) && (
+              <div className="flex gap-4 mt-4">
+                {instagramUrl && (
+                  <a
+                    href={instagramUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-sm text-white/70 hover:text-white font-medium"
+                  >
+                    Instagram
+                  </a>
+                )}
+                {linkedinUrl && (
+                  <a
+                    href={linkedinUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-sm text-white/70 hover:text-white font-medium"
+                  >
+                    LinkedIn
+                  </a>
+                )}
+              </div>
+            )}
           </div>
           <nav className={`flex flex-wrap gap-4 sm:gap-6 text-sm ${logoPosition === 'center' ? 'justify-center' : ''}`} aria-label="Footer">
             {(links.length > 0 ? links.filter(l => l.href !== '/') : [
@@ -73,10 +112,10 @@ export default function Footer({ logoUrl = '', logoSize = 'medium', logoPosition
           <NewsletterSignup source="footer" />
         </div>
         <p className="text-xs sm:text-sm text-white/60 mt-8 sm:mt-10 pt-6 sm:pt-8 border-t border-white/10">
-          &copy; {new Date().getFullYear()} DIGG · {PILLARS}
+          &copy; {new Date().getFullYear()} {siteName} · {pillars}
         </p>
         <p className="text-xs text-white/50 mt-2">
-          {COMPANY_LINE}
+          {companyLine}
         </p>
         <Link
           href="/admin/login"

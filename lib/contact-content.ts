@@ -6,9 +6,9 @@ export const CONTACT_PAGE_SECTIONS: PageSection[] = [
   {
     type: 'hero',
     data: {
-      title: "Let's talk about your project.",
+      title: "Let's talk about your property.",
       subtitle:
-        'A short message is enough. No pressure — we\'ll come back to you within a day or two.',
+        "The first conversation is always free — and always worth it.\n\nWhether you're a homeowner with a half-formed idea, an agent with a seller who needs plans, or an investor with land and a vision — start here.\n\nTell us a little about your property or project and we'll come back to you. No obligation, no jargon — just a straight conversation about what's possible.",
       primaryCTAtext: '',
       primaryCTAhref: '#contact-form',
       secondaryCTAtext: '',

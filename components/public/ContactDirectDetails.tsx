@@ -1,39 +1,72 @@
+import type { SiteSettings } from '@/lib/site-settings'
 import { COMPANY_LINE } from '@/lib/brand'
+import { buildTelHref, buildWhatsAppUrl } from '@/lib/contact-utils'
 
-export default function ContactDirectDetails() {
+type ContactDirectDetailsProps = {
+  siteSettings?: SiteSettings
+}
+
+export default function ContactDirectDetails({ siteSettings = {} }: ContactDirectDetailsProps) {
+  const phone = siteSettings.phone?.trim() || '082 707 7080'
+  const email = siteSettings.contact_email?.trim() || 'judy@digg-ct.co.za'
+  const location = siteSettings.location?.trim() || 'Cape Town, South Africa'
+  const companyLine = siteSettings.company_line?.trim() || COMPANY_LINE
+  const waMessage =
+    siteSettings.whatsapp_message?.trim() ||
+    "Hi DIGG, I'd like to talk about a project."
+  const whatsappUrl = buildWhatsAppUrl(phone, waMessage)
+  const instagramUrl = siteSettings.instagram_url?.trim()
+
   return (
-    <section className="py-10 bg-white border-y border-[var(--color-greige)]/50">
-      <div className="max-w-2xl mx-auto px-4 sm:px-6 text-center">
-        <h2 className="text-lg font-semibold text-[var(--color-ink)] mb-4">Prefer to reach out directly?</h2>
-        <div className="flex flex-col sm:flex-row flex-wrap gap-4 justify-center items-center text-sm">
-          <a
-            href="tel:+27827077080"
-            className="font-medium text-[var(--color-terracotta)] hover:text-[var(--color-terra-deep)]"
-          >
-            082 707 7080
-          </a>
-          <span className="hidden sm:inline text-[var(--color-greige)]" aria-hidden>
-            ·
-          </span>
-          <a
-            href="mailto:judy@digg-ct.co.za"
-            className="font-medium text-[var(--color-terracotta)] hover:text-[var(--color-terra-deep)]"
-          >
-            judy@digg-ct.co.za
-          </a>
-          <span className="hidden sm:inline text-[var(--color-greige)]" aria-hidden>
-            ·
-          </span>
-          <a
-            href="https://wa.me/27827077080?text=Hi%20DIGG%2C%20I%27d%20like%20to%20talk%20about%20a%20project."
-            target="_blank"
-            rel="noopener noreferrer"
-            className="font-medium text-[#25D366] hover:opacity-90"
-          >
-            WhatsApp
-          </a>
+    <section className="py-12 sm:py-16 bg-white border-y border-[var(--color-greige)]/50">
+      <div className="max-w-2xl mx-auto px-4 sm:px-6">
+        <div className="grid gap-8 sm:grid-cols-3 text-center sm:text-left">
+          <div>
+            <h3 className="text-xs font-semibold uppercase tracking-wide text-[var(--color-muted)] mb-2">Email</h3>
+            <a
+              href={`mailto:${email}`}
+              className="font-medium text-[var(--color-terracotta)] hover:text-[var(--color-terra-deep)] break-all"
+            >
+              {email}
+            </a>
+          </div>
+          <div>
+            <h3 className="text-xs font-semibold uppercase tracking-wide text-[var(--color-muted)] mb-2">Phone</h3>
+            <a
+              href={buildTelHref(phone)}
+              className="font-medium text-[var(--color-terracotta)] hover:text-[var(--color-terra-deep)]"
+            >
+              {phone}
+            </a>
+          </div>
+          <div>
+            <h3 className="text-xs font-semibold uppercase tracking-wide text-[var(--color-muted)] mb-2">Where</h3>
+            <p className="text-[var(--color-ink)] font-medium">{location}</p>
+          </div>
         </div>
-        <p className="text-xs text-[var(--color-muted)] mt-6">{COMPANY_LINE}</p>
+        <div className="flex flex-wrap gap-4 justify-center sm:justify-start mt-8">
+          {whatsappUrl ? (
+            <a
+              href={whatsappUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-2 min-h-[44px] px-5 py-2.5 rounded-xl bg-[#25D366] text-white font-semibold hover:opacity-95 transition-opacity"
+            >
+              Chat on WhatsApp
+            </a>
+          ) : null}
+          {instagramUrl ? (
+            <a
+              href={instagramUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-2 min-h-[44px] px-5 py-2.5 rounded-xl border-2 border-[var(--color-ink)] text-[var(--color-ink)] font-semibold hover:bg-[var(--color-ink)] hover:text-white transition-colors"
+            >
+              Instagram
+            </a>
+          ) : null}
+        </div>
+        <p className="text-xs text-[var(--color-muted)] mt-8 text-center sm:text-left">{companyLine}</p>
       </div>
     </section>
   )

@@ -1,8 +1,18 @@
-export default function WhatsAppButton() {
-  const whatsappMessage = encodeURIComponent(
+import type { SiteSettings } from '@/lib/site-settings'
+import { buildWhatsAppUrl } from '@/lib/contact-utils'
+
+type WhatsAppButtonProps = {
+  siteSettings?: SiteSettings
+}
+
+export default function WhatsAppButton({ siteSettings = {} }: WhatsAppButtonProps) {
+  const phone = siteSettings.phone?.trim() || '082 707 7080'
+  const message =
+    siteSettings.whatsapp_message?.trim() ||
     'Hi DIGG team, I found you online and would love to chat about my property.'
-  )
-  const whatsappUrl = `https://wa.me/27827077080?text=${whatsappMessage}`
+  const whatsappUrl = buildWhatsAppUrl(phone, message)
+
+  if (!whatsappUrl) return null
 
   return (
     <a
