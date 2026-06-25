@@ -16,6 +16,21 @@ function codeDefaults(slug: BuiltinPageSlug): PageSection[] {
   }
 }
 
+/** DB rows seeded before the mockup rebuild still win unless we detect legacy section shapes. */
+function isLegacyBuiltinSections(slug: BuiltinPageSlug, sections: PageSection[]): boolean {
+  const types = new Set(sections.map((s) => s.type))
+  switch (slug) {
+    case 'home':
+      return !types.has('marquee') || !types.has('services') || !types.has('work_cards')
+    case 'about':
+      return !types.has('about_hero') || !types.has('pillars_interactive')
+    case 'contact':
+      return !types.has('contact_layout')
+    default:
+      return false
+  }
+}
+
 type WorkCardItem = {
   title: string
   description: string
@@ -53,7 +68,11 @@ export function applySiteSettingsToSections(
 
     if (section.type === 'hero') {
       if (slug === 'home') {
-        if (settings.hero_title?.trim()) d.title = settings.hero_title.trim()
+        const isMockupHero = Boolean(d.emphasisWord)
+        // Old settings hero_title breaks mockup split headline — only override legacy heroes
+        if (settings.hero_title?.trim() && !isMockupHero) {
+          d.title = settings.hero_title.trim()
+        }
         if (settings.hero_subtitle?.trim()) d.subtitle = settings.hero_subtitle.trim()
         if (settings.hero_primary_cta_text?.trim()) d.primaryCTAtext = settings.hero_primary_cta_text.trim()
         if (settings.hero_primary_cta_href?.trim()) d.primaryCTAhref = settings.hero_primary_cta_href.trim()
@@ -82,8 +101,9 @@ export function applySiteSettingsToSections(
 }
 
 /**
- * Resolve public page sections: DB content when present, else code defaults for built-in pages.
- * Settings overrides apply on top (hero image, homepage products, etc.).
+ * Resolve public page sections: DB content when present and mockup-current, else code defaults.
+ * Legacy DB seeds (pre-mockup section types) fall back to code defaults so deploys show new UI
+ * even before migration 017 is applied in Supabase.
  */
 export function resolvePageSections(
   slug: string,
@@ -94,9 +114,11 @@ export function resolvePageSections(
 
   let sections: PageSection[]
   if (isBuiltinPageSlug(slug)) {
-    sections = hasDb
+    const builtinSlug = slug as BuiltinPageSlug
+    const useDb = hasDb && !isLegacyBuiltinSections(builtinSlug, dbSections as PageSection[])
+    sections = useDb
       ? (JSON.parse(JSON.stringify(dbSections)) as PageSection[])
-      : codeDefaults(slug)
+      : codeDefaults(builtinSlug)
   } else {
     sections = hasDb ? (JSON.parse(JSON.stringify(dbSections)) as PageSection[]) : []
   }

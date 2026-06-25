@@ -41,7 +41,10 @@ export default async function DynamicPage({ params }: Props) {
 
   if (error || !page) notFound()
 
-  if ((page.editor_type as string) === 'grapesjs') {
+  const builtin = isBuiltinPageSlug(slug)
+  const useGrapesJs = (page.editor_type as string) === 'grapesjs' && !builtin
+
+  if (useGrapesJs) {
     return (
       <GjsPageRenderer
         html={(page.content_html as string) || ''}
@@ -50,7 +53,6 @@ export default async function DynamicPage({ params }: Props) {
     )
   }
 
-  const builtin = isBuiltinPageSlug(slug)
   const content = page.content as { sections?: PageSection[] } | null
   const sections = builtin
     ? resolvePageSections(slug, content?.sections, settings)

@@ -1,7 +1,6 @@
 import { createClient } from '@/lib/supabase/server'
 import { notFound } from 'next/navigation'
 import SectionRenderer from '@/components/public/SectionRenderer'
-import GjsPageRenderer from '@/components/public/GjsPageRenderer'
 import { getSiteSettings } from '@/lib/site-settings'
 import { resolvePageSections } from '@/lib/builtin-pages'
 import type { PageSection } from '@/lib/types/database'
@@ -15,15 +14,7 @@ export default async function HomePage() {
 
   if (!page) notFound()
 
-  if ((page.editor_type as string) === 'grapesjs') {
-    return (
-      <GjsPageRenderer
-        html={(page.content_html as string) || ''}
-        css={(page.content_css as string) || ''}
-      />
-    )
-  }
-
+  // Home is always section-based (mockup layout); ignore legacy GrapesJS rows in DB.
   const content = page.content as { sections?: PageSection[] } | null
   const sections = resolvePageSections('home', content?.sections, settings)
 
