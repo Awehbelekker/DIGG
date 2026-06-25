@@ -489,12 +489,8 @@ export default function SectionPageEditor({ page }: { page: Page }) {
       return (
         <div className="space-y-4">
           {type === 'work_cards' && page.slug === 'home' && (
-            <p className="text-xs text-amber-800 bg-amber-50 border border-amber-200 rounded-lg px-3 py-2">
-              On the live homepage, card titles and links may be overridden by{' '}
-              <Link href="/admin/settings" className="font-semibold underline">
-                Settings → Homepage products
-              </Link>
-              . Eyebrow and &ldquo;View all&rdquo; link are always from this section.
+            <p className="text-xs text-gray-600 bg-gray-50 border border-gray-200 rounded-lg px-3 py-2">
+              Cards on the live homepage come from this section. Settings → Homepage products no longer overrides these cards (heading/kick only via Settings if set).
             </p>
           )}
           <label className="block">

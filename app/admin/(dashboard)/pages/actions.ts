@@ -33,8 +33,11 @@ export async function savePageSections(
 
   if (error) throw new Error(error.message)
 
+  revalidatePath('/', 'layout')
   revalidatePath('/')
-  revalidatePath(`/${payload.slug}`)
+  revalidatePath('/about')
+  revalidatePath('/contact')
+  revalidatePath('/insights')
   revalidatePath('/admin/pages')
   revalidatePath(`/admin/pages/${pageId}`)
 }

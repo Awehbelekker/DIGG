@@ -5,6 +5,7 @@ import Image from 'next/image'
 import { usePathname } from 'next/navigation'
 import { useState, useEffect } from 'react'
 import Wordmark from '@/components/public/ui/Wordmark'
+import { logoImageClassName, logoWordmarkClassName, type LogoSize } from '@/lib/logo-size'
 
 type NavLink = { href: string; label: string }
 
@@ -36,6 +37,7 @@ const DEFAULT_LINKS: NavLink[] = [
 
 export default function Navbar({
   logoUrl = '',
+  logoSize = 'medium',
   siteName = 'digg',
   navCtaText = "Let's talk",
   links,
@@ -45,6 +47,9 @@ export default function Navbar({
   const navLinks = links && links.length > 0 ? links.filter((l) => l.href !== '/contact') : DEFAULT_LINKS
   const logoSrc = logoUrl?.trim() || ''
   const isExternal = logoSrc.startsWith('http')
+  const size = (logoSize || 'medium') as LogoSize
+  const logoClass = logoImageClassName(size, 'nav')
+  const wordmarkClass = logoWordmarkClassName(size, 'nav')
 
   useEffect(() => {
     setMobileOpen(false)
@@ -65,22 +70,24 @@ export default function Navbar({
   }
 
   const logoEl = logoSrc ? (
-    <Link href="/" className="shrink-0 min-h-[44px] flex items-center" aria-label="Home">
+    <Link href="/" className="shrink-0 min-h-[44px] flex items-center max-w-[min(100%,14rem)] sm:max-w-[16rem]" aria-label="Home">
       {isExternal ? (
         // eslint-disable-next-line @next/next/no-img-element
-        <img src={logoSrc} alt={siteName} className="h-9 sm:h-10 w-auto object-contain" />
+        <img src={logoSrc} alt={siteName} className={logoClass} />
       ) : (
-        <Image src={logoSrc} alt={siteName} width={140} height={48} className="h-9 sm:h-10 w-auto object-contain" priority />
+        <Image src={logoSrc} alt={siteName} width={200} height={64} className={logoClass} priority />
       )}
     </Link>
   ) : (
-    <Wordmark siteName={siteName} />
+    <div className={wordmarkClass}>
+      <Wordmark siteName={siteName} />
+    </div>
   )
 
   return (
     <nav className="sticky top-0 z-50 bg-[var(--color-bone)]/90 backdrop-blur-md border-b border-[var(--color-greige)]/50 [padding-top:env(safe-area-inset-top)]">
       <div className="max-w-[1080px] mx-auto px-4 sm:px-6 lg:px-7">
-        <div className="flex items-center justify-between h-16 sm:h-[68px]">
+        <div className="flex items-center justify-between h-16 sm:h-[72px] md:h-[76px]">
           {logoEl}
           <div className="hidden md:flex items-center gap-1.5">
             {navLinks.map(({ href, label }) => (

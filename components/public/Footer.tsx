@@ -2,14 +2,13 @@ import Link from 'next/link'
 import Image from 'next/image'
 import type { SiteSettings } from '@/lib/site-settings'
 import Wordmark from '@/components/public/ui/Wordmark'
+import { parsePillarWords } from '@/lib/parse-pillars'
+import { logoImageClassName, logoWordmarkClassName, type LogoSize } from '@/lib/logo-size'
 
 type NavLink = { href: string; label: string }
 
 function FooterPillars({ pillars }: { pillars: string }) {
-  const words = pillars
-    .split(/\s*[·•]\s*|\s*,\s*|\s*\|\s*/)
-    .map((w) => w.trim())
-    .filter(Boolean)
+  const words = parsePillarWords(pillars)
 
   if (words.length === 0) return null
 
@@ -37,7 +36,12 @@ type FooterProps = {
   siteSettings?: SiteSettings
 }
 
-export default function Footer({ logoUrl = '', links = [], siteSettings = {} }: FooterProps) {
+export default function Footer({
+  logoUrl = '',
+  logoSize = 'medium',
+  links = [],
+  siteSettings = {},
+}: FooterProps) {
   const siteName = siteSettings.site_name?.trim() || 'digg'
   const email = siteSettings.contact_email?.trim() || 'judy@digg-ct.co.za'
   const phone = siteSettings.phone?.trim() || '082 707 7080'
@@ -57,6 +61,9 @@ export default function Footer({ logoUrl = '', links = [], siteSettings = {} }: 
         ]
 
   const logoSrc = logoUrl?.trim()
+  const size = (logoSize || 'medium') as LogoSize
+  const logoClass = logoImageClassName(size, 'footer')
+  const wordmarkClass = logoWordmarkClassName(size, 'footer')
 
   return (
     <footer className="bg-[var(--color-ink)] text-[var(--color-greige)] pt-10 sm:pt-12 pb-[max(2.25rem,env(safe-area-inset-bottom))]">
@@ -67,13 +74,13 @@ export default function Footer({ logoUrl = '', links = [], siteSettings = {} }: 
               <Link href="/" className="inline-block mb-3">
                 {logoSrc.startsWith('http') ? (
                   // eslint-disable-next-line @next/next/no-img-element
-                  <img src={logoSrc} alt={siteName} className="h-10 brightness-0 invert opacity-90" />
+                  <img src={logoSrc} alt={siteName} className={`${logoClass} brightness-0 invert opacity-90`} />
                 ) : (
-                  <Image src={logoSrc} alt={siteName} width={140} height={40} className="h-10 w-auto brightness-0 invert opacity-90" />
+                  <Image src={logoSrc} alt={siteName} width={200} height={64} className={`${logoClass} brightness-0 invert opacity-90`} />
                 )}
               </Link>
             ) : (
-              <div className="mb-3 [&_a]:text-white [&_a]:text-[2rem]">
+              <div className={`mb-3 [&_a]:text-white ${wordmarkClass}`}>
                 <Wordmark siteName={siteName} />
               </div>
             )}
@@ -105,7 +112,14 @@ export default function Footer({ logoUrl = '', links = [], siteSettings = {} }: 
         </div>
         <div className="mt-8 sm:mt-10 pt-5 sm:pt-6 border-t border-white/10 flex flex-col sm:flex-row sm:flex-wrap sm:justify-between gap-2 sm:gap-3 text-xs text-[#7d8694]">
           <span>© {new Date().getFullYear()} {siteName}. All rights reserved.</span>
-          <span>Develop. Invest. Grow. Give.</span>
+          <span className="hidden sm:inline-flex sm:items-center sm:gap-1.5">
+            {parsePillarWords('Develop · Invest · Grow · Give').map((word, i, arr) => (
+              <span key={word}>
+                {word}
+                {i < arr.length - 1 && <span className="text-[var(--color-coral)] mx-0.5">·</span>}
+              </span>
+            ))}
+          </span>
         </div>
         {showNewsletter && null}
         <Link href="/admin/login" className="inline-block mt-4 text-[10px] text-white/20 hover:text-white/40">

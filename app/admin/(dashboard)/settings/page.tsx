@@ -9,6 +9,7 @@ import { showToast } from '@/components/admin/Toast'
 import DropUpload from '@/components/admin/DropUpload'
 import { useRegisterAdminNavUnsaved } from '@/components/admin/AdminUnsavedProvider'
 import { useUnsavedChangesAlert } from '@/lib/hooks/useUnsavedChangesAlert'
+import { saveSiteSetting } from '@/app/admin/(dashboard)/settings/actions'
 import BrandColorsEditor from '@/components/admin/BrandColorsEditor'
 import { parseBrandColors, type BrandColors } from '@/lib/brand-colors'
 
@@ -94,19 +95,10 @@ export default function AdminSettingsPage() {
   const handleSave = async (key: string, value: unknown) => {
     setSaving(true)
     try {
-      const { error } = await supabase
-        .from('site_settings')
-        .upsert({
-          key,
-          value: typeof value === 'string' ? value : JSON.stringify(value),
-          updated_at: new Date().toISOString()
-        }, { onConflict: 'key' })
-
-      if (error) throw error
-
+      await saveSiteSetting(key, value)
       setSettings((prev) => ({ ...prev, [key]: value }))
       setSavedSettings((prev) => ({ ...prev, [key]: value }))
-      showToast('Settings saved!')
+      showToast('Settings saved — live site updated.')
     } catch (err) {
       showToast('Error saving settings: ' + (err instanceof Error ? err.message : String(err)), 'error')
     } finally {

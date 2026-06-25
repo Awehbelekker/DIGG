@@ -74,8 +74,8 @@ function DesktopPillarRow({
               }`}
             >
               <span
-                className={`font-black shrink-0 ${reducedMotion ? '' : 'transition-all duration-400 ease-out'} ${
-                  isActive ? 'text-4xl mb-2 self-start text-left' : 'text-5xl xl:text-[3.25rem]'
+                className={`font-black shrink-0 max-w-full ${reducedMotion ? '' : 'transition-all duration-400 ease-out'} ${
+                  isActive ? 'text-3xl sm:text-4xl mb-2 self-start text-left' : 'text-4xl xl:text-[3rem]'
                 }`}
                 style={{ fontFamily: 'var(--font-heading)' }}
               >
@@ -84,7 +84,7 @@ function DesktopPillarRow({
 
               {!isActive && (
                 <p
-                  className={`font-bold text-sm mt-2 ${reducedMotion ? '' : 'transition-opacity duration-300'}`}
+                  className={`font-bold text-xs sm:text-sm mt-2 max-w-full px-1 line-clamp-2 leading-snug ${reducedMotion ? '' : 'transition-opacity duration-300'}`}
                   style={{ fontFamily: 'var(--font-heading)' }}
                 >
                   {pillar.title}

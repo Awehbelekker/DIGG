@@ -87,7 +87,7 @@ export function applySiteSettingsToSections(
     if (section.type === 'work_cards' && slug === 'home') {
       if (settings.products_heading?.trim()) d.title = settings.products_heading.trim()
       if (settings.products_intro?.trim()) d.kick = settings.products_intro.trim()
-      if (workItems?.length) d.items = workItems
+      // Page editor cards are source of truth — do not replace with Settings → Homepage products
     }
 
     if (section.type === 'products' && slug === 'home') {
